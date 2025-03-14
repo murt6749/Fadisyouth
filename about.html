@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waa'ee Keenya</title>
+  <!-- Font Awesome and Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Reset & Typography */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #1e1e1e, #2c3e50);
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 2.8em;
+      color: #f1c40f;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .lang-toggle {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    .lang-toggle:hover {
+      background: #e0b90f;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    /* Section Styles */
+    .section {
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease;
+    }
+    .section-header {
+      border-bottom: 2px solid #f1c40f;
+      padding-bottom: 5px;
+      margin-bottom: 20px;
+    }
+    .section-header h2 {
+      text-align: center;
+      font-size: 2em;
+    }
+    .section-content {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      animation: fadeIn 0.6s ease;
+    }
+    .section-content p {
+      margin: 10px 0;
+      font-size: 1.1em;
+      line-height: 1.6;
+      text-align: justify;
+    }
+    /* Grid for Profile Cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+    .profile-card {
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .profile-card:hover {
+      transform: scale(1.05);
+    }
+    .profile-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #f1c40f;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .profile-card img:hover {
+      transform: scale(1.1);
+    }
+    .profile-card h3 {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #f1c40f;
+    }
+    .profile-card p {
+      font-size: 0.95em;
+      color: #ddd;
+    }
+    /* Back Button */
+    .back-btn {
+      display: block;
+      width: 180px;
+      margin: 30px auto;
+      background: #f1c40f;
+      color: #000;
+      text-align: center;
+      padding: 10px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .back-btn:hover {
+      background: #e0b90f;
+      transform: scale(1.05);
+    }
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 data-key="title">Waa'ee Keenya</h1>
+    <button class="lang-toggle" id="langToggle">EN</button>
+  </header>
+  <div class="container">
+    <!-- Our Mission Section -->
+    <div class="section" id="ourMission">
+      <div class="section-header">
+        <h2 data-key="missionTitle">Nu Maalif Jiraanna?</h2>
+      </div>
+      <div class="section-content" id="missionContent">
+        <p data-key="missionTextOm">
+          Nu garee Fadis Boko, Itiyoophiyaa ti. Ani daa’imni xiqqoo ta’uu koo irraa kaasee, hawwii guddaa qaba; nuti hojii keenya keessatti, bulchiinsa fi tajaajila amantii dhugaa kennuuf, akkasumas sheekonni keenya ogummaa isaanii irratti hundaa’udhaan gorsa seeraa fi aadaa Islaamaa, akkasumas qajeelfama jireenya amantii kennuuf ni hojjenna.
+        </p>
+        <p data-key="missionTextEn" style="display:none;">
+          We are Fadis Boko from Ethiopia. From a very young age, I dreamed of helping our Muslim community by providing authentic and reliable Islamic guidance. Our work—ranging from administrative services to digital solutions—is dedicated to upholding and spreading true Islamic values.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Section 1: Admin Team -->
+    <div class="section" id="adminTeam">
+      <div class="section-header">
+        <h2 data-key="adminTeamTitle">Garee Bulchiinsa</h2>
+      </div>
+      <div class="grid">
+        <!-- Admin Card: Nadhii -->
+        <div class="profile-card">
+          <img src="nadhii.png" alt="Nadhii Yusuuf">
+          <h3>Nadhii Yusuuf</h3>
+          <p data-key="nadhiiDesc">
+            Hogganaa Miidiyaa Waliigalaa – Nadhii hoogganaa miidiyaa waliigalaa dha; odeeffannoo sirrii fi wal-qunnamtii gahaa ummataaf dhiheessa.
+          </p>
+        </div>
+        <!-- Admin Card: Murtesa -->
+        <div class="profile-card">
+          <img src="murtesa.png" alt="Murtesa Ahmed">
+          <h3>Murtesa Ahmed</h3>
+          <p data-key="murtesaDesc">
+            Hogganaa Dijitaalaa – Murtesa, hoogganaa dijitaalaa dha; teknoolojii ammayyaa fayyadamuun tajaajila dijitaalaa fi bulchiinsa odeeffannoo ummataaf gumaacha.
+          </p>
+        </div>
+        <!-- Admin Card: Jamaal -->
+        <div class="profile-card">
+          <img src="jamaal.png" alt="Jamaal Sh/Abdalla">
+          <h3>Jamaal Sh/Abdalla</h3>
+          <p data-key="jamaalDesc">
+            Gargaaraa Viidiyoo – Jamaal, gargaaraa viidiyoo dha; viidiyoo fi suuraalee hojii keenya qindeessuudhaan, ummataaf ifa fi hubannoo kenna.
+          </p>
+        </div>
+        <!-- Admin Card: Bahaar -->
+        <div class="profile-card">
+          <img src="bahaar.png" alt="Bahaar Sh/Abdalla">
+          <h3>Bahaar Sh/Abdalla</h3>
+          <p data-key="bahaarDesc">
+            Itti-gaafatamaa Viidiyoo – Bahaar itti-gaafatamaa viidiyoo dha; viidiyoo fi agarsiisa hojii keenyaa sirnaan qindeessuudhaan, bilchina fi amanamummaa fidu.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 2: Fatwaa Sheekhs -->
+    <div class="section" id="sheekhsSection">
+      <div class="section-header">
+        <h2 data-key="sheekhsTitle">Sheekota Fatwaa</h2>
+      </div>
+      <div class="grid">
+        <!-- Sheek Aliyyi -->
+        <div class="profile-card">
+          <img src="shekaliyyi.png" alt="Sheek Aliyyi">
+          <h3>Sheek Aliyyi</h3>
+          <p data-key="sheekAliyyiDesc">
+            Aadaa fi Seeraa Islaamaa Waliigalaa – Sheek Aliyyi beekkumsa olaanaa aadaa fi seeraa Islaamaa irratti qabu; barsiisaa fi gorsa dhugaa kennuudhaan, ummata keenyaaf qajeelfama fi tasgabbii ni fida.
+          </p>
+        </div>
+        <!-- Sheek Abdusalaam -->
+        <div class="profile-card">
+          <img src="shekabdusalasm.png" alt="Sheek Abdusalaam Fadis">
+          <h3>Sheek Abdusalaam Fadis</h3>
+          <p data-key="sheekAbdusalaamDesc">
+            Imaamas Magaalaa, Bokkoo Fadis, Qabeenyaa fi Zaka’a – Sheek Abdusalaam Fadis, ogummaa imaamaa fi qabeenya Islaamaa keessatti beekamaa dha; gorsa maallaqaa, zakaa fi seeraa kennuudhaan ummata keenyaaf deeggarsa cimaa taasisu.
+          </p>
+        </div>
+        <!-- Sheek Abdurahmaan -->
+        <div class="profile-card">
+          <img src="sheikabdurahmasn.png" alt="Sheek Abdurahmaan">
+          <h3>Sheek Abdurahmaan</h3>
+          <p data-key="sheekAbdurahmaanDesc">
+            Fiqh Islaamaa – Sheek Abdurahmaan ogummaa fiqhii Islaamaa keessatti muuxannoo bal’aa qaba; seera fi qajeelfama amantii, akkasumas ilaalcha sirrii kennuudhaan ummata keenyaaf ifa ni taasisu.
+          </p>
+        </div>
+        <!-- Sheek Nasraddiin -->
+        <div class="profile-card">
+          <img src="sheknasraddiin.png" alt="Sheek Nasraddiin">
+          <h3>Sheek Nasraddiin</h3>
+          <p data-key="sheekNasraddiinDesc">
+            Haadusaa fi Quranas – Sheek Nasraddiin, ogummaa haadusaa fi hiikkaa Quraanaa irratti hundaa’e, gorsa seenaa Islaamaa fi amantii dhugaa kennuudhaan ummataaf ifa ni fida.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 3: About Our Mission -->
+    <div class="section" id="ourMissionText">
+      <div class="section-header">
+        <h2 data-key="missionTitle2">Nu Maalif Jiraanna?</h2>
+      </div>
+      <div class="section-content">
+        <p data-key="missionTextOm">
+          Nu garee Fadis Boko, Itiyoophiyaa ti. Hojii keenya keessatti, bulchiinsa fi tajaajila amantii haqa qabeessa kennuudhaan, ummata Muslimoota keenyaaf tokkummaa, nagaa fi guddina fiduuf hojjenna. Gargaarsa admin fi sheekonni keenya, ogummaa isaanii irratti hundaa’udhaan, qajeelfama dhugaa fi hubannoo kennu; akkasumas hawaasa keenya gara ifa fi tasgabbii ceesisuuf ni tattaaffatu.
+        </p>
+        <p data-key="missionTextEn" style="display:none;">
+          We are Fadis Boko from Ethiopia. Our work is dedicated to providing authentic Islamic guidance and quality services to help our Muslim community achieve unity, peace, and progress. Our dedicated admin team and knowledgeable scholars work hand-in-hand to deliver truthful guidance and inspire our community.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-btn" data-key="backBtn">Gara Duraatti Deebi'ii</a>
+  </div>
+  
+  <script>
+    // Language Toggle Logic
+    var currentLanguage = "om"; // Default language Afan Oromo
+    var translations = {
+      om: {
+        title: "Waa'ee Keenya",
+        missionTitle: "Nu Maalif Jiraanna?",
+        adminTeamTitle: "Garee Bulchiinsa",
+        sheekhsTitle: "Sheekota Fatwaa",
+        missionTitle2: "Nu Maalif Jiraanna?",
+        missionTextOm: "Nu garee Fadis Boko, Itiyoophiyaa ti. Hojii keenya keessatti, bulchiinsa fi tajaajila amantii haqa qabeessa kennuudhaan, ummata Muslimoota keenyaaf tokkummaa, nagaa fi guddina fiduuf hojjenna. Gargaarsa admin fi sheekonni keenya, ogummaa isaanii irratti hundaa’udhaan, qajeelfama dhugaa fi hubannoo kennu; akkasumas hawaasa keenya gara ifa fi tasgabbii ceesisuuf ni tattaaffatu.",
+        backBtn: "Gara Duraatti Deebi'ii",
+        nadhiiDesc: "Hogganaa Miidiyaa Waliigalaa – Nadhii Yusuuf, hogganaa miidiyaa waliigalaa dha; odeeffannoo sirrii fi wal-qunnamtii gahaa ummataaf dhiheessa.",
+        murtesaDesc: "Hogganaa Dijitaalaa – Murtesa Ahmed, hoogganaa dijitaalaa dha; teknoolojii ammayyaa fayyadamuun tajaajila dijitaalaa fi bulchiinsa odeeffannoo ummataaf gumaacha.",
+        jamaalDesc: "Gargaaraa Viidiyoo – Jamaal Sh/Abdalla, gargaaraa viidiyoo dha; viidiyoo fi suuraalee hojii keenya qindeessuudhaan, ummataaf ifa fi hubannoo kenna.",
+        bahaarDesc: "Itti-gaafatamaa Viidiyoo – Bahaar Sh/Abdalla, itti-gaafatamaa viidiyoo dha; viidiyoo fi agarsiisa hojii keenyaa sirnaan qindeessuudhaan, bilchina fi amanamummaa fidu.",
+        sheekAliyyiDesc: "Aadaa fi Seeraa Islaamaa Waliigalaa – Sheek Aliyyi beekkumsa olaanaa aadaa fi seeraa Islaamaa irratti qabu; barsiisaa, qajeelchaa fi gorsa dhugaa kenna, akkasumas ummata keenyaaf bu’uura sirna amantii fi seeraa ifa taasisa.",
+        sheekAbdusalaamDesc: "Imaamas Magaalaa, Bokkoo Fadis, Qabeenyaa fi Zaka’a – Sheek Abdusalaam Fadis, ogummaa imaamaa fi qabeenya Islaamaa keessatti qabuun, gorsa maallaqaa, zakaa fi seeraa kennuudhaan ummata keenyaaf deeggarsa cimaa ni taasisu.",
+        sheekAbdurahmaanDesc: "Fiqh Islaamaa – Sheek Abdurahmaan, ogummaa fiqhii Islaamaa keessatti bal’inaan beekama; seera fi qajeelfama amantii irratti hubannoo jabaa kenna, akkasumas gorsa dhugaa fi tasgabbii ummataaf ni fida.",
+        sheekNasraddiinDesc: "Haadusaa fi Quranas – Sheek Nasraddiin, ogummaa hiikkaa Quraanaa fi haadusa Nabiyyii irratti hundaa’e, gorsa seenaa Islaamaa fi amantii dhugaa kennuudhaan, ummata keenyaaf ifa taasisu.",
+      },
+      en: {
+        title: "About Us",
+        missionTitle: "Our Mission",
+        adminTeamTitle: "Admin Team",
+        sheekhsTitle: "Fatwaa Scholars",
+        missionTitle2: "Our Mission",
+        missionTextOm: "We are Fadis Boko from Ethiopia. Our work is dedicated to providing authentic Islamic guidance and quality services to help our Muslim community achieve unity, peace, and progress. Our admin team and our scholars work together to deliver truthful guidance and inspire our community.",
+        backBtn: "Go Back",
+        nadhiiDesc: "General Media Manager – Nadhii Yusuuf leads our media operations with a focus on reliable and engaging communication.",
+        murtesaDesc: "Digital Leader – Murtesa Ahmed spearheads our digital initiatives using modern technology to empower our community.",
+        jamaalDesc: "Video Assistant – Jamaal Sh/Abdalla coordinates our video production to deliver clear and creative content.",
+        bahaarDesc: "Video Manager – Bahaar Sh/Abdalla oversees video production and presentation to ensure trustworthy information.",
+        sheekAliyyiDesc: "Islamic Scholar – Sheikh Aliyyi has profound knowledge of Islamic culture and law, offering authentic guidance and serving as a mentor in Islamic practices.",
+        sheekAbdusalaamDesc: "City Imam & Financial Advisor – Sheikh Abdusalaam Fadis specializes in managing community finances, zakat, and Islamic legal rulings.",
+        sheekAbdurahmaanDesc: "Islamic Jurist – Sheikh Abdurahmaan is an expert in Islamic jurisprudence, providing sound legal opinions and guidance.",
+        sheekNasraddiinDesc: "Quranic & Hadith Interpreter – Sheikh Nasraddiin excels in interpreting the Quran and prophetic traditions, offering sincere advice.",
+      }
+    };
+    
+    function updateLanguage(lang) {
+      currentLanguage = lang;
+      // Update main title
+      document.querySelector("h1[data-key='title']").innerText = translations[lang].title;
+      // Update Our Mission section header and text
+      document.querySelector("h2[data-key='missionTitle']").innerText = translations[lang].missionTitle;
+      document.querySelector("#missionContent p").innerText = translations[lang].missionTextOm;
+      // Update section headers for Admin Team and Sheekhs remain the same (or you can add translation if desired)
+      // Update Admin Team card descriptions
+      var adminCards = document.querySelectorAll("#adminTeam .profile-card");
+      if (adminCards.length >= 4) {
+        adminCards[0].querySelector("p").innerText = translations[lang].nadhiiDesc;
+        adminCards[1].querySelector("p").innerText = translations[lang].murtesaDesc;
+        adminCards[2].querySelector("p").innerText = translations[lang].jamaalDesc;
+        adminCards[3].querySelector("p").innerText = translations[lang].bahaarDesc;
+      }
+      // Update Fatwaa Sheekhs card descriptions
+      var sheekhCards = document.querySelectorAll("#sheekhsSection .profile-card");
+      if (sheekhCards.length >= 4) {
+        sheekhCards[0].querySelector("p").innerText = translations[lang].sheekAliyyiDesc;
+        sheekhCards[1].querySelector("p").innerText = translations[lang].sheekAbdusalaamDesc;
+        sheekhCards[2].querySelector("p").innerText = translations[lang].sheekAbdurahmaanDesc;
+        sheekhCards[3].querySelector("p").innerText = translations[lang].sheekNasraddiinDesc;
+      }
+      // Update Back Button
+      document.querySelector(".back-btn").innerText = translations[lang].backBtn;
+      // Update Our Mission section header in Section 3 if needed
+      document.querySelector("h2[data-key='missionTitle2']").innerText = translations[lang].missionTitle2;
+    }
+    
+    // Set default language to Afan Oromo
+    updateLanguage("om");
+    
+    // Toggle language when button is clicked
+    document.getElementById("langToggle").addEventListener("click", function() {
+      var newLang = currentLanguage === "om" ? "en" : "om";
+      updateLanguage(newLang);
+      this.innerText = newLang.toUpperCase();
+    });
+  </script>
+</body>
+</html>
