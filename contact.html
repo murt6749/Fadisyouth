@@ -1,0 +1,614 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fadis Youth Helpers Team</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Poppins:wght@400;500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 2.8em;
+      letter-spacing: 1px;
+      color: #f1c40f;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    .member-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .member-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .member-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: -60px auto 15px;
+      border: 3px solid #f1c40f;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .member-name {
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      color: #f1c40f;
+    }
+
+    .member-role {
+      font-size: 0.95em;
+      color: #ecf0f1;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .role-description {
+      font-size: 0.85em;
+      color: #bdc3c7;
+      margin-bottom: 15px;
+      line-height: 1.4;
+      min-height: 60px;
+    }
+
+    .member-contact {
+      margin: 15px 0;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+
+    .contact-item {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9em;
+    }
+
+    .contact-item i {
+      color: #f1c40f;
+      width: 20px;
+    }
+
+    .social-links {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .social-links a {
+      color: #fff;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      padding: 8px;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .social-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.1);
+    }
+
+    .office-address {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.1em;
+    }
+
+    .map-container {
+      margin-top: 50px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 400px;
+      border: 0;
+    }
+
+    /* Message Modal – Neon Glowing Style */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .message-modal {
+      background: #0a0a0a;
+      border: 2px solid #f1c40f;
+      box-shadow: 0 0 20px 5px rgba(241, 196, 15, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      color: #f1c40f;
+      position: relative;
+    }
+    .message-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .message-header img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 2px solid #f1c40f;
+    }
+    .message-header h2 {
+      font-size: 1.5em;
+      margin: 0;
+    }
+    .message-modal hr {
+      border: 1px solid #f1c40f;
+      margin: 10px 0;
+    }
+    /* Remove the sender name input – we use the logged-in user's name */
+    /* <input type="text" id="messageSenderName" placeholder="Maqaa kee"> is removed */
+    .message-modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 5px;
+    }
+    .message-modal .modal-btn {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .message-modal .modal-btn:hover {
+      background: #e0b90f;
+    }
+    .message-modal .cancel-btn {
+      background: transparent;
+      color: #f1c40f;
+      border: 2px solid #f1c40f;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .message-modal .cancel-btn:hover {
+      background: #f1c40f;
+      color: #000;
+    }
+
+    /* Spinner CSS */
+    .spinner {
+      border: 4px solid rgba(241, 196, 15, 0.3);
+      border-top: 4px solid #f1c40f;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-btn {
+      background: #D4AF37;
+      color: white;
+      border: none;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .nav-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ogeeyyii Keenya</h1>
+    <div class="team-grid">
+      <!-- Team Member 1 -->
+      <div class="member-card" data-phone="+251912345678">
+        <div class="member-image" style="background-image: url('murtesa.png')"></div>
+        <h2 class="member-name">Murtesa Ahmed</h2>
+        <p class="member-role">Lead Developer</p>
+        <div class="role-description">
+          Odeeffannoo teeknikaa fi hoggansa deeggarsa dijitaalaa, ogeessa guddaa ta'ee hojii guutuu irratti hojjetaa.
+        </div>
+        <div class="member-contact">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            dev.murtesa@fadis.org
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            +251912345678
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Member 2 -->
+      <div class="member-card" data-phone="+251911987654">
+        <div class="member-image" style="background-image: url('nadhii.png')"></div>
+        <h2 class="member-name">Nadhii Yusuuf</h2>
+        <p class="member-role">Editorial Coordinator</p>
+        <div class="role-description">
+          Qindeessaa gosa barreessaa fi to'annoo qulqullina maxxansaa, gargaarsa qindoomina odeeffannoo.
+        </div>
+        <div class="member-contact">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            editors@fadis.org
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            +251911987654
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Member 3 -->
+      <div class="member-card" data-phone="+251913112233">
+        <div class="member-image" style="background-image: url('bahaar.png')"></div>
+        <h2 class="member-name">Bahaar Sh/Abdalla</h2>
+        <p class="member-role">Chief Videographer</p>
+        <div class="role-description">
+          Ogummaa suuraafi viidiyoo barreessuu keessatti hogganaa fi qindeessaa viidiyoo, dandeettii odeeffannoo agarsiisuu.
+        </div>
+        <div class="member-contact">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            camera@fadis.org
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            +251913112233
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Member 4 -->
+      <div class="member-card" data-phone="+251914445566">
+        <div class="member-image" style="background-image: url('jamaal.png')"></div>
+        <h2 class="member-name">Jamaal Sh/Abdalla</h2>
+        <p class="member-role">Visual Media Specialist</p>
+        <div class="role-description">
+          Ogeessa suuraa fi viidiyoo, deeggarsa teeknikaa fi agarsiisa ogummaa suuraa keessatti tajaajila.
+        </div>
+        <div class="member-contact">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            media@fadis.org
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            +251914445566
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Member 5 -->
+      <div class="member-card" data-phone="+251915778899">
+        <div class="member-image" style="background-image: url('abdul.png')"></div>
+        <h2 class="member-name">Abdulwaduud Abdusalasm</h2>
+        <p class="member-role">Counseling Specialist</p>
+        <div class="role-description">
+          Deeggarsa sammuu fi gorsa fayyaa sammuu, tajaajila deeggarsaafi dhiheessa gorsaa namaa.
+        </div>
+        <div class="member-contact">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            support@fadis.org
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            +251915778899
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="office-address">
+      <h3>Teessoo Ofiisii</h3>
+      <p>Boko Main Road, Itiyoophiyaa</p>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3941.231231033726!2d36.07584597507944!3d8.952120291076642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x16315a3b2d0d2a0f%3A0x7a5d0d229a8d7d5f!2sBoko%2C%20Ethiopia!5e0!3m2!1sen!2set!4v1717123456789!5m2!1sen!2set" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Message Modal (Neon Glowing Notification) -->
+  <div class="modal-overlay" id="messageModal">
+    <div class="message-modal">
+      <button class="cancel-btn" id="closeMessageBtn">&times;</button>
+      <div class="message-header">
+        <img id="messageRecipientImage" src="" alt="Recipient Image">
+        <h2 id="messageRecipientName"></h2>
+      </div>
+      <hr>
+      <p id="messageModalPrompt">Ergaa kee galchi:</p>
+      <!-- Removed the name input; the sender's name is taken from the logged-in user -->
+      <textarea id="messageText" rows="4" placeholder="Ergaa kee"></textarea>
+      <div style="text-align:center; margin-top: 15px;">
+        <button class="modal-btn" id="sendMessageBtn">Ergaa Ergi</button>
+        <button class="modal-btn" id="callNowBtn">Bilbili Amma</button>
+        <button class="modal-btn" id="checkResponseBtn">Deebii Ilaali</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <button class="nav-btn" id="homeBtn"><i class="fas fa-home"></i><span id="homeText">Mana</span></button>
+    <button class="nav-btn" id="historyBtn"><i class="fas fa-history"></i><span id="historyText">Seenaa</span></button>
+    <button class="nav-btn" id="exitBtn"><i class="fas fa-sign-out-alt"></i><span id="exitText">Ba'aa</span></button>
+  </div>
+
+  <!-- Firebase & App Script using firebase/compat libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase using compat libraries
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var currentLang = 'om';
+      var selectedMemberPhone = "";
+      var currentMessageDocId = null; // For checking responses
+
+      // --- Ensure only logged in users can send messages.
+      // Before opening the message modal, check firebase.auth().currentUser.
+      document.querySelectorAll('.member-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('.member-contact') || e.target.closest('.social-links')) return;
+          var user = firebase.auth().currentUser;
+          if (!user) {
+            alert("Mee, dura seeni (log in)!");
+            return;
+          }
+          openMessageModal(card);
+        });
+      });
+
+      // --- Open Message Modal
+      function openMessageModal(card) {
+        var memberName = card.querySelector('.member-name').innerText;
+        var memberImage = card.querySelector('.member-image').style.backgroundImage;
+        // Remove url("...") wrapper properly
+        memberImage = memberImage.replace(/^url["']?/, '').replace(/["']?$/, '');
+        selectedMemberPhone = card.getAttribute('data-phone') || "";
+        document.getElementById('messageRecipientName').innerText = memberName;
+        document.getElementById('messageRecipientImage').src = memberImage;
+        document.getElementById('messageModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMessageModal() {
+        document.getElementById('messageModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+      document.getElementById('closeMessageBtn').addEventListener('click', closeMessageModal);
+
+      // --- Send Message Button with Spinner Animation
+      document.getElementById('sendMessageBtn').addEventListener('click', function() {
+        var user = firebase.auth().currentUser;
+        if (!user) {
+          alert("Mee, dura seeni (log in)!");
+          return;
+        }
+        var senderName = user.displayName || user.email;
+        var messageText = document.getElementById('messageText').value.trim();
+        if (!messageText) {
+          alert("Mee, ergaa kee barreessi!");
+          return;
+        }
+        var record = {
+          senderName: senderName,
+          message: messageText,
+          recipientName: document.getElementById('messageRecipientName').innerText,
+          phone: selectedMemberPhone,
+          submissionDate: new Date().toISOString()
+        };
+        // Show spinner animation in the button
+        var sendBtn = document.getElementById('sendMessageBtn');
+        sendBtn.innerHTML = '<span class="spinner"></span>Ergaa Ergaa...';
+        db.collection("messages").add(record)
+          .then(function(docRef) {
+            currentMessageDocId = docRef.id;
+            sendBtn.innerHTML = '<i class="fas fa-check"></i> Ergaan kee ergameera';
+            showNotification("Ergaan kee ergameera ✓");
+            setTimeout(function() {
+              document.getElementById('messageText').value = "";
+              closeMessageModal();
+              sendBtn.innerText = "Ergaa Ergi";
+            }, 2000);
+          })
+          .catch(function(error) {
+            console.error("Dogoggora ergaa erguu:", error);
+            showNotification("Dogoggora ergaa erguu keessatti mudate.");
+            sendBtn.innerText = "Ergaa Ergi";
+          });
+      });
+
+      // --- Call Now Button
+      document.getElementById('callNowBtn').addEventListener('click', function() {
+        if (selectedMemberPhone) {
+          window.location.href = "tel:" + selectedMemberPhone;
+        }
+      });
+
+      // --- Check Response Button
+      document.getElementById('checkResponseBtn').addEventListener('click', function() {
+        if (!currentMessageDocId) {
+          alert("Ergaan kee hin ergame. Dursee ergaa ergi.");
+          return;
+        }
+        db.collection("responses").where("messageId", "==", currentMessageDocId).get()
+          .then(function(querySnapshot) {
+            if (querySnapshot.empty) {
+              alert("Deebii hin jiru. Eega turtii dabalataa eeggadhu.");
+            } else {
+              var responses = [];
+              querySnapshot.forEach(function(doc) {
+                responses.push(doc.data().responseText);
+              });
+              alert("Deebii argame:\n" + responses.join("\n"));
+            }
+          })
+          .catch(function(error) {
+            console.error("Dogoggora deebii ilaalu keessatti:", error);
+            alert("Dogoggora deebii ilaalu keessatti mudate.");
+          });
+      });
+
+      // --- Notification System (Neon Glowing)
+      function showNotification(message) {
+        var notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+        setTimeout(function() {
+          notification.style.display = 'none';
+        }, 3000);
+      }
+    });
+  </script>
+  <style>
+    /* Spinner CSS */
+    .spinner {
+      border: 4px solid rgba(241, 196, 15, 0.3);
+      border-top: 4px solid #f1c40f;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>

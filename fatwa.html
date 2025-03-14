@@ -1,0 +1,825 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatwaa Gargaarsa</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2B5A46;
+      --secondary: #7D9D6E;
+      --accent: #D4AF37;
+      --light: #F8F5F0;
+      --dark: #1E1E1E;
+      --success: #4CAF50;
+      --error: #E74C3C;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Amiri', 'Noto Naskh Arabic', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, var(--light) 0%, #e9ecef 100%);
+      color: var(--dark);
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 80px; /* space for navigation buttons */
+    }
+    .islamic-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.1;
+      z-index: -1;
+      background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.414l-8.486 8.486-1.414-1.414 8.486-8.486 1.414 1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    /* Header Styles */
+    .main-header {
+      background: var(--primary);
+      color: white;
+      padding: 2rem;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+    .header-decoration {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    /* Grid Styles */
+    .sheikh-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      padding: 1rem;
+    }
+    .sheikh-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+    .sheikh-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    .sheikh-image {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      border: 4px solid var(--secondary);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .sheikh-card:hover .sheikh-image {
+      transform: scale(1.08) rotate(5deg);
+    }
+    .sheikh-bio {
+      font-size: 0.95rem;
+      color: #666;
+      margin: 1rem 0;
+      line-height: 1.6;
+    }
+    .card-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .card-btn {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.3s ease;
+    }
+    .card-btn:hover {
+      background: var(--accent);
+    }
+    /* Custom Dropdown */
+    .custom-select {
+      position: relative;
+      margin: 0.5rem 0;
+    }
+    .select-header {
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    .select-header:hover {
+      border-color: var(--secondary);
+    }
+    .select-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+      z-index: 10;
+    }
+    .select-option {
+      padding: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .select-option:hover {
+      background: var(--light);
+    }
+    .select-open .select-options {
+      max-height: 500px;
+    }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .question-modal {
+      background: white;
+      border-radius: 25px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform-origin: center;
+      animation: modalScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes modalScale {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 2px solid var(--light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--dark);
+      transition: transform 0.2s ease;
+    }
+    .modal-close:hover {
+      transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    /* Form Styles */
+    .question-form {
+      padding: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(125, 157, 110, 0.3);
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 1.2rem 2.5rem;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 1rem auto;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .nav-btn:hover {
+      transform: scale(1.05);
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sheikh-grid {
+        grid-template-columns: 1fr;
+      }
+      .sheikh-card {
+        margin: 0 1rem;
+      }
+      .question-modal {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="islamic-pattern"></div>
+  
+  <div class="lang-switcher" style="position:fixed; top:20px; left:20px; z-index:1000;">
+    <button class="lang-btn" id="langSwitch">OM/EN</button>
+  </div>
+
+  <header class="main-header">
+    <div class="header-decoration"></div>
+    <div class="container header-content">
+      <h1 id="mainTitle">Fatwaa Gargaarsa</h1>
+      <p id="subTitle">Sheekota marii filadhu</p>
+    </div>
+  </header>
+
+  <!-- Primary Scholars Section -->
+  <main class="container">
+    <h2 id="primaryTitle"></h2>
+    <div class="sheikh-grid" id="sheikhPrimaryContainer"></div>
+  </main>
+
+  <!-- Additional Scholars Section -->
+  <section class="container" id="additionalSheikhsSection">
+    <h2 id="moreSheikhsTitle"></h2>
+    <div class="sheikh-grid" id="sheikhAdditionalContainer"></div>
+  </section>
+
+  <!-- Question Modal -->
+  <div class="modal-overlay" id="questionModal">
+    <div class="question-modal">
+      <div class="modal-header">
+        <h2 id="modalTitle"></h2>
+        <span class="modal-close" id="closeModalBtn">&times;</span>
+      </div>
+      <form class="question-form" id="fatwaForm">
+        <div class="form-group">
+          <label id="nameLabel">Maqaa kee</label>
+          <input type="text" id="userName" required>
+        </div>
+        <div class="form-group">
+          <label id="occupationLabel">Hojii</label>
+          <div class="custom-select" id="occupationDropdown"></div>
+          <input type="text" id="customOccupation" class="custom-input" placeholder="" style="display:none; margin-top:0.5rem;">
+        </div>
+        <div id="dynamicFields"></div>
+        <div class="form-group">
+          <label id="questionLabel">Gaaffii</label>
+          <textarea id="questionText" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <i class="fas fa-paper-plane"></i>
+          <span id="submitText">Ergaa ergaa</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="question-modal">
+      <div class="modal-header">
+        <h2 id="historyModalTitle"></h2>
+        <span class="modal-close" id="closeHistoryBtn">&times;</span>
+      </div>
+      <div class="modal-body" id="historyContent">
+        <!-- History records will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- More Info Modal -->
+  <div class="modal-overlay" id="infoModal">
+    <div class="question-modal">
+      <div class="modal-header">
+        <h2 id="infoModalTitle"></h2>
+        <span class="modal-close" id="closeInfoBtn">&times;</span>
+      </div>
+      <div class="modal-body" id="infoContent">
+        <!-- More info about sheikh -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <button class="nav-btn" id="homeBtn"><i class="fas fa-home"></i><span id="homeText"></span></button>
+    <button class="nav-btn" id="historyBtn"><i class="fas fa-history"></i><span id="historyText"></span></button>
+    <button class="nav-btn" id="exitBtn"><i class="fas fa-sign-out-alt"></i><span id="exitText"></span></button>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 50px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"></div>
+
+  <!-- Firebase & App Script using firebase/compat libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase using compat libraries
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Global variables and translation data
+      var currentLang = 'om';
+      var selectedSheikh = null;
+      var selectedGroup = null;
+      var historyRecords = [];
+
+      // Define correct Afaan Oromo marital status options
+      var omMaritalStatus = ["Kophaan jiraadha", "Fuudhaa", "Haadha warra koo hiikeen Jira", "Hadhaa warra qaba"];
+
+      var translations = {
+        en: {
+          title: "Fatwa Consultation",
+          subtitle: "Select an Islamic Scholar",
+          name: "Your Name",
+          occupation: "Occupation",
+          question: "Your Question",
+          submit: "Submit Question",
+          primaryTitle: "Islamic Scholars",
+          moreSheikhsTitle: "Additional Scholars",
+          moreInfo: "More Info",
+          home: "Home",
+          history: "History",
+          exit: "Exit",
+          occupationOptions: ["Student", "Writer", "Employee", "Other"],
+          sheikhsPrimary: [
+            {
+              name: "Sheik Aliyyi",
+              bio: "Expert in marriage and family matters",
+              details: "Sheik Aliyyi is known for his extensive experience in family law, offering reliable guidance.",
+              image: "shekaliyyi.png",
+              fields: [
+                { type: "select", label: "Marital Status", options: ["Single", "Married", "Divorced", "Other"] }
+              ]
+            },
+            {
+              name: "Sheik Abdusalaam Fadis",
+              bio: "Expert in zakat and financial issues",
+              details: "Sheik Abdusalaam Fadis provides insightful advice on zakat and finance.",
+              image: "shekabdusalasm.png",
+              fields: [
+                { type: "number", label: "Monthly Income (USD)" }
+              ]
+            }
+          ],
+          sheikhsAdditional: [
+            {
+              name: "Sheikh Abdurahmaan",
+              bio: "Specialist in fiqh and Islamic jurisprudence.",
+              details: "Sheikh Abdurahmaan has dedicated over 25 years to the study of Islamic jurisprudence, offering guidance and legal opinions on various matters.",
+              image: "sheikabdurahmasn.png",
+              fields: [
+                { type: "select", label: "Legal Issue", options: ["Contract", "Inheritance", "Other"] }
+              ]
+            },
+            {
+              name: "Sheik Nasraddiin",
+              bio: "Expert in hadith sciences and prophetic traditions.",
+              details: "Sheik Nasraddiin is renowned for his deep understanding of hadith literature and the application of prophetic traditions in modern times.",
+              image: "sheknasraddiin.png",
+              fields: [
+                { type: "number", label: "Years of Study" }
+              ]
+            }
+          ]
+        },
+        om: {
+          title: "Fatwaa Gargaarsa",
+          subtitle: "Sheekota marii filadhu",
+          name: "Maqaa kee",
+          occupation: "Hojii",
+          question: "Gaaffii",
+          submit: "Ergaa ergaa",
+          primaryTitle: "Sheekota Islaamaa",
+          moreSheikhsTitle: "Sheekota Dabalataa",
+          moreInfo: "Dabalata",
+          home: "Mana",
+          history: "Seenaa",
+          exit: "Ba'aa",
+          occupationOptions: ["Barataa", "Barreessaa", "Hojjetaa", "Kan biraa"],
+          sheikhsPrimary: [
+            {
+              name: "Sheik Aliyyi",
+              bio: "Mariin aadaa fi hawaasaa keessatti ogeessa",
+              details: "Sheik Aliyyi beekkamaa dhaaf marii hawaasaa fi aadaa keessatti gorsa kennuuf.",
+              image: "shekaliyyi.png",
+              fields: [
+                { type: "select", label: "Haammii", options: omMaritalStatus }
+              ]
+            },
+            {
+              name: "Sheik Abdusalaam Fadis",
+              bio: "Zakaafi hojii qabeenyaa keessatti ogeessa",
+              details: "Sheik Abdusalaam Fadis hojii qabeenyaa fi zakaaf irratti muuxannoo guddaa qabu.",
+              image: "shekabdusalasm.png",
+              fields: [
+                { type: "number", label: "Qaama bara (USD)" }
+              ]
+            }
+          ],
+          sheikhsAdditional: [
+            {
+              name: "Sheikh Abdurahmaan",
+              bio: "Ogeessa fiqh fi seera Islaamaa.",
+              details: "Sheikh Abdurahmaan waggaa 25 oliif barnoota fiqh irratti hojjetaa ture, gorsa seeraa kennuudhaaf.",
+              image: "sheikabdurahmasn.png",
+              fields: [
+                { type: "select", label: "Rakkoo Seeraa", options: ["Contract", "Inheritance", "Other"] }
+              ]
+            },
+            {
+              name: "Sheik Nasraddiin",
+              bio: "Ogeessa hadith fi aadaawwan Nabiyyii.",
+              details: "Sheik Nasraddiin ogummaa hadith keessatti beekamaa dha, aadaawwan Nabiyyii yeroo ammaa irratti hojiirra oolchuuf.",
+              image: "sheknasraddiin.png",
+              fields: [
+                { type: "number", label: "Waggoota Barnootaa" }
+              ]
+            }
+          ]
+        }
+      };
+
+      // -------------------------------
+      // Occupation Dropdown Functions
+      function updateOccupationDropdown() {
+        var dropdown = document.getElementById('occupationDropdown');
+        var options = translations[currentLang].occupationOptions;
+        var html = '<div class="select-header" onclick="toggleSelect(this)">' +
+                   '<span id="selectedOccupation">' + options[0] + '</span>' +
+                   '<i class="fas fa-chevron-down"></i></div><div class="select-options">';
+        options.forEach(function(option) {
+          html += '<div class="select-option" onclick="selectOption(\'' + option + '\', this)">' + option + '</div>';
+        });
+        html += '</div>';
+        dropdown.innerHTML = html;
+        var customInput = document.getElementById('customOccupation');
+        customInput.placeholder = (currentLang === 'en') ? "Please enter your occupation" : "Hojii kee sirrii ta'ee barreessi";
+        customInput.style.display = "none";
+      }
+      window.toggleSelect = function(header) {
+        header.parentElement.classList.toggle('select-open');
+      };
+      window.selectOption = function(value, element) {
+        var header = element.parentElement.previousElementSibling;
+        header.querySelector('span').textContent = value;
+        element.parentElement.parentElement.classList.remove('select-open');
+        var options = translations[currentLang].occupationOptions;
+        var customInput = document.getElementById('customOccupation');
+        if (value === options[3]) {
+          customInput.style.display = 'block';
+        } else {
+          customInput.style.display = 'none';
+        }
+      };
+
+      // -------------------------------
+      // Dynamic Field Functions for Sheikh-Specific Fields
+      window.toggleDynamicSelect = function(header) {
+        header.parentElement.classList.toggle('select-open');
+      };
+      window.selectDynamicOption = function(value, element, index) {
+        var header = element.parentElement.previousElementSibling;
+        header.textContent = value;
+        document.getElementById('dynamicField' + index).value = value;
+        element.parentElement.parentElement.classList.remove('select-open');
+      };
+      function populateDynamicFields(fields) {
+        var dynamicFields = document.getElementById('dynamicFields');
+        dynamicFields.innerHTML = '';
+        fields.forEach(function(field, i) {
+          var fieldHtml = '';
+          if (field.type === 'select') {
+            fieldHtml = '<div class="form-group"><label>' + field.label + '</label>' +
+                        '<div class="custom-select">' +
+                        '<div class="select-header" onclick="toggleDynamicSelect(this)">' +
+                        '<span id="dynamicSelectValue' + i + '">' + field.options[0] + '</span>' +
+                        '<i class="fas fa-chevron-down"></i></div>' +
+                        '<div class="select-options">';
+            field.options.forEach(function(option) {
+              fieldHtml += '<div class="select-option" onclick="selectDynamicOption(\'' + option + '\', this, ' + i + ')">' + option + '</div>';
+            });
+            fieldHtml += '</div></div>' +
+                         '<input type="hidden" id="dynamicField' + i + '" data-label="' + field.label + '" value="' + field.options[0] + '"></div>';
+          } else if (field.type === 'number') {
+            fieldHtml = '<div class="form-group"><label>' + field.label + '</label>' +
+                        '<input type="number" id="dynamicField' + i + '" data-label="' + field.label + '" required></div>';
+          }
+          dynamicFields.innerHTML += fieldHtml;
+        });
+      }
+
+      // -------------------------------
+      // Rendering Sheikh Cards
+      function renderSheikhsPrimary() {
+        var container = document.getElementById('sheikhPrimaryContainer');
+        var sheikhs = translations[currentLang].sheikhsPrimary;
+        container.innerHTML = sheikhs.map(function(sheikh, index) {
+          var imgSrc = sheikh.image;
+          return '<div class="sheikh-card">' +
+                 '<img src="' + imgSrc + '" class="sheikh-image" alt="' + sheikh.name + '">' +
+                 '<h3>' + sheikh.name + '</h3>' +
+                 '<p class="sheikh-bio">' + sheikh.bio + '</p>' +
+                 '<div class="card-buttons">' +
+                 '<button class="card-btn" onclick="openModal(' + index + ', \'primary\')">' +
+                 '<i class="fas fa-question-circle"></i> ' + ((currentLang === 'en') ? "Ask" : "Gaaffii") +
+                 '</button>' +
+                 '<button class="card-btn" onclick="openInfoModal(' + index + ', \'primary\')">' +
+                 '<i class="fas fa-info-circle"></i> ' + translations[currentLang].moreInfo +
+                 '</button></div></div>';
+        }).join('');
+      }
+      function renderSheikhsAdditional() {
+        var container = document.getElementById('sheikhAdditionalContainer');
+        var sheikhs = translations[currentLang].sheikhsAdditional;
+        container.innerHTML = sheikhs.map(function(sheikh, index) {
+          var imgSrc = sheikh.image;
+          return '<div class="sheikh-card">' +
+                 '<img src="' + imgSrc + '" class="sheikh-image" alt="' + sheikh.name + '">' +
+                 '<h3>' + sheikh.name + '</h3>' +
+                 '<p class="sheikh-bio">' + sheikh.bio + '</p>' +
+                 '<div class="card-buttons">' +
+                 '<button class="card-btn" onclick="openModal(' + index + ', \'additional\')">' +
+                 '<i class="fas fa-question-circle"></i> ' + ((currentLang === 'en') ? "Ask" : "Gaaffii") +
+                 '</button>' +
+                 '<button class="card-btn" onclick="openInfoModal(' + index + ', \'additional\')">' +
+                 '<i class="fas fa-info-circle"></i> ' + translations[currentLang].moreInfo +
+                 '</button></div></div>';
+        }).join('');
+      }
+
+      // -------------------------------
+      // Translation and Initialization
+      function translatePage() {
+        document.getElementById('mainTitle').textContent = translations[currentLang].title;
+        document.getElementById('subTitle').textContent = translations[currentLang].subtitle;
+        document.getElementById('nameLabel').textContent = translations[currentLang].name;
+        document.getElementById('occupationLabel').textContent = translations[currentLang].occupation;
+        document.getElementById('questionLabel').textContent = translations[currentLang].question;
+        document.getElementById('submitText').textContent = translations[currentLang].submit;
+        document.getElementById('primaryTitle').textContent = translations[currentLang].primaryTitle;
+        document.getElementById('moreSheikhsTitle').textContent = translations[currentLang].moreSheikhsTitle;
+        document.getElementById('homeText').textContent = translations[currentLang].home;
+        document.getElementById('historyText').textContent = translations[currentLang].history;
+        document.getElementById('exitText').textContent = translations[currentLang].exit;
+        document.getElementById('historyModalTitle').textContent = translations[currentLang].history;
+      }
+      document.getElementById('langSwitch').addEventListener('click', function() {
+        currentLang = (currentLang === 'en') ? 'om' : 'en';
+        translatePage();
+        updateOccupationDropdown();
+        renderSheikhsPrimary();
+        renderSheikhsAdditional();
+      });
+
+      // -------------------------------
+      // Modal Handling
+      window.openModal = function(index, group) {
+        selectedGroup = group;
+        var sheikh = (group === 'primary') ? translations[currentLang].sheikhsPrimary[index]
+                                           : translations[currentLang].sheikhsAdditional[index];
+        selectedSheikh = sheikh;
+        document.getElementById('modalTitle').textContent = sheikh.name;
+        populateDynamicFields(sheikh.fields);
+        document.getElementById('questionModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      };
+      window.closeModal = function() {
+        document.getElementById('questionModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+      window.openInfoModal = function(index, group) {
+        var sheikh = (group === 'primary') ? translations[currentLang].sheikhsPrimary[index]
+                                           : translations[currentLang].sheikhsAdditional[index];
+        document.getElementById('infoModalTitle').textContent = sheikh.name;
+        document.getElementById('infoContent').innerHTML = '<p>' + sheikh.details + '</p>';
+        document.getElementById('infoModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      };
+      window.closeInfoModal = function() {
+        document.getElementById('infoModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+      window.closeHistoryModal = function() {
+        document.getElementById('historyModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+
+      // Attach event listeners for close buttons
+      document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+      document.getElementById('closeHistoryBtn').addEventListener('click', closeHistoryModal);
+      document.getElementById('closeInfoBtn').addEventListener('click', closeInfoModal);
+
+      // -------------------------------
+      // Form Submission with Firebase Firestore Integration
+      document.getElementById('fatwaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var userName = document.getElementById('userName').value;
+        var questionText = document.getElementById('questionText').value;
+        var occupation = document.getElementById('selectedOccupation').textContent;
+        var customOccupation = document.getElementById('customOccupation').value;
+        var dynamicData = {};
+        var dynamicInputs = document.querySelectorAll('#dynamicFields [id^="dynamicField"]');
+        dynamicInputs.forEach(function(input) {
+          var label = input.getAttribute('data-label');
+          dynamicData[label] = input.value;
+        });
+        var record = {
+          userName: userName,
+          occupation: occupation,
+          customOccupation: customOccupation,
+          questionText: questionText,
+          sheikh: selectedSheikh.name,
+          group: selectedGroup,
+          dynamicData: dynamicData,
+          submissionDate: new Date().toISOString()
+        };
+        // If a user is logged in, add their email to the record
+        var currentUser = firebase.auth().currentUser;
+        if (currentUser) {
+          record.userEmail = currentUser.email;
+        }
+        db.collection("questions").add(record)
+          .then(function(docRef) {
+            historyRecords.push(record);
+            showNotification((currentLang === 'en') ? "Your question has been submitted!" : "Gaaffiin kee ergaame!");
+            closeModal();
+            document.getElementById('fatwaForm').reset();
+          })
+          .catch(function(error) {
+            console.error("Error storing document: ", error);
+            showNotification((currentLang === 'en') ? "Error submitting question." : "Dogoggora gaaffii erguu keessatti mudate.");
+          });
+      });
+
+      // -------------------------------
+      // Notification System
+      function showNotification(message) {
+        var notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+        setTimeout(function() {
+          notification.style.display = 'none';
+        }, 3000);
+      }
+
+      // -------------------------------
+      // History Modal Functions – using Firebase Auth instead of localStorage
+      window.showHistoryModal = function() {
+        var currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
+          showNotification("Please log in to see your history.");
+          return;
+        }
+        var userEmail = currentUser.email;
+        db.collection("questions").where("userEmail", "==", userEmail).get()
+          .then(function(querySnapshot) {
+            var historyContent = document.getElementById("historyContent");
+            if (querySnapshot.empty) {
+              historyContent.innerHTML = '<p>' + ((currentLang === 'en') ? "No history available." : "Seenaa hin jiru.") + '</p>';
+            } else {
+              var html = "";
+              querySnapshot.forEach(function(doc) {
+                var record = doc.data();
+                html += '<div style="border-bottom:1px solid #ddd; margin-bottom:0.5rem; padding-bottom:0.5rem;">' +
+                        '<p><strong>' + record.userName + '</strong> (' + new Date(record.submissionDate).toLocaleString() + ')</p>' +
+                        '<p>' + record.sheikh + ': ' + record.questionText + '</p></div>';
+              });
+              historyContent.innerHTML = html;
+            }
+            document.getElementById("historyModal").style.display = "flex";
+            document.body.style.overflow = "hidden";
+          })
+          .catch(function(error) {
+            console.error("Error fetching history: ", error);
+            showNotification("Error fetching history.");
+          });
+      };
+
+      // -------------------------------
+      // Navigation Buttons
+      document.getElementById('homeBtn').addEventListener('click', function() {
+        closeModal();
+        closeHistoryModal();
+        closeInfoModal();
+      });
+      document.getElementById('historyBtn').addEventListener('click', showHistoryModal);
+      document.getElementById('exitBtn').addEventListener('click', function() {
+        window.location.href = "home.html";
+      });
+      window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+          closeModal();
+          closeHistoryModal();
+          closeInfoModal();
+        }
+      });
+
+      // -------------------------------
+      // Initialize Page
+      translatePage();
+      updateOccupationDropdown();
+      renderSheikhsPrimary();
+      renderSheikhsAdditional();
+    });
+  </script>
+</body>
+</html>

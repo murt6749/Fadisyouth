@@ -1,0 +1,566 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulchiinsa Ergaa - Admin Panel</title>
+  <!-- Font Awesome and Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Reset & Typography */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.8em;
+      color: #f1c40f;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    h2 {
+      color: #f1c40f;
+    }
+    h3 {
+      color: #f1c40f;
+      margin-bottom: 5px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    /* Overlay for Checking Login Status */
+    #loginStatusOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 4000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #f1c40f;
+      font-size: 1.5em;
+    }
+    /* Section Styles */
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-header {
+      border-bottom: 2px solid #f1c40f;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .section-content {
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease;
+    }
+    /* Admin Account Info */
+    #adminAccount p {
+      margin: 5px 0;
+      font-size: 1em;
+    }
+    /* Admin Users List */
+    .admin-user {
+      padding: 8px;
+      border-bottom: 1px solid rgba(241,196,15,0.5);
+    }
+    /* Message Item */
+    .message-item {
+      background: rgba(0,0,0,0.3);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      animation: slideIn 0.5s ease;
+    }
+    .message-item p {
+      margin-bottom: 5px;
+      font-size: 0.95em;
+    }
+    /* Spinner */
+    .spinner {
+      border: 4px solid rgba(241,196,15,0.3);
+      border-top: 4px solid #f1c40f;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    /* Tabs for Grouping Messages */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      animation: fadeIn 0.5s ease;
+    }
+    .tab-btn {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: #e0b90f;
+      transform: scale(1.05);
+    }
+    .refresh-btn {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin-left: 20px;
+    }
+    .refresh-btn:hover {
+      background: #2980b9;
+      transform: scale(1.05);
+    }
+    /* Response Modal for Admin Replies */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      animation: fadeIn 0.3s ease;
+    }
+    .response-modal {
+      background: #0a0a0a;
+      border: 2px solid #f1c40f;
+      box-shadow: 0 0 20px 5px rgba(241,196,15,0.7);
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      color: #f1c40f;
+      position: relative;
+    }
+    .response-modal .cancel-btn {
+      background: transparent;
+      color: #f1c40f;
+      border: 2px solid #f1c40f;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      transition: background 0.3s ease;
+    }
+    .response-modal .cancel-btn:hover {
+      background: #f1c40f;
+      color: #000;
+    }
+    .response-modal .modal-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .response-modal .modal-header img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 2px solid #f1c40f;
+    }
+    .response-modal .modal-header h2 {
+      font-size: 1.5em;
+      margin: 0;
+    }
+    .response-modal hr {
+      border: 1px solid #f1c40f;
+      margin: 10px 0;
+    }
+    .response-modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 5px;
+    }
+    .response-modal .modal-btn {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .response-modal .modal-btn:hover {
+      background: #e0b90f;
+    }
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-btn {
+      background: #D4AF37;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .nav-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Status Overlay -->
+  <div id="loginStatusOverlay">
+    <div class="spinner"></div>
+    <p>Seensa ilaalchisee mirkaneeffamaa jira...</p>
+  </div>
+  
+  <!-- Main Admin Panel Content -->
+  <div class="container" id="adminPanel" style="display:none;">
+    <h1>Bulchiinsa Ergaa - Admin Panel</h1>
+    
+    <!-- Section 1: Admin Account Info -->
+    <div class="section" id="adminAccount">
+      <div class="section-header">
+        <h2>Admin Account</h2>
+      </div>
+      <div class="section-content" id="adminAccountContent">
+        <!-- This will be filled dynamically -->
+        <p><strong>Maqaa:</strong> <span id="accountName"></span></p>
+        <p><strong>Bilbila:</strong> <span id="accountPhone"></span></p>
+      </div>
+    </div>
+    
+    <!-- Section 2: Admin Users List -->
+    <div class="section" id="adminUsersSection">
+      <div class="section-header">
+        <h2>Admin Users</h2>
+      </div>
+      <div class="section-content" id="adminUsersList">
+        <p>Loading admin users...</p>
+      </div>
+    </div>
+    
+    <!-- Section 3: Messages Grouped by Card -->
+    <div class="section" id="messagesSection">
+      <div class="section-header">
+        <h2>Messages (Group by Card)</h2>
+      </div>
+      <div class="section-content" id="messagesGrouped">
+        <!-- Grouped messages will be loaded here -->
+        <div id="groupedMessagesContent">
+          <p>Loading messages...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 4: Questions Grouped by Card -->
+    <div class="section" id="questionsSection">
+      <div class="section-header">
+        <h2>Questions (Group by Card)</h2>
+      </div>
+      <div class="section-content" id="questionsGrouped">
+        <!-- Grouped questions will be loaded here -->
+        <p>Loading questions...</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Response Modal (For Admin to Reply to a Message) -->
+  <div class="modal-overlay" id="responseModal">
+    <div class="response-modal">
+      <button class="cancel-btn" id="closeResponseBtn">&times;</button>
+      <div class="modal-header">
+        <img id="responseRecipientImage" src="" alt="Recipient Image">
+        <h2 id="responseRecipientName"></h2>
+      </div>
+      <hr>
+      <p>Deebii kee barreessi:</p>
+      <textarea id="responseText" rows="4" placeholder="Deebii kee..."></textarea>
+      <div style="text-align:center; margin-top: 15px;">
+        <button class="modal-btn" id="sendResponseBtn"><i class="fas fa-paper-plane"></i> Ergaa Deebii Ergi</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <button class="nav-btn" id="backHomeBtn"><i class="fas fa-home"></i><span>Mana</span></button>
+    <button class="nav-btn" id="chatBtn"><i class="fas fa-comments"></i><span>Chat</span></button>
+    <button class="nav-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Bahi</span></button>
+  </div>
+  
+  <!-- Firebase & App Scripts (Compat Libraries) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Use onAuthStateChanged to check login status.
+      firebase.auth().onAuthStateChanged(function(user) {
+        var overlay = document.getElementById("loginStatusOverlay");
+        if (user) {
+          // Admin is logged in; remove the overlay and display the panel.
+          overlay.style.display = "none";
+          document.getElementById("adminPanel").style.display = "block";
+          var adminName = user.displayName || user.email;
+          
+          // SECTION 1: Load Admin Account Info
+          db.collection("adminUsers").doc(adminName).get()
+            .then(function(doc) {
+              var accountContent = document.getElementById("adminAccountContent");
+              if (doc.exists) {
+                var data = doc.data();
+                accountContent.innerHTML = "<p><strong>Maqaa:</strong> " + adminName + "</p>" +
+                  "<p><strong>Bilbila:</strong> " + (data.phone || "Hin ibsamin") + "</p>";
+              } else {
+                accountContent.innerHTML = "<p><strong>Maqaa:</strong> " + adminName + "</p>" +
+                  "<p><strong>Bilbila:</strong> Hin ibsamin</p>";
+              }
+            })
+            .catch(function(error) {
+              console.error("Dogoggora admin account info:", error);
+            });
+          
+          // SECTION 2: Load All Admin Users
+          db.collection("adminUsers").get()
+            .then(function(querySnapshot) {
+              var adminList = document.getElementById("adminUsersList");
+              var html = "";
+              querySnapshot.forEach(function(doc) {
+                var adminData = doc.data();
+                html += '<div class="admin-user"><strong>' + doc.id + "</strong> - " + (adminData.phone || "Hin ibsamin") + "</div>";
+              });
+              adminList.innerHTML = html;
+            })
+            .catch(function(error) {
+              console.error("Dogoggora admin users:", error);
+            });
+          
+          // SECTION 3: Load Messages Grouped by Card
+          db.collection("messages")
+            .where("recipient", "==", adminName)
+            .orderBy("submissionDate", "desc")
+            .get()
+            .then(function(querySnapshot) {
+              var groups = {};
+              querySnapshot.forEach(function(doc) {
+                var msg = doc.data();
+                var card = msg.card || "Others";
+                if (!groups[card]) { groups[card] = []; }
+                groups[card].push({ id: doc.id, data: msg });
+              });
+              var groupedHTML = "";
+              for (var card in groups) {
+                groupedHTML += "<h3>" + card + "</h3>";
+                groups[card].forEach(function(item) {
+                  var msg = item.data;
+                  var dateStr = msg.submissionDate ? new Date(msg.submissionDate).toLocaleString() : "Guyyaa hin ibsamne";
+                  groupedHTML += '<div class="message-item" data-message-id="'+ item.id +'" data-sender-image="'+ (msg.senderImage || "default.png") +'">' +
+                                 '<p><strong>' + msg.senderName + '</strong> (' + dateStr + ')</p>' +
+                                 '<p>' + msg.questionText + '</p>' +
+                                 '<button class="modal-btn" onclick="openResponseModal(\'' + item.id + '\', this)">Deebii Kenni</button>' +
+                                 '</div>';
+                });
+              }
+              document.getElementById("messagesGrouped").innerHTML = groupedHTML || "<p style='text-align:center;'>Ergaa hin jiru.</p>";
+            })
+            .catch(function(error) {
+              console.error("Dogoggora messages:", error);
+              showNotification(error.message || "Dogoggora ergaa keessatti mudate.");
+            });
+          
+          // SECTION 4: Load Questions Grouped by Card
+          db.collection("questions")
+            .where("recipient", "==", adminName)
+            .orderBy("submissionDate", "desc")
+            .get()
+            .then(function(querySnapshot) {
+              var groups = {};
+              querySnapshot.forEach(function(doc) {
+                var q = doc.data();
+                var card = q.card || "Others";
+                if (!groups[card]) { groups[card] = []; }
+                groups[card].push({ id: doc.id, data: q });
+              });
+              var questionsHTML = "";
+              for (var card in groups) {
+                questionsHTML += "<h3>" + card + "</h3>";
+                groups[card].forEach(function(item) {
+                  var q = item.data;
+                  var dateStr = q.submissionDate ? new Date(q.submissionDate).toLocaleString() : "Guyyaa hin ibsamne";
+                  questionsHTML += '<div class="message-item" data-message-id="'+ item.id +'" data-sender-image="'+ (q.senderImage || "default.png") +'">' +
+                                   '<p><strong>' + q.senderName + '</strong> (' + dateStr + ')</p>' +
+                                   '<p>' + q.questionText + '</p>' +
+                                   '<button class="modal-btn" onclick="openResponseModal(\'' + item.id + '\', this)">Deebii Kenni</button>' +
+                                   '</div>';
+                });
+              }
+              document.getElementById("questionsGrouped").innerHTML = questionsHTML || "<p style='text-align:center;'>Gaaffii hin jiru.</p>";
+            })
+            .catch(function(error) {
+              console.error("Dogoggora gaaffii:", error);
+              showNotification(error.message || "Dogoggora gaaffii keessatti mudate.");
+            });
+          
+          // Neon Glowing Notification Function
+          function showNotification(message) {
+            var notification = document.createElement("div");
+            notification.className = "notification";
+            notification.innerText = message;
+            document.body.appendChild(notification);
+            setTimeout(function() {
+              notification.remove();
+            }, 3000);
+          }
+          
+          // --- Response Modal Functionality ---
+          window.openResponseModal = function(messageId, btnElement) {
+            var msgItem = btnElement.parentElement;
+            var senderName = msgItem.querySelector("p strong").innerText;
+            var senderImage = msgItem.getAttribute("data-sender-image") || "default.png";
+            document.getElementById("responseRecipientName").innerText = senderName;
+            document.getElementById("responseRecipientImage").src = senderImage;
+            window.selectedMessageId = messageId;
+            document.getElementById("responseModal").style.display = "flex";
+            document.body.style.overflow = "hidden";
+          };
+          window.closeResponseModal = function() {
+            document.getElementById("responseModal").style.display = "none";
+            document.body.style.overflow = "auto";
+            document.getElementById("responseText").value = "";
+          };
+          document.getElementById("closeResponseBtn").addEventListener("click", closeResponseModal);
+          
+          // Send Response Button – store admin reply in Firestore "responses" collection.
+          document.getElementById("sendResponseBtn").addEventListener("click", function() {
+            var responseText = document.getElementById("responseText").value.trim();
+            if (!responseText) {
+              showNotification("Mee deebii kee barreessi.");
+              return;
+            }
+            var sendBtn = document.getElementById("sendResponseBtn");
+            sendBtn.innerHTML = '<span class="spinner"></span>Deebii Ergaa...';
+            var responseRecord = {
+              admin: adminName,
+              messageId: window.selectedMessageId,
+              responseText: responseText,
+              submissionDate: new Date().toISOString()
+            };
+            db.collection("responses").add(responseRecord)
+              .then(function() {
+                sendBtn.innerHTML = '<i class="fas fa-check"></i> Deebii Ergameera';
+                showNotification("Deebii kee ergameera ✓");
+                setTimeout(function() {
+                  closeResponseModal();
+                  sendBtn.innerText = "Deebii Kenni";
+                }, 2000);
+              })
+              .catch(function(error) {
+                console.error("Dogoggora deebii erguu:", error);
+                showNotification("Dogoggora deebii erguu keessatti mudate.");
+                sendBtn.innerText = "Deebii Kenni";
+              });
+          });
+          
+          // --- Navigation Buttons ---
+          document.getElementById("backHomeBtn").addEventListener("click", function() {
+            window.location.href = "home.html";
+          });
+          document.getElementById("chatBtn").addEventListener("click", function() {
+            window.location.href = "chat.html";
+          });
+          document.getElementById("logoutBtn").addEventListener("click", function() {
+            auth.signOut().then(function() {
+              showNotification("Ba'ii milkaa'aa!");
+              window.location.href = "home.html";
+            }).catch(function(error) {
+              console.error("Dogoggora ba'uu keessatti:", error);
+              showNotification("Dogoggora ba'uu keessatti mudate.");
+            });
+          });
+        } else {
+          // No user is logged in: update overlay and redirect to contactadmin.html.
+          var overlay = document.getElementById("loginStatusOverlay");
+          overlay.innerHTML = '<div class="spinner"></div><p>Mee, dura seeni (log in)!</p>';
+          setTimeout(function() {
+            window.location.href = "contactadmin.html";
+          }, 2000);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
