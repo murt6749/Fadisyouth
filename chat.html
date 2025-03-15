@@ -4,181 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chaatii - Ergaa Ergaa</title>
-  <!-- Google Fonts and Font Awesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    * {
+    /* Minimal styling */
+    body, html {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-    body {
-      background: #ffffff;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .container {
-      width: 100%;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Chat Window Page */
-    .chat-window {
       width: 100%;
       height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: white;
-      display: flex;
-      flex-direction: column;
+      background: #ffffff;
+      font-family: sans-serif;
     }
-    /* Header */
-    .header {
-      padding: 16px;
-      background: #0088cc;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-      height: 60px;
-    }
-    .header .header-title {
-      font-weight: 500;
-      font-size: 18px;
-    }
-    /* Messages Container */
-    .messages-container {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      background: #f0f2f5;
-    }
-    .message {
-      max-width: 80%;
-      margin-bottom: 12px;
-      padding: 12px;
-      border-radius: 12px;
-      animation: fadeIn 0.3s ease-in;
-    }
-    .message.received {
-      background: white;
-      margin-right: auto;
-    }
-    .message.sent {
-      background: #dcf8c6;
-      margin-left: auto;
-    }
-    .message .message-time {
-      font-size: 12px;
-      color: #999;
-      margin-top: 4px;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Input Container */
-    .input-container {
-      position: fixed;
-      bottom: 0;
+    #chatEmbedContainer {
       width: 100%;
-      background: white;
-      padding: 12px;
-      display: flex;
-      gap: 8px;
-      border-top: 1px solid #e0e0e0;
-    }
-    .message-input {
-      flex-grow: 1;
-      padding: 12px;
-      border: 1px solid #e0e0e0;
-      border-radius: 24px;
-      outline: none;
-      font-size: 16px;
-    }
-    .send-button {
-      background: #0088cc;
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    /* Spinner for Loading */
-    .spinner {
-      border: 4px solid rgba(241,196,15,0.3);
-      border-top: 4px solid #f1c40f;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    /* Navigation Buttons */
-    .nav-buttons {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 1rem;
-    }
-    .nav-btn {
-      background: #D4AF37;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-    .nav-btn:hover {
-      transform: scale(1.05);
+      height: 100%;
+      overflow: auto;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Chat Window Page -->
-    <div class="chat-window" id="chatWindow">
-      <div class="header">
-        <div class="header-title" id="chatHeaderTitle">Chaatii Adminii</div>
-      </div>
-      <div class="messages-container" id="messagesContainer">
-        <div id="loadingSpinner" class="spinner" style="display:none;"></div>
-        <div id="chatMessages"></div>
-      </div>
-      <div class="input-container">
-        <input type="text" class="message-input" id="chatInput" placeholder="Ergaa kee barreessi..." required>
-        <button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button>
-      </div>
-    </div>
+  <div id="chatEmbedContainer">
+    <!-- The chat embed will be inserted here -->
   </div>
   
-  <!-- Firebase & App Scripts (Compat Libraries) -->
+  <!-- Firebase Scripts (Compat Libraries) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
-    // Initialize Firebase (Replace with your actual Firebase configuration)
+    // Replace with your actual Firebase configuration
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -193,121 +47,64 @@
     firebase.analytics();
     var db = firebase.firestore();
     var auth = firebase.auth();
-  </script>
-  <script>
+    
+    // Function to embed the Minnit Chat code
+    function embedChat() {
+      var container = document.getElementById("chatEmbedContainer");
+      container.innerHTML = "";
+      // Create script element for Minnit Chat embed
+      var scriptElem = document.createElement("script");
+      scriptElem.src = "https://minnit.chat/js/embed.js?c=1740011833";
+      scriptElem.defer = true;
+      // Create the span element with embed settings
+      var spanElem = document.createElement("span");
+      spanElem.style.display = "none";
+      spanElem.className = "minnit-chat-sembed";
+      spanElem.setAttribute("data-chatname", "https://organizations.minnit.chat/168565909530863/Main?embed");
+      spanElem.setAttribute("data-style", "width:100%;height:100%;");
+      spanElem.innerText = "Chat";
+      // Create the powered-by paragraph
+      var poweredP = document.createElement("p");
+      poweredP.style.textAlign = "center";
+      poweredP.innerHTML = '<a href="https://minnit.chat" target="_blank" style="color:#000;font-size:12px;text-decoration:none;">Free embeddable chatroom powered by Minnit Chat</a>';
+      // Append elements to container
+      container.appendChild(scriptElem);
+      container.appendChild(spanElem);
+      container.appendChild(poweredP);
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
-      // Check for authentication.
+      // Check if a user is logged in.
       firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
           alert("Mee, dura seeni (log in)!");
           window.location.href = "login.html";
           return;
         }
-        // Set the current user from Firebase Auth.
-        window.currentUser = user.displayName || user.email;
-        // Determine group based on whether the user is in adminUsers collection.
-        db.collection("adminUsers").doc(window.currentUser).get()
+        // Get the current user identifier.
+        var currentUser = user.displayName || user.email;
+        // Check if the user is an admin by looking up the "adminUsers" collection.
+        db.collection("adminUsers").doc(currentUser).get()
           .then(function(doc) {
-            window.currentGroup = doc.exists ? "Admin" : "User";
-            document.getElementById("chatHeaderTitle").innerText = window.currentGroup === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
-            loadChatMessages();
+            if (doc.exists) {
+              // User is an admin: embed the chat immediately.
+              embedChat();
+            } else {
+              // User is not an admin: require password verification.
+              var enteredPwd = prompt("Galchi jecha icciitii:\n(12345678fadis)");
+              if (enteredPwd === "12345678fadis") {
+                embedChat();
+              } else {
+                alert("Jecha icciitii sirrii hin ta'u.");
+                // Optionally, you could redirect or halt further actions.
+              }
+            }
           })
           .catch(function(error) {
             console.error("Dogoggora verification:", error);
             alert("Dogoggora qunnamtii database keessatti mudate.");
           });
       });
-      
-      // Function: Load chat messages in real time (group chat for current group)
-      function loadChatMessages() {
-        var messagesContainer = document.getElementById("messagesContainer");
-        var loadingSpinner = document.getElementById("loadingSpinner");
-        loadingSpinner.style.display = "block";
-        db.collection("chatMessages")
-          .where("group", "==", window.currentGroup)
-          .orderBy("timestamp", "asc")
-          .onSnapshot(function(snapshot) {
-            loadingSpinner.style.display = "none";
-            var chatMessagesElem = document.getElementById("chatMessages");
-            chatMessagesElem.innerHTML = "";
-            snapshot.forEach(function(doc) {
-              var message = doc.data();
-              var timeStr = "";
-              if (message.timestamp) {
-                var ts = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
-                timeStr = ts.toLocaleString();
-              }
-              var messageDiv = document.createElement("div");
-              var messageClass = (message.sender === window.currentUser) ? "sent" : "received";
-              messageDiv.className = "message " + messageClass;
-              messageDiv.innerHTML = "<strong>" + message.sender + "</strong>: " + message.text +
-                "<br><span class='message-time'>" + timeStr + "</span>";
-              chatMessagesElem.appendChild(messageDiv);
-            });
-            // Auto-scroll to bottom
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          }, function(error) {
-            console.error("Dogoggora ergaa fe'uu:", error);
-          });
-      }
-      
-      // Handle sending a message with optimistic update.
-      document.getElementById("sendButton").addEventListener("click", function() {
-        var chatInput = document.getElementById("chatInput");
-        var text = chatInput.value.trim();
-        if (text === "") return;
-        
-        // Optimistic UI: immediately append message to chat window.
-        var messagesContainer = document.getElementById("messagesContainer");
-        var chatMessagesElem = document.getElementById("chatMessages");
-        var messageDiv = document.createElement("div");
-        messageDiv.className = "message sent";
-        var localTime = new Date().toLocaleTimeString();
-        messageDiv.innerHTML = "<strong>" + window.currentUser + "</strong>: " + text +
-          "<br><span class='message-time'>" + localTime + " (pending...)</span>";
-        chatMessagesElem.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        chatInput.value = "";
-        
-        // Now send the message to Firebase.
-        db.collection("chatMessages").add({
-          sender: window.currentUser,
-          text: text,
-          group: window.currentGroup,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(function() {
-          // The real-time listener will update the message list with correct timestamps.
-        })
-        .catch(function(error) {
-          console.error("Dogoggora ergaa erguu:", error);
-          showNotification("Dogoggora ergaa erguu: " + error.message);
-          // Optionally, you could remove the pending message from UI.
-        });
-      });
-      
-      // Navigation Buttons.
-      document.getElementById("backHomeBtn").addEventListener("click", function() {
-        window.location.href = window.currentGroup === "Admin" ? "admin.html" : "home.html";
-      });
-      document.getElementById("logoutBtn").addEventListener("click", function() {
-        auth.signOut().then(function() {
-          alert("Ba'ii milkaa'aa!");
-          window.location.href = "home.html";
-        }).catch(function(error) {
-          console.error("Dogoggora ba'uu keessatti:", error);
-        });
-      });
-      
-      // Neon Notification Utility.
-      function showNotification(message) {
-        var notification = document.getElementById("notification");
-        notification.textContent = message;
-        notification.style.display = "block";
-        setTimeout(function() {
-          notification.style.display = "none";
-        }, 3000);
-      }
     });
   </script>
 </body>
