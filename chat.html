@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaatii - Ergaa Ergaa</title>
+  <!-- Google Fonts and Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    body {
+      background: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Chat Window (single group chat room) */
+    .chat-window {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Header */
+    .header {
+      padding: 16px;
+      background: #0088cc;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      height: 60px;
+    }
+    .header .header-title {
+      font-weight: 500;
+      font-size: 18px;
+    }
+    /* Chat Messages Container */
+    .messages-container {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #f0f2f5;
+    }
+    .message {
+      max-width: 80%;
+      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      animation: fadeIn 0.3s ease-in;
+    }
+    .received {
+      background: white;
+      margin-right: auto;
+    }
+    .sent {
+      background: #dcf8c6;
+      margin-left: auto;
+    }
+    .message .message-time {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Input Container */
+    .input-container {
+      width: 100%;
+      background: white;
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .message-input {
+      flex-grow: 1;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 24px;
+      outline: none;
+      font-size: 16px;
+    }
+    .send-button {
+      background: #0088cc;
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    /* Spinner for Loading */
+    .spinner {
+      border: 4px solid rgba(241,196,15,0.3);
+      border-top: 4px solid #f1c40f;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-btn {
+      background: #D4AF37;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .nav-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Chat Window -->
+    <div class="chat-window" id="chatWindow">
+      <div class="header">
+        <div class="header-title" id="chatHeaderTitle">Chaatii - </div>
+      </div>
+      <div class="messages-container" id="messagesContainer">
+        <!-- Spinner for loading messages -->
+        <div id="loadingSpinner" class="spinner" style="display:none;"></div>
+        <!-- Chat messages will be loaded here -->
+        <div id="chatMessages"></div>
+      </div>
+      <div class="input-container">
+        <input type="text" class="message-input" id="chatInput" placeholder="Ergaa kee barreessi..." required>
+        <button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase (update with your configuration)
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is logged in.
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+          alert("Mee, dura seeni (log in)!");
+          window.location.href = "login.html";
+          return;
+        }
+        // Determine if user is an admin by checking Firestore "adminUsers" document.
+        var currentUser = user.displayName || user.email;
+        window.currentUser = currentUser;  // Save for sending messages
+        db.collection("adminUsers").doc(currentUser).get()
+          .then(function(doc) {
+            var group = doc.exists ? "Admin" : "User";
+            // Set header title based on group.
+            var headerTitle = document.getElementById("chatHeaderTitle");
+            headerTitle.innerText = group === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
+            // When sending messages, include group info.
+            window.currentGroup = group;
+            // Load chat messages for this group.
+            loadChatMessages();
+          })
+          .catch(function(error) {
+            console.error("Error verifying admin:", error);
+            alert("Dogoggora qunnamtii database keessatti mudate.");
+          });
+      });
+      
+      // Load chat messages for the current group in real time.
+      function loadChatMessages() {
+        var messagesContainer = document.getElementById("messagesContainer");
+        var loadingSpinner = document.getElementById("loadingSpinner");
+        loadingSpinner.style.display = "block";
+        db.collection("chatMessages")
+          .where("group", "==", window.currentGroup)
+          .orderBy("timestamp", "asc")
+          .onSnapshot(function(snapshot) {
+            loadingSpinner.style.display = "none";
+            var chatMessagesElem = document.getElementById("chatMessages");
+            chatMessagesElem.innerHTML = "";
+            snapshot.forEach(function(doc) {
+              var message = doc.data();
+              var timeStr = "";
+              if (message.timestamp) {
+                var date = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
+                timeStr = date.toLocaleString();
+              }
+              var messageDiv = document.createElement("div");
+              // If the sender is the current user, use "sent" style; otherwise, "received"
+              var messageClass = (message.sender === window.currentUser) ? "sent" : "received";
+              messageDiv.className = "message " + messageClass;
+              messageDiv.innerHTML = "<strong>" + message.sender + "</strong>: " + message.text +
+                "<br><span class='message-time'>" + timeStr + "</span>";
+              chatMessagesElem.appendChild(messageDiv);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          }, function(error) {
+            console.error("Dogoggora ergaa fe'uu:", error);
+          });
+      }
+      
+      // Handle sending a chat message.
+      document.getElementById("sendButton").addEventListener("click", function() {
+        var chatInput = document.getElementById("chatInput");
+        var text = chatInput.value.trim();
+        if (text === "") return;
+        db.collection("chatMessages").add({
+          sender: window.currentUser,
+          text: text,
+          group: window.currentGroup,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(function() {
+          chatInput.value = "";
+        })
+        .catch(function(error) {
+          console.error("Dogoggora ergaa erguu:", error);
+        });
+      });
+      
+      // Navigation Buttons.
+      document.getElementById("backHomeBtn").addEventListener("click", function() {
+        // For admin group, send them to admin.html; for users, perhaps to a home page.
+        window.location.href = window.currentGroup === "Admin" ? "admin.html" : "home.html";
+      });
+      document.getElementById("logoutBtn").addEventListener("click", function() {
+        auth.signOut().then(function() {
+          alert("Ba'ii milkaa'aa!");
+          window.location.href = "home.html";
+        }).catch(function(error) {
+          console.error("Dogoggora ba'uu keessatti:", error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
