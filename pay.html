@@ -1,0 +1,534 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fadis Youth - Kaffaltii Islaamummaa</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri&family=Tajawal&family=Reem+Kufi&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --primary-color: #4CAF50; /* bright green */
+      --accent-color: #FFC107; /* amber */
+      --background-color: #f9f9f9; /* light background */
+      --surface-color: #ffffff; /* white */
+      --text-primary: #333333;
+      --text-secondary: #555555;
+      --pattern: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><path fill="%234CAF50" opacity="0.05" d="M50 0L100 50 50 100 0 50 50 0zm0 20a30 30 0 1030 30 30 30 0 00-30-30z"/></svg>');
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Reem Kufi", "Tajawal", sans-serif;
+    }
+    body {
+      background-color: var(--background-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 80px; /* space for bottom slider */
+    }
+    .container {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    /* Header Topic */
+    .header {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    /* Quran Verse Carousel */
+    .quran-carousel {
+      position: relative;
+      height: 180px;
+      margin: 2rem 0;
+      perspective: 1000px;
+    }
+    .quran-verse {
+      position: absolute;
+      width: 100%;
+      padding: 1.5rem;
+      background: var(--surface-color);
+      border-radius: 16px;
+      text-align: center;
+      opacity: 0;
+      transform: rotateY(90deg);
+      transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .quran-verse.active {
+      opacity: 1;
+      transform: rotateY(0deg);
+    }
+    .arabic-text {
+      font-family: "Amiri", serif;
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    .translation {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+    /* Fixed Bottom Payment Slider with Green Background */
+    .payment-slider {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary-color);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      padding: 10px 5px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      z-index: 900;
+    }
+    .payment-card {
+      flex: 0 0 auto;
+      background: var(--surface-color);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      position: relative;
+      min-width: 80px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .payment-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--pattern);
+      opacity: 0.1;
+      border-radius: 12px;
+      z-index: -1;
+    }
+    .payment-card:hover {
+      transform: scale(1.05);
+    }
+    .payment-card.active {
+      border-color: var(--accent-color);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(255, 193, 7, 0.2);
+    }
+    .payment-icon {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    .payment-label {
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    /* Bottom Sheet for Payment Forms */
+    .bottom-sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: -100%;
+      background: var(--surface-color);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      transition: bottom 0.4s ease;
+      z-index: 1000;
+      max-height: 90%;
+      overflow-y: auto;
+    }
+    .bottom-sheet.active {
+      bottom: 0;
+    }
+    .close-sheet {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .payment-form {
+      margin-top: 40px;
+      text-align: left;
+      display: none;
+      animation: formFade 0.4s ease;
+    }
+    .payment-form.active {
+      display: block;
+    }
+    @keyframes formFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      background: #f1f1f1;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    .donate-button {
+      width: 100%;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, var(--primary-color), #388E3C);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      margin-top: 1rem;
+    }
+    .donate-button:hover {
+      transform: scale(1.02);
+    }
+    .donate-button:active {
+      transform: scale(0.98);
+    }
+    /* Success Modal (Centered Overlay) */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1100;
+    }
+    .success-content {
+      background: var(--surface-color);
+      padding: 2rem;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 400px;
+      animation: modalEnter 0.3s ease;
+    }
+    @keyframes modalEnter {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    /* Decorative Islamic Elements */
+    .islamic-decor {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(
+        circle at 30% 30%,
+        var(--accent-color) 0%,
+        transparent 60%
+      );
+      opacity: 0.2;
+      pointer-events: none;
+      animation: decorGlow 4s ease-in-out infinite;
+    }
+    @keyframes decorGlow {
+      0% {
+        filter: drop-shadow(0 0 5px var(--accent-color));
+      }
+      50% {
+        filter: drop-shadow(0 0 20px var(--accent-color));
+      }
+      100% {
+        filter: drop-shadow(0 0 5px var(--accent-color));
+      }
+    }
+    .decor-top {
+      top: 5%;
+      left: 5%;
+    }
+    .decor-bottom {
+      bottom: 5%;
+      right: 5%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Decorative Elements -->
+  <div class="islamic-decor decor-top"></div>
+  <div class="islamic-decor decor-bottom"></div>
+
+  <div class="container">
+    <!-- Header Topic -->
+    <div class="header">FADIS YOUTH GARGAARSA</div>
+    <!-- Quran Verse Carousel -->
+    <div class="quran-carousel">
+      <div class="quran-verse active" id="quranVerse">
+        <div class="arabic-text">
+          مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ
+          حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ
+        </div>
+        <div class="translation">
+          Namni qabeenya isaa karaa Rabbii keessatti kennu fakkeenya mukaa sadi'aa
+          kan bishaan gadi bu'uudha
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Bottom Payment Slider -->
+  <div class="payment-slider">
+    <div class="payment-card" data-method="telebirr">
+      <i class="fas fa-mobile-alt payment-icon"></i>
+      <div class="payment-label">Telebirr</div>
+    </div>
+    <div class="payment-card" data-method="hellocash">
+      <i class="fas fa-wallet payment-icon"></i>
+      <div class="payment-label">HelloCash</div>
+    </div>
+    <div class="payment-card" data-method="cbe">
+      <i class="fas fa-university payment-icon"></i>
+      <div class="payment-label">CBE Birr</div>
+    </div>
+    <div class="payment-card" data-method="amole">
+      <i class="fas fa-sim-card payment-icon"></i>
+      <div class="payment-label">Amole</div>
+    </div>
+    <div class="payment-card" data-method="bank">
+      <i class="fas fa-exchange-alt payment-icon"></i>
+      <div class="payment-label">Baankii</div>
+    </div>
+    <div class="payment-card" data-method="mpesa">
+      <i class="fas fa-money-bill-wave payment-icon"></i>
+      <div class="payment-label">M‑Pesa</div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Payment Form (slides up when a payment method is selected) -->
+  <div id="paymentSheet" class="bottom-sheet">
+    <span class="close-sheet" onclick="closeSheet()">&times;</span>
+
+    <!-- Telebirr Form -->
+    <div id="telebirrForm" class="payment-form">
+      <div class="form-group">
+        <label>Lakkoofsa Bilbilaa</label>
+        <input type="tel" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" required />
+      </div>
+      <div class="form-group">
+        <label>Maallaqa (ETB)</label>
+        <input type="number" min="1" step="1" required />
+      </div>
+      <button class="donate-button" onclick="processPayment()">Kaffalti Kennuu</button>
+    </div>
+
+    <!-- HelloCash Form -->
+    <div id="hellocashForm" class="payment-form">
+      <div class="form-group">
+        <label>Lakkoofsa Wallet</label>
+        <input type="tel" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" required />
+      </div>
+      <div class="form-group">
+        <label>Maallaqa (ETB)</label>
+        <input type="number" min="1" step="1" required />
+      </div>
+      <button class="donate-button" onclick="processPayment()">Kaffalti Kennuu</button>
+    </div>
+
+    <!-- CBE Birr Form -->
+    <div id="cbeForm" class="payment-form">
+      <div class="form-group">
+        <label>Maqaa Akkaawuntii</label>
+        <input type="text" required />
+      </div>
+      <div class="form-group">
+        <label>Lakkoofsa Akkaawuntii</label>
+        <input type="number" required />
+      </div>
+      <div class="form-group">
+        <label>Maallaqa (ETB)</label>
+        <input type="number" min="1" step="1" required />
+      </div>
+      <button class="donate-button" onclick="processPayment()">Kaffalti Kennuu</button>
+    </div>
+
+    <!-- Amole Form -->
+    <div id="amoleForm" class="payment-form">
+      <div class="form-group">
+        <label>ID Amole</label>
+        <input type="text" required />
+      </div>
+      <div class="form-group">
+        <label>Maallaqa (ETB)</label>
+        <input type="number" min="1" step="1" required />
+      </div>
+      <button class="donate-button" onclick="processPayment()">Kaffalti Kennuu</button>
+    </div>
+
+    <!-- Bank Transfer Form -->
+    <div id="bankForm" class="payment-form">
+      <div class="form-group">
+        <p>Baankii: Commercial Bank of Ethiopia</p>
+        <p>Maqaa Akkaawuntii: Fadis Youth</p>
+        <p>Lak. Akkaawuntii: 1000 2000 3000</p>
+        <p>Biraanjii: Finfinne</p>
+      </div>
+    </div>
+
+    <!-- M‑Pesa Form -->
+    <div id="mpesaForm" class="payment-form">
+      <div class="form-group">
+        <label>M‑Pesa Phone Number</label>
+        <input type="tel" pattern="07[0-9]{8}" placeholder="07XXXXXXXX" required />
+      </div>
+      <div class="form-group">
+        <label>Maallaqa (KES)</label>
+        <input type="number" min="1" step="1" required />
+      </div>
+      <button class="donate-button" onclick="processPayment()">Kaffalti Kennuu</button>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="success-modal" id="successModal">
+    <div class="success-content">
+      <i class="fas fa-mosque" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+      <h2>Jazāk Allāhu Khayran! 🤲</h2>
+      <p>Kaffalti keessan fudhateerra</p>
+      <button class="donate-button" onclick="closeSuccessModal()" style="margin-top: 1.5rem;">Itti Fufu</button>
+    </div>
+  </div>
+
+  <script>
+    /* --- Quran Verse Rotation with Language Cycle --- */
+    const verses = [
+      {
+        arabic:
+          "مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ",
+        translations: {
+          om: "Namni qabeenya isaa karaa Rabbii keessatti kennu fakkeenya mukaa sadi'aa kan bishaan gadi bu'uudha",
+          am: "የሚያገለግሉ ሰዎች በአላህ መንገድ የሚያበዙ እንደ ዘር ናቸው",
+          en: "The example of those who spend their wealth in the way of Allah is like a seed which grows seven spikes..."
+        }
+      },
+      {
+        arabic:
+          "الَّذِينَ يُنفِقُونَ أَمْوَالَهُم بِاللَّيْلِ وَالنَّهَارِ سِرًّا وَعَلَانِيَةً فَلَهُمْ أَجْرُهُمْ عِندَ رَبِّهِمْ",
+        translations: {
+          om: "Namni halkanii guyyaa qabeenya isaa dhoksaadhaan ifaadhaan kennu, mindaan isaanii Rabbiin bira jira",
+          am: "የሚያበዙ ሰዎች በሌሊትና ቀን በሚያደርጉት ስራ እንዲያገኙ ተስፋ አለው",
+          en: "Those who spend their wealth night and day, secretly and publicly - their reward is with their Lord..."
+        }
+      }
+    ];
+    // Cycle order: Arabic → Afaan Oromoo → Amharic → English.
+    const langOrder = ["arabic", "om", "am", "en"];
+    let currentLangIndex = 0;
+    let currentVerseIndex = 0;
+    function rotateVerses() {
+      const verseDiv = document.getElementById("quranVerse");
+      const lang = langOrder[currentLangIndex];
+      const verse = verses[currentVerseIndex];
+      let htmlContent = "";
+      if (lang === "arabic") {
+        htmlContent = `<div class="arabic-text">${verse.arabic}</div>`;
+      } else {
+        htmlContent = `<div class="arabic-text">${verse.arabic}</div>
+                       <div class="translation">${verse.translations[lang]}</div>`;
+      }
+      verseDiv.classList.remove("active");
+      setTimeout(() => {
+        verseDiv.innerHTML = htmlContent;
+        verseDiv.classList.add("active");
+      }, 500);
+      currentLangIndex++;
+      if (currentLangIndex >= langOrder.length) {
+        currentLangIndex = 0;
+        currentVerseIndex = (currentVerseIndex + 1) % verses.length;
+      }
+    }
+    setInterval(rotateVerses, 10000);
+
+    /* --- Payment Bottom Sheet Handling --- */
+    const paymentCards = document.querySelectorAll(".payment-card");
+    paymentCards.forEach((card) => {
+      card.addEventListener("click", function () {
+        paymentCards.forEach((c) => c.classList.remove("active"));
+        this.classList.add("active");
+        const method = this.getAttribute("data-method");
+        showSheet(method);
+      });
+    });
+    function showSheet(method) {
+      // Hide all forms inside the sheet
+      const forms = document.querySelectorAll(".payment-form");
+      forms.forEach((form) => form.classList.remove("active"));
+      const selectedForm = document.getElementById(method + "Form");
+      if (selectedForm) {
+        selectedForm.classList.add("active");
+      }
+      document.getElementById("paymentSheet").classList.add("active");
+    }
+    function closeSheet() {
+      document.getElementById("paymentSheet").classList.remove("active");
+      paymentCards.forEach((c) => c.classList.remove("active"));
+    }
+    // Simulated payment processing (replace with real integration)
+    function processPayment() {
+      const form = document.querySelector(".payment-form.active");
+      const inputs = form.querySelectorAll("input");
+      let valid = true;
+      inputs.forEach((inp) => {
+        if (!inp.checkValidity()) {
+          inp.reportValidity();
+          valid = false;
+        }
+      });
+      if (valid) {
+        closeSheet();
+        document.getElementById("successModal").style.display = "flex";
+      }
+    }
+    function closeSuccessModal() {
+      document.getElementById("successModal").style.display = "none";
+    }
+  </script>
+</body>
+</html>
