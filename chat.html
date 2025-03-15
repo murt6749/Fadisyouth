@@ -178,7 +178,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
-    // Replace the configuration below with your project's configuration
+    // Initialize Firebase (Replace with your actual Firebase configuration)
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -196,23 +196,20 @@
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if a user is logged in.
+      // Check for authentication.
       firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
           alert("Mee, dura seeni (log in)!");
           window.location.href = "login.html";
           return;
         }
-        // Set current user (using displayName or email)
+        // Set the current user from Firebase Auth.
         window.currentUser = user.displayName || user.email;
-        // Verify group: Check if user exists in "adminUsers" – if yes, group = "Admin", else group = "User"
+        // Determine group based on whether the user is in adminUsers collection.
         db.collection("adminUsers").doc(window.currentUser).get()
           .then(function(doc) {
             window.currentGroup = doc.exists ? "Admin" : "User";
-            // Set header title based on group.
-            document.getElementById("chatHeaderTitle").innerText =
-              window.currentGroup === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
-            // Load chat messages for this group.
+            document.getElementById("chatHeaderTitle").innerText = window.currentGroup === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
             loadChatMessages();
           })
           .catch(function(error) {
@@ -221,7 +218,7 @@
           });
       });
       
-      // Function to load chat messages in real time
+      // Function: Load chat messages in real time (group chat for current group)
       function loadChatMessages() {
         var messagesContainer = document.getElementById("messagesContainer");
         var loadingSpinner = document.getElementById("loadingSpinner");
@@ -237,30 +234,42 @@
               var message = doc.data();
               var timeStr = "";
               if (message.timestamp) {
-                // Ensure the timestamp is a Firestore Timestamp
                 var ts = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
                 timeStr = ts.toLocaleString();
               }
               var messageDiv = document.createElement("div");
-              // Use "sent" style if sender is currentUser, else "received"
               var messageClass = (message.sender === window.currentUser) ? "sent" : "received";
               messageDiv.className = "message " + messageClass;
               messageDiv.innerHTML = "<strong>" + message.sender + "</strong>: " + message.text +
                 "<br><span class='message-time'>" + timeStr + "</span>";
               chatMessagesElem.appendChild(messageDiv);
             });
-            // Scroll to the bottom after rendering messages.
+            // Auto-scroll to bottom
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
           }, function(error) {
             console.error("Dogoggora ergaa fe'uu:", error);
           });
       }
       
-      // Handle sending a message.
+      // Handle sending a message with optimistic update.
       document.getElementById("sendButton").addEventListener("click", function() {
         var chatInput = document.getElementById("chatInput");
         var text = chatInput.value.trim();
         if (text === "") return;
+        
+        // Optimistic UI: immediately append message to chat window.
+        var messagesContainer = document.getElementById("messagesContainer");
+        var chatMessagesElem = document.getElementById("chatMessages");
+        var messageDiv = document.createElement("div");
+        messageDiv.className = "message sent";
+        var localTime = new Date().toLocaleTimeString();
+        messageDiv.innerHTML = "<strong>" + window.currentUser + "</strong>: " + text +
+          "<br><span class='message-time'>" + localTime + " (pending...)</span>";
+        chatMessagesElem.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        chatInput.value = "";
+        
+        // Now send the message to Firebase.
         db.collection("chatMessages").add({
           sender: window.currentUser,
           text: text,
@@ -268,16 +277,17 @@
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(function() {
-          chatInput.value = "";
+          // The real-time listener will update the message list with correct timestamps.
         })
         .catch(function(error) {
           console.error("Dogoggora ergaa erguu:", error);
+          showNotification("Dogoggora ergaa erguu: " + error.message);
+          // Optionally, you could remove the pending message from UI.
         });
       });
       
       // Navigation Buttons.
       document.getElementById("backHomeBtn").addEventListener("click", function() {
-        // Redirect admin group to admin.html; users to home.html.
         window.location.href = window.currentGroup === "Admin" ? "admin.html" : "home.html";
       });
       document.getElementById("logoutBtn").addEventListener("click", function() {
@@ -288,6 +298,16 @@
           console.error("Dogoggora ba'uu keessatti:", error);
         });
       });
+      
+      // Neon Notification Utility.
+      function showNotification(message) {
+        var notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.style.display = "block";
+        setTimeout(function() {
+          notification.style.display = "none";
+        }, 3000);
+      }
     });
   </script>
 </body>
