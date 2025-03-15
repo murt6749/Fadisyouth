@@ -25,7 +25,7 @@
       position: relative;
       overflow: hidden;
     }
-    /* Chat Window (single group chat room) */
+    /* Chat Window Page */
     .chat-window {
       width: 100%;
       height: 100%;
@@ -51,7 +51,7 @@
       font-weight: 500;
       font-size: 18px;
     }
-    /* Chat Messages Container */
+    /* Messages Container */
     .messages-container {
       flex: 1;
       padding: 16px;
@@ -65,11 +65,11 @@
       border-radius: 12px;
       animation: fadeIn 0.3s ease-in;
     }
-    .received {
+    .message.received {
       background: white;
       margin-right: auto;
     }
-    .sent {
+    .message.sent {
       background: #dcf8c6;
       margin-left: auto;
     }
@@ -84,6 +84,8 @@
     }
     /* Input Container */
     .input-container {
+      position: fixed;
+      bottom: 0;
       width: 100%;
       background: white;
       padding: 12px;
@@ -154,15 +156,13 @@
 </head>
 <body>
   <div class="container">
-    <!-- Chat Window -->
+    <!-- Chat Window Page -->
     <div class="chat-window" id="chatWindow">
       <div class="header">
-        <div class="header-title" id="chatHeaderTitle">Chaatii - </div>
+        <div class="header-title" id="chatHeaderTitle">Chaatii Adminii</div>
       </div>
       <div class="messages-container" id="messagesContainer">
-        <!-- Spinner for loading messages -->
         <div id="loadingSpinner" class="spinner" style="display:none;"></div>
-        <!-- Chat messages will be loaded here -->
         <div id="chatMessages"></div>
       </div>
       <div class="input-container">
@@ -172,13 +172,13 @@
     </div>
   </div>
   
-  <!-- Firebase Scripts -->
+  <!-- Firebase & App Scripts (Compat Libraries) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
-    // Initialize Firebase (update with your configuration)
+    // Replace the configuration below with your project's configuration
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -196,34 +196,32 @@
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if user is logged in.
+      // Check if a user is logged in.
       firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
           alert("Mee, dura seeni (log in)!");
           window.location.href = "login.html";
           return;
         }
-        // Determine if user is an admin by checking Firestore "adminUsers" document.
-        var currentUser = user.displayName || user.email;
-        window.currentUser = currentUser;  // Save for sending messages
-        db.collection("adminUsers").doc(currentUser).get()
+        // Set current user (using displayName or email)
+        window.currentUser = user.displayName || user.email;
+        // Verify group: Check if user exists in "adminUsers" – if yes, group = "Admin", else group = "User"
+        db.collection("adminUsers").doc(window.currentUser).get()
           .then(function(doc) {
-            var group = doc.exists ? "Admin" : "User";
+            window.currentGroup = doc.exists ? "Admin" : "User";
             // Set header title based on group.
-            var headerTitle = document.getElementById("chatHeaderTitle");
-            headerTitle.innerText = group === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
-            // When sending messages, include group info.
-            window.currentGroup = group;
+            document.getElementById("chatHeaderTitle").innerText =
+              window.currentGroup === "Admin" ? "Chaatii Adminii" : "Chaatii Fayyadamtoota";
             // Load chat messages for this group.
             loadChatMessages();
           })
           .catch(function(error) {
-            console.error("Error verifying admin:", error);
+            console.error("Dogoggora verification:", error);
             alert("Dogoggora qunnamtii database keessatti mudate.");
           });
       });
       
-      // Load chat messages for the current group in real time.
+      // Function to load chat messages in real time
       function loadChatMessages() {
         var messagesContainer = document.getElementById("messagesContainer");
         var loadingSpinner = document.getElementById("loadingSpinner");
@@ -239,24 +237,26 @@
               var message = doc.data();
               var timeStr = "";
               if (message.timestamp) {
-                var date = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
-                timeStr = date.toLocaleString();
+                // Ensure the timestamp is a Firestore Timestamp
+                var ts = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
+                timeStr = ts.toLocaleString();
               }
               var messageDiv = document.createElement("div");
-              // If the sender is the current user, use "sent" style; otherwise, "received"
+              // Use "sent" style if sender is currentUser, else "received"
               var messageClass = (message.sender === window.currentUser) ? "sent" : "received";
               messageDiv.className = "message " + messageClass;
               messageDiv.innerHTML = "<strong>" + message.sender + "</strong>: " + message.text +
                 "<br><span class='message-time'>" + timeStr + "</span>";
               chatMessagesElem.appendChild(messageDiv);
             });
+            // Scroll to the bottom after rendering messages.
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
           }, function(error) {
             console.error("Dogoggora ergaa fe'uu:", error);
           });
       }
       
-      // Handle sending a chat message.
+      // Handle sending a message.
       document.getElementById("sendButton").addEventListener("click", function() {
         var chatInput = document.getElementById("chatInput");
         var text = chatInput.value.trim();
@@ -277,7 +277,7 @@
       
       // Navigation Buttons.
       document.getElementById("backHomeBtn").addEventListener("click", function() {
-        // For admin group, send them to admin.html; for users, perhaps to a home page.
+        // Redirect admin group to admin.html; users to home.html.
         window.location.href = window.currentGroup === "Admin" ? "admin.html" : "home.html";
       });
       document.getElementById("logoutBtn").addEventListener("click", function() {
