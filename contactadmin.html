@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Ergaa Ergaa</title>
+  <!-- Font Awesome and Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      color: #f1c40f;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+    /* Admin Cards Grid */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .admin-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .admin-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.15);
+    }
+    .admin-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: -60px auto 10px;
+      border: 3px solid #f1c40f;
+      background-size: cover;
+      background-position: center;
+    }
+    .admin-name {
+      font-size: 1.4em;
+      margin-bottom: 5px;
+      color: #f1c40f;
+    }
+    .admin-role {
+      font-size: 1em;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .admin-description {
+      font-size: 0.85em;
+      color: #bdc3c7;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    /* Notification */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f1c40f;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 50px;
+      display: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      font-weight: bold;
+      z-index: 3000;
+    }
+    /* Neon Glowing Modal for Admin Authentication */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .auth-modal {
+      background: #0a0a0a;
+      border: 2px solid #f1c40f;
+      box-shadow: 0 0 20px 5px rgba(241,196,15,0.7);
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      color: #f1c40f;
+      position: relative;
+    }
+    .modal-header {
+      text-align: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #f1c40f;
+      padding-bottom: 10px;
+    }
+    .modal-header h2 {
+      font-size: 1.6em;
+    }
+    .modal-body input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 5px;
+    }
+    .modal-btn {
+      background: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .modal-btn:hover {
+      background: #e0b90f;
+    }
+    .cancel-btn {
+      background: transparent;
+      color: #f1c40f;
+      border: 2px solid #f1c40f;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .cancel-btn:hover {
+      background: #f1c40f;
+      color: #000;
+    }
+    /* Navigation Buttons */
+    .nav-buttons {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-btn {
+      background: #D4AF37;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .nav-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Admin Card Grid -->
+  <div class="container" id="adminContainer">
+    <h1>Bulchiinsa Ergaa - Garee Ijoo</h1>
+    <div class="admin-grid">
+      <!-- Admin Card 1 -->
+      <div class="admin-card" data-phone="+251912345678" data-admin="Murtesa Ahmed">
+        <div class="admin-image" style="background-image: url('murtesa.png')"></div>
+        <h2 class="admin-name">Murtesa Ahmed</h2>
+        <p class="admin-role">Hogganaa</p>
+      </div>
+      <!-- Admin Card 2 -->
+      <div class="admin-card" data-phone="+251911987654" data-admin="Nadhii Yusuuf">
+        <div class="admin-image" style="background-image: url('nadhii.png')"></div>
+        <h2 class="admin-name">Nadhii Yusuuf</h2>
+        <p class="admin-role">Hojjetaa Gorsaa</p>
+      </div>
+      <!-- Admin Card 3 -->
+      <div class="admin-card" data-phone="+251913112233" data-admin="Bahaar Sh/Abdalla">
+        <div class="admin-image" style="background-image: url('bahaar.png')"></div>
+        <h2 class="admin-name">Bahaar Sh/Abdalla</h2>
+        <p class="admin-role">Itti-gaafatamaa Viidiyoo</p>
+      </div>
+      <!-- Admin Card 4 -->
+      <div class="admin-card" data-phone="+251914445566" data-admin="Jamaal Sh/Abdalla">
+        <div class="admin-image" style="background-image: url('jamaal.png')"></div>
+        <h2 class="admin-name">Jamaal Sh/Abdalla</h2>
+        <p class="admin-role">Ogeessa Miidiyaa</p>
+      </div>
+      <!-- Admin Card 5 -->
+      <div class="admin-card" data-phone="+251915778899" data-admin="Abdulwaduud Abdusalasm">
+        <div class="admin-image" style="background-image: url('abdul.png')"></div>
+        <h2 class="admin-name">Abdulwaduud Abdusalasm</h2>
+        <p class="admin-role">Ogeessa Gorsa</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- (Optional) Admin Messages Section is not used on this login page -->
+  <div class="container admin-messages" id="adminMessages" style="display:none;">
+    <h1 id="adminMessagesTitle"></h1>
+    <div id="messageList">
+      <!-- Messages for this admin will be loaded here -->
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <button class="nav-btn" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Bahi</button>
+    </div>
+  </div>
+
+  <!-- Admin Authentication Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-modal">
+      <button class="cancel-btn" id="closeAuthBtn">&times;</button>
+      <div class="modal-header">
+        <h2 id="authModalTitle">Bulchiinsa Ergaa Seensa</h2>
+      </div>
+      <div class="modal-body" id="authModalBody">
+        <!-- The content is determined by whether the admin already exists -->
+        <input type="password" id="adminPassword" placeholder="Jecha icciitii kee galchi">
+        <input type="password" id="adminPasswordConfirm" placeholder="Jecha icciitii kee mirkaneessi" style="display:none;">
+        <button class="modal-btn" id="authActionBtn"><i class="fas fa-lock"></i> Galchi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Firebase & App Scripts (Compat Libraries) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Global variables
+      var currentAdmin = null;
+      var currentAdminName = "";
+      var currentAdminPhone = "";
+      var adminLoggedIn = false;
+
+      // Neon Notification Utility
+      function showNotification(message) {
+        var notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+        setTimeout(function() {
+          notification.style.display = 'none';
+        }, 3000);
+      }
+
+      // Admin Card Click Handling – when an admin card is clicked, use that card's data to trigger authentication
+      document.querySelectorAll('.admin-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('.admin-contact')) return;
+          currentAdminName = card.getAttribute('data-admin');
+          currentAdminPhone = card.getAttribute('data-phone');
+          openAuthModal();
+        });
+      });
+
+      // Open Admin Authentication Modal
+      function openAuthModal() {
+        document.getElementById('authModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        // Check Firestore "adminUsers" collection for document with ID = currentAdminName
+        db.collection("adminUsers").doc(currentAdminName).get()
+          .then(function(doc) {
+            if (doc.exists) {
+              // Admin exists; show login form (one password field)
+              document.getElementById('authModalTitle').innerText = currentAdminName + " - Seensa";
+              document.getElementById('adminPassword').placeholder = "Jecha icciitii kee galchi";
+              document.getElementById('adminPasswordConfirm').style.display = 'none';
+              document.getElementById('authActionBtn').innerText = "Seeni";
+            } else {
+              // Admin does not exist; show set-password form (two password fields)
+              document.getElementById('authModalTitle').innerText = currentAdminName + " - Jecha icciitii uumuu";
+              document.getElementById('adminPassword').placeholder = "Jecha icciitii kee uumi";
+              document.getElementById('adminPasswordConfirm').placeholder = "Jecha icciitii kee mirkaneessi";
+              document.getElementById('adminPasswordConfirm').style.display = 'block';
+              document.getElementById('authActionBtn').innerText = "Uumi";
+            }
+          })
+          .catch(function(error) {
+            console.error("Dogoggora ilaalchisee admin:", error);
+            showNotification("Dogoggora qunnamtii database keessatti mudate.");
+          });
+      }
+
+      // Close Admin Authentication Modal
+      function closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('adminPassword').value = "";
+        document.getElementById('adminPasswordConfirm').value = "";
+      }
+      document.getElementById('closeAuthBtn').addEventListener('click', closeAuthModal);
+
+      // Admin Authentication Action
+      document.getElementById('authActionBtn').addEventListener('click', function() {
+        var pwd = document.getElementById('adminPassword').value;
+        var pwdConfirm = document.getElementById('adminPasswordConfirm').value;
+        db.collection("adminUsers").doc(currentAdminName).get()
+          .then(function(doc) {
+            if (doc.exists) {
+              // Admin exists; verify password
+              if (pwd === doc.data().password) {
+                adminLoggedIn = true;
+                currentAdmin = doc.data();
+                showNotification("Seensa milkaa'ee!");
+                closeAuthModal();
+                // Redirect to admin.html (the main admin panel)
+                window.location.href = "admin.html";
+              } else {
+                showNotification("Jecha icciitii sirrii hin ta'u.");
+              }
+            } else {
+              // Admin does not exist; create new admin document if passwords match
+              if (!pwd || !pwdConfirm) {
+                showNotification("Mee, jecha icciitii kee guuti.");
+                return;
+              }
+              if (pwd !== pwdConfirm) {
+                showNotification("Jecha icciitii wal simachuu hin danda'u.");
+                return;
+              }
+              db.collection("adminUsers").doc(currentAdminName).set({
+                password: pwd,
+                phone: currentAdminPhone
+              })
+              .then(function() {
+                adminLoggedIn = true;
+                currentAdmin = { password: pwd, phone: currentAdminPhone };
+                showNotification("Jecha icciitii uumame, seensa milkaa'ee!");
+                closeAuthModal();
+                // Redirect to admin.html after account creation
+                window.location.href = "admin.html";
+              })
+              .catch(function(error) {
+                console.error("Dogoggora admin uumuu:", error);
+                showNotification("Dogoggora uumuu keessatti mudate.");
+              });
+            }
+          })
+          .catch(function(error) {
+            console.error("Dogoggora seensa admin:", error);
+          });
+      });
+
+      // Navigation: If logout button exists on this page, attach a listener
+      document.getElementById('adminLogoutBtn') && document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+        auth.signOut().then(function() {
+          showNotification("Ba'ii milkaa'aa!");
+          location.reload();
+        }).catch(function(error) {
+          console.error("Dogoggora ba'uu keessatti:", error);
+          showNotification("Dogoggora ba'uu keessatti mudate.");
+        });
+      });
+
+      // Clicking outside the modal (auth) closes it
+      window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+          closeAuthModal();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
