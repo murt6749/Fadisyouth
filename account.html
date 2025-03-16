@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fadis Youth – Account Settings</title>
+  <link rel="manifest" href="manifest.json">
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <!-- Firestore for extra info -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Variables & Base Styles */
+    :root {
+      --primary-color: #0a1931;
+      --secondary-color: #FFD700;
+      --accent-color: #009688;
+      --text-light: #f0f0f0;
+      --bg-gradient: linear-gradient(135deg, #0a1931 0%, #020024 100%);
+      --card-bg: rgba(16,36,60,0.9);
+      --shadow: 0 4px 30px rgba(0,0,0,0.1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Amiri', 'Segoe UI', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-light);
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 100px; /* reserve space for bottom nav */
+    }
+    .islamic-pattern {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%),
+        repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px);
+      z-index: -1;
+    }
+    /* Header */
+    header {
+      background: rgba(10,25,49,0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid var(--secondary-color);
+    }
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--secondary-color);
+      flex-grow: 1;
+    }
+    header a.back-link {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 1.2rem;
+    }
+    /* Account Container */
+    .account-container {
+      max-width: 500px;
+      margin: 3rem auto 2rem auto;
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    /* Profile Card */
+    .profile-card {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid var(--secondary-color);
+      border-radius: 10px;
+      background: var(--card-bg);
+    }
+    .profile-card .profile-circle {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+    .profile-card .profile-circle i {
+      font-size: 4rem;
+      color: #fff;
+    }
+    .profile-card .profile-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .profile-card .profile-bio {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    .profile-card .profile-actions {
+      margin-top: 10px;
+    }
+    .profile-card .profile-actions button {
+      margin: 0 5px;
+      padding: 0.5rem 1rem;
+      background: var(--accent-color);
+      border: none;
+      border-radius: 5px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .profile-card .profile-actions button:hover {
+      transform: scale(1.05);
+    }
+    /* Section Styles */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .section h3 {
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+      border-bottom: 1px solid var(--secondary-color);
+      padding-bottom: 0.5rem;
+    }
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--secondary-color);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--text-light);
+    }
+    .btn-group {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .btn-group button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      background: var(--accent-color);
+      color: var(--text-light);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      margin: 0 0.5rem;
+    }
+    .btn-group button:hover { transform: scale(1.05); }
+    .spinner {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: var(--secondary-color);
+    }
+    /* Bottom Navigation Buttons */
+    .bottom-nav {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1.5rem;
+      background: rgba(255,255,255,0.9);
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+    }
+    .bottom-nav .nav-btn {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .bottom-nav .nav-btn span {
+      font-size: 0.7rem;
+      margin-top: 4px;
+    }
+    .bottom-nav .nav-btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.1);
+      transform: scale(0);
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    .bottom-nav .nav-btn:hover::after {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+    .bottom-nav .nav-btn:hover {
+      transform: translateY(-5px) rotate(360deg);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .bottom-nav .nav-btn i {
+      font-size: 1.5rem;
+      transition: transform 0.3s;
+    }
+    @keyframes spinButton {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .nav-btn.updating {
+      animation: spinButton 1s linear;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .bottom-nav {
+        bottom: 10px;
+        padding: 0.8rem 1.5rem;
+        gap: 1rem;
+      }
+      .bottom-nav .nav-btn {
+        width: 50px;
+        height: 50px;
+      }
+      .bottom-nav .nav-btn i {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="islamic-pattern"></div>
+  <!-- Header with Back Link -->
+  <header>
+    <h1>Account Settings</h1>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back</a>
+  </header>
+  
+  <div class="account-container">
+    <!-- Profile Card -->
+    <section class="profile-card" id="profileCard" style="display:none;">
+      <div class="profile-circle" id="profileCircle">
+        <i class="fas fa-user"></i>
+        <img id="profileImg" src="" alt="Profile Picture">
+      </div>
+      <div class="profile-bio" id="profileBio"></div>
+      <div class="profile-actions">
+        <button id="logoutBtn">Logout</button>
+        <button id="editBtn">Edit</button>
+      </div>
+      <input type="file" id="profilePicInput" accept="image/png, image/jpeg, image/jpg" style="display:none;">
+    </section>
+    
+    <!-- Sections for Account Settings -->
+    <!-- Change Email Section -->
+    <section class="section active" id="emailTab">
+      <h3>Change Email</h3>
+      <div class="input-group">
+        <label for="newEmailField">New Email</label>
+        <input type="email" id="newEmailField" placeholder="Enter new email">
+      </div>
+      <div class="input-group">
+        <label for="emailCurrentPassword">Current Password</label>
+        <input type="password" id="emailCurrentPassword" placeholder="Enter current password">
+      </div>
+      <div class="btn-group">
+        <button type="button" id="changeEmailBtn">Change Email</button>
+      </div>
+      <div class="spinner" id="emailSpinner"><i class="fas fa-spinner fa-spin"></i> Updating...</div>
+    </section>
+    
+    <!-- Change Password Section -->
+    <section class="section" id="passwordTab">
+      <h3>Change Password</h3>
+      <div class="input-group">
+        <label for="currentPasswordField">Current Password</label>
+        <input type="password" id="currentPasswordField" placeholder="Enter current password">
+      </div>
+      <div class="input-group">
+        <label for="newPasswordField">New Password</label>
+        <input type="password" id="newPasswordField" placeholder="Enter new password">
+      </div>
+      <div class="input-group">
+        <label for="confirmNewPasswordField">Confirm New Password</label>
+        <input type="password" id="confirmNewPasswordField" placeholder="Confirm new password">
+      </div>
+      <div class="btn-group">
+        <button type="button" id="changePasswordBtn">Change Password</button>
+      </div>
+      <div class="spinner" id="passwordSpinner"><i class="fas fa-spinner fa-spin"></i> Updating...</div>
+    </section>
+    
+    <!-- Extra Information Section -->
+    <section class="section" id="extraTab">
+      <h3>Extra Information</h3>
+      <div class="input-group">
+        <label for="addressField">Address</label>
+        <input type="text" id="addressField" placeholder="Where do you live?">
+      </div>
+      <div class="input-group">
+        <label for="phoneField">Phone Number</label>
+        <input type="text" id="phoneField" placeholder="Enter your phone number">
+      </div>
+      <div class="input-group">
+        <label for="occupationField">Occupation / Student Status</label>
+        <input type="text" id="occupationField" placeholder="Your occupation or student status">
+      </div>
+      <div class="input-group">
+        <label for="bioField">Bio</label>
+        <input type="text" id="bioField" placeholder="A short bio about you">
+      </div>
+      <div class="btn-group">
+        <button type="button" id="saveExtraBtn">Save Extra Info</button>
+      </div>
+      <div class="spinner" id="extraSpinner"><i class="fas fa-spinner fa-spin"></i> Saving...</div>
+    </section>
+  </div>
+  
+  <!-- Bottom Navigation Buttons -->
+  <div class="bottom-nav">
+    <button class="nav-btn" data-tab="emailTab" id="navEmail">
+      <i class="fas fa-envelope"></i>
+      <span>Email</span>
+    </button>
+    <button class="nav-btn" data-tab="passwordTab" id="navPassword">
+      <i class="fas fa-key"></i>
+      <span>Password</span>
+    </button>
+    <button class="nav-btn" data-tab="extraTab" id="navExtra">
+      <i class="fas fa-info-circle"></i>
+      <span>Extra</span>
+    </button>
+  </div>
+  
+  <!-- JavaScript -->
+  <script>
+    // Initialize Firestore
+    const db = firebase.firestore();
+
+    // --- Authentication Check & Populate Profile Card ---
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        // Populate Change Email field and profile card
+        document.getElementById("newEmailField").value = user.email || "";
+        document.getElementById("profileBio").innerHTML = `<strong>${user.displayName || "User"}</strong><br>${user.email}`;
+        if (user.photoURL) {
+          document.getElementById("profileImg").src = user.photoURL;
+          document.getElementById("profileImg").style.display = "block";
+          document.getElementById("profileCircle").querySelector("i").style.display = "none";
+        }
+        document.getElementById("profileCard").style.display = "block";
+      }
+    });
+
+    // --- Bottom Navigation Button Functionality ---
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const sections = document.querySelectorAll(".section");
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Animate button (spin)
+        btn.classList.add("updating");
+        setTimeout(() => { btn.classList.remove("updating"); }, 500);
+        // Hide all sections
+        sections.forEach(s => s.classList.remove("active"));
+        // Activate the selected section based on data-tab attribute
+        document.getElementById(btn.getAttribute("data-tab")).classList.add("active");
+        // If Extra Information tab is activated, load saved extra info
+        if (btn.getAttribute("data-tab") === "extraTab") {
+          loadExtraInfo();
+        }
+      });
+    });
+
+    // --- Load Extra Information from Firestore ---
+    function loadExtraInfo() {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            document.getElementById("addressField").value = data.address || "";
+            document.getElementById("phoneField").value = data.phone || "";
+            document.getElementById("occupationField").value = data.occupation || "";
+            document.getElementById("bioField").value = data.bio || "";
+          }
+        }).catch(err => {
+          console.error("Error loading extra info: ", err);
+        });
+      }
+    }
+
+    // --- Change Email Functionality ---
+    document.getElementById("changeEmailBtn").addEventListener("click", async () => {
+      const spinner = document.getElementById("emailSpinner");
+      spinner.style.display = "block";
+      const user = firebase.auth().currentUser;
+      const newEmail = document.getElementById("newEmailField").value.trim();
+      const emailCurrentPassword = document.getElementById("emailCurrentPassword").value;
+      if (!newEmail || !emailCurrentPassword) {
+        alert("Please fill in all fields.");
+        spinner.style.display = "none";
+        return;
+      }
+      try {
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, emailCurrentPassword);
+        await user.reauthenticateWithCredential(credential);
+        await user.updateEmail(newEmail);
+        alert("Email updated successfully!");
+      } catch (error) {
+        alert("Error updating email: " + error.message);
+      }
+      spinner.style.display = "none";
+    });
+
+    // --- Change Password Functionality ---
+    document.getElementById("changePasswordBtn").addEventListener("click", async () => {
+      const spinner = document.getElementById("passwordSpinner");
+      spinner.style.display = "block";
+      const user = firebase.auth().currentUser;
+      const currentPassword = document.getElementById("currentPasswordField").value;
+      const newPassword = document.getElementById("newPasswordField").value;
+      const confirmNewPassword = document.getElementById("confirmNewPasswordField").value;
+      if (!currentPassword || !newPassword || !confirmNewPassword) {
+        alert("Please fill in all fields.");
+        spinner.style.display = "none";
+        return;
+      }
+      if (newPassword !== confirmNewPassword) {
+        alert("New passwords do not match.");
+        spinner.style.display = "none";
+        return;
+      }
+      try {
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+        alert("Password updated successfully!");
+      } catch (error) {
+        alert("Error updating password: " + error.message);
+      }
+      spinner.style.display = "none";
+    });
+
+    // --- Save Extra Information Functionality ---
+    document.getElementById("saveExtraBtn").addEventListener("click", async () => {
+      const spinner = document.getElementById("extraSpinner");
+      spinner.style.display = "block";
+      const user = firebase.auth().currentUser;
+      const extraInfo = {
+        address: document.getElementById("addressField").value.trim(),
+        phone: document.getElementById("phoneField").value.trim(),
+        occupation: document.getElementById("occupationField").value.trim(),
+        bio: document.getElementById("bioField").value.trim()
+      };
+      try {
+        await db.collection("users").doc(user.uid).set(extraInfo, { merge: true });
+        alert("Extra information saved successfully!");
+      } catch (error) {
+        alert("Error saving extra information: " + error.message);
+      }
+      spinner.style.display = "none";
+    });
+
+    // --- Profile Card: Update Profile Picture ---
+    const profileCircle = document.getElementById("profileCircle");
+    const profilePicInput = document.getElementById("profilePicInput");
+    profileCircle.addEventListener("click", () => { profilePicInput.click(); });
+    profilePicInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async function(evt) {
+          document.getElementById("profileImg").src = evt.target.result;
+          document.getElementById("profileImg").style.display = "block";
+          profileCircle.querySelector("i").style.display = "none";
+          try {
+            await firebase.auth().currentUser.updateProfile({ photoURL: evt.target.result });
+            alert("Profile picture updated!");
+          } catch (err) {
+            alert("Error updating profile picture: " + err.message);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // --- Profile Card Buttons ---
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      firebase.auth().signOut().then(() => { window.location.href = "login.html"; });
+    });
+    document.getElementById("editBtn").addEventListener("click", () => {
+      // For example, redirect to a dedicated account edit page or simply focus the extra info section.
+      window.location.href = "account.html";
+    });
+    
+    // --- Service Worker Registration for Offline Support ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
