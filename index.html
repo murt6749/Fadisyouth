@@ -1,9 +1,11 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="om">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fadis Youth – Member</title>
+  <!-- Link to the web app manifest -->
+  <link rel="manifest" href="manifest.json">
   <!-- Firebase Scripts (compat version for simplicity) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -39,146 +41,351 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Amiri', 'Segoe UI', sans-serif; }
     body { min-height: 100vh; background: var(--bg-gradient); color: var(--text-light); overflow-x: hidden; position: relative; }
-
-    /* ========================================================
-       Intro Modal (4-second single message)
-    ========================================================== */
-    #introModal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(10,25,49,0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 5000;
-      opacity: 1;
-      transition: opacity 1s ease-out;
-    }
-    #introContent {
-      text-align: center;
-      color: var(--secondary-color);
-      font-size: 2em;
-      font-weight: bold;
-      padding: 20px;
-    }
-
     /* ========================================================
        Background Elements
     ========================================================== */
-    .islamic-pattern { position: fixed; width: 100vw; height: 100vh; background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); z-index: -1; }
-    .floating-ornament { position: fixed; width: 50px; height: 50px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23009688" d="M50 0L100 50 50 100 0 50 50 0" opacity="0.1"/></svg>'); animation: float 20s linear infinite; pointer-events: none; }
+    .islamic-pattern { 
+      position: fixed; 
+      width: 100vw; 
+      height: 100vh; 
+      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
+      z-index: -1; 
+    }
+    .floating-ornament { 
+      position: fixed; 
+      width: 50px; 
+      height: 50px; 
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23009688" d="M50 0L100 50 50 100 0 50 50 0" opacity="0.1"/></svg>'); 
+      animation: float 20s linear infinite; 
+      pointer-events: none; 
+    }
     @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
-
     /* ========================================================
        Header
     ========================================================== */
-    header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(10,25,49,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; padding: 0 2rem; z-index: 1000; border-bottom: 2px solid var(--secondary-color); }
-    .logo { font-size: 1.8rem; color: var(--secondary-color); text-decoration: none; margin-right: auto; }
-    .hamburger { width: 35px; height: 25px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; margin-left: 1.5rem; }
-    .hamburger span { height: 3px; background: var(--secondary-color); transition: all 0.3s ease; }
+    header { 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 70px; 
+      background: rgba(10,25,49,0.95); 
+      backdrop-filter: blur(10px); 
+      display: flex; align-items: center; 
+      padding: 0 2rem; z-index: 1000; 
+      border-bottom: 2px solid var(--secondary-color); 
+    }
+    .logo { 
+      font-size: 1.8rem; 
+      color: var(--secondary-color); 
+      text-decoration: none; 
+      margin-right: auto; 
+    }
+    .hamburger { 
+      width: 35px; height: 25px; 
+      cursor: pointer; 
+      display: flex; flex-direction: column; justify-content: space-between; 
+      margin-left: 1.5rem; 
+    }
+    .hamburger span { 
+      height: 3px; 
+      background: var(--secondary-color); 
+      transition: all 0.3s ease; 
+    }
     .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px,8px); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px,-8px); }
-
     /* ========================================================
        Side Navigation
     ========================================================== */
-    .side-nav { position: fixed; left: -300px; top: 0; width: 300px; height: 100vh; background: rgba(16,36,60,0.98); backdrop-filter: blur(15px); padding: 80px 1.5rem 2rem; transition: left 0.3s ease; z-index: 999; border-right: 2px solid var(--secondary-color); overflow-y: auto; }
+    .side-nav { 
+      position: fixed; 
+      left: -300px; top: 0; 
+      width: 300px; height: 100vh; 
+      background: rgba(16,36,60,0.98); 
+      backdrop-filter: blur(15px); 
+      padding: 80px 1.5rem 2rem; 
+      transition: left 0.3s ease; 
+      z-index: 999; 
+      border-right: 2px solid var(--secondary-color); 
+      overflow-y: auto; 
+    }
     .side-nav.active { left: 0; }
-    .nav-link { display: flex; align-items: center; padding: 1rem; margin: 0.5rem 0; color: var(--text-light); text-decoration: none; border-radius: 8px; transition: all 0.3s ease; }
-    .nav-link:hover { background: rgba(255,215,0,0.1); transform: translateX(10px); }
-    .nav-link i { margin-right: 1rem; width: 25px; text-align: center; }
-
+    .nav-link { 
+      display: flex; 
+      align-items: center; 
+      padding: 1rem; 
+      margin: 0.5rem 0; 
+      color: var(--text-light); 
+      text-decoration: none; 
+      border-radius: 8px; 
+      transition: all 0.3s ease; 
+    }
+    .nav-link:hover { 
+      background: rgba(255,215,0,0.1); 
+      transform: translateX(10px); 
+    }
+    .nav-link i { 
+      margin-right: 1rem; 
+      width: 25px; 
+      text-align: center; 
+    }
     /* ========================================================
        Settings Dropdown in Side Nav
     ========================================================== */
-    .settings-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-bottom: 1rem; border-radius: 5px; }
-    .settings-section { margin-bottom: 1rem; }
-    .settings-header { display: flex; align-items: center; padding: 0.5rem; cursor: pointer; }
-    .settings-header i { margin-right: 0.5rem; }
-    .settings-submenu { display: none; flex-direction: column; margin-left: 1.5rem; }
-    .settings-submenu a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
-
+    .settings-dropdown { 
+      display: none; 
+      flex-direction: column; 
+      padding: 0.5rem; 
+      background: rgba(16,36,60,0.95); 
+      margin-bottom: 1rem; 
+      border-radius: 5px; 
+    }
+    .settings-section { 
+      margin-bottom: 1rem; 
+    }
+    .settings-header { 
+      display: flex; 
+      align-items: center; 
+      padding: 0.5rem; 
+      cursor: pointer; 
+    }
+    .settings-header i { 
+      margin-right: 0.5rem; 
+    }
+    .settings-submenu { 
+      display: none; 
+      flex-direction: column; 
+      margin-left: 1.5rem; 
+    }
+    .settings-submenu a { 
+      padding: 0.5rem; 
+      text-decoration: none; 
+      color: var(--text-light); 
+      border-top: 1px solid rgba(255,215,0,0.2); 
+    }
     /* ========================================================
        Contact Dropdown – Simple Vertical List
     ========================================================== */
-    .contact-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-top: 0.5rem; border-radius: 5px; }
-    .contact-dropdown a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
-
+    .contact-dropdown { 
+      display: none; 
+      flex-direction: column; 
+      padding: 0.5rem; 
+      background: rgba(16,36,60,0.95); 
+      margin-top: 0.5rem; 
+      border-radius: 5px; 
+    }
+    .contact-dropdown a { 
+      padding: 0.5rem; 
+      text-decoration: none; 
+      color: var(--text-light); 
+      border-top: 1px solid rgba(255,215,0,0.2); 
+    }
     /* ========================================================
        Main Content Sections
     ========================================================== */
-    main { margin-top: 90px; padding: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
-    .dashboard-section { background: var(--card-bg); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.2); box-shadow: var(--shadow); }
-    .section-header { display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--accent-color); }
-    .section-title { font-size: 1.8rem; color: var(--secondary-color); margin-left: 1rem; }
-
+    main { 
+      margin-top: 90px; 
+      padding: 2rem; 
+      max-width: 1200px; 
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    .dashboard-section { 
+      background: var(--card-bg); 
+      border-radius: 15px; 
+      padding: 2rem; 
+      margin-bottom: 2rem; 
+      backdrop-filter: blur(10px); 
+      border: 1px solid rgba(255,215,0,0.2); 
+      box-shadow: var(--shadow); 
+    }
+    .section-header { 
+      display: flex; 
+      align-items: center; 
+      margin-bottom: 1.5rem; 
+      padding-bottom: 1rem; 
+      border-bottom: 2px solid var(--accent-color); 
+    }
+    .section-title { 
+      font-size: 1.8rem; 
+      color: var(--secondary-color); 
+      margin-left: 1rem; 
+    }
     /* --------------------------------------------------------
        Prayer Times Section
     --------------------------------------------------------- */
-    #dateDisplay { text-align: center; font-size: 1.2rem; margin-bottom: 1rem; }
-    #upcomingPrayer { text-align: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(16,36,60,0.9), rgba(8,18,32,0.9)); border-radius: 12px; }
-
+    #dateDisplay { 
+      text-align: center; 
+      font-size: 1.2rem; 
+      margin-bottom: 1rem; 
+    }
+    #upcomingPrayer { 
+      text-align: center; 
+      padding: 1.5rem; 
+      background: linear-gradient(145deg, rgba(16,36,60,0.9), rgba(8,18,32,0.9)); 
+      border-radius: 12px; 
+    }
     /* --------------------------------------------------------
-       Fadis Sheik Section
+       Donate Section (Replaces Fadis Sheik Section)
     --------------------------------------------------------- */
-    #fadisSection { text-align: center; }
-    #fadisSection .refresh-icon { font-size: 1.4rem; cursor: pointer; transition: transform 0.3s; user-select: none; }
-    #fadisSection .refresh-icon:hover { transform: rotate(360deg); }
-
+    #donateSection { 
+      text-align: center; 
+    }
     /* --------------------------------------------------------
        Featured Topic Flashcard Section
     --------------------------------------------------------- */
-    #topicSection { margin-bottom: 2rem; }
-    #topicSection .topic-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: transform 0.3s ease; }
-    #topicSection .topic-card:hover { transform: scale(1.02); }
-    #topicSection .topic-image { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; margin-bottom: 0.5rem; }
-    #topicSection .topic-title { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--secondary-color); }
-    #topicSection .topic-description { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1rem; }
-
+    #topicSection { 
+      margin-bottom: 2rem; 
+    }
+    #topicSection .topic-card { 
+      background: var(--card-bg); 
+      border-radius: 12px; 
+      padding: 1rem; 
+      text-align: center; 
+      cursor: pointer; 
+      transition: transform 0.3s ease; 
+    }
+    #topicSection .topic-card:hover { 
+      transform: scale(1.02); 
+    }
+    #topicSection .topic-image { 
+      width: 100%; 
+      height: 150px; 
+      object-fit: cover; 
+      border-radius: 5px; 
+      margin-bottom: 0.5rem; 
+    }
+    #topicSection .topic-title { 
+      font-size: 1.1rem; 
+      margin-bottom: 0.5rem; 
+      color: var(--secondary-color); 
+    }
+    #topicSection .topic-description { 
+      font-size: 0.95rem; 
+      opacity: 0.9; 
+      margin-bottom: 1rem; 
+    }
     /* --------------------------------------------------------
        Buttons
     --------------------------------------------------------- */
-    .submit-btn { padding: 0.5rem 1rem; background: var(--accent-color); border: none; border-radius: 5px; color: var(--text-light); cursor: pointer; transition: transform 0.3s ease; }
-    .submit-btn:hover { transform: scale(1.05); }
-
+    .submit-btn { 
+      padding: 0.5rem 1rem; 
+      background: var(--accent-color); 
+      border: none; 
+      border-radius: 5px; 
+      color: var(--text-light); 
+      cursor: pointer; 
+      transition: transform 0.3s ease; 
+    }
+    .submit-btn:hover { 
+      transform: scale(1.05); 
+    }
     /* --------------------------------------------------------
        Footer
     --------------------------------------------------------- */
-    footer { background: rgba(10,25,49,0.95); padding: 2rem; margin-top: 4rem; border-top: 2px solid var(--secondary-color); text-align: center; }
-
+    footer { 
+      background: rgba(10,25,49,0.95); 
+      padding: 2rem; 
+      margin-top: 4rem; 
+      border-top: 2px solid var(--secondary-color); 
+      text-align: center; 
+    }
     /* ========================================================
        Modals
     ========================================================== */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
-    .modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
-    .modal-content input { width: 100%; margin: 5px 0; padding: 8px; }
-    .prayer-modal, .idiot-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 3000; }
-    .prayer-modal-content, .idiot-modal-content { background: var(--card-bg); padding: 1rem; border-radius: 10px; text-align: center; width: 300px; }
-    .prayer-modal-content h3, .idiot-modal-content h3 { margin-bottom: 1rem; }
-    .prayer-modal-content p, .idiot-modal-content p { margin-bottom: 1rem; }
-    .prayer-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
+    .modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.8); 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 4000; 
+    }
+    .modal-content { 
+      background: var(--card-bg); 
+      padding: 20px; 
+      border-radius: 10px; 
+      width: 300px; 
+      text-align: center; 
+    }
+    .modal-content input { 
+      width: 100%; 
+      margin: 5px 0; 
+      padding: 8px; 
+    }
+    .prayer-modal, .idiot-modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.8); 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 3000; 
+    }
+    .prayer-modal-content, .idiot-modal-content { 
+      background: var(--card-bg); 
+      padding: 1rem; 
+      border-radius: 10px; 
+      text-align: center; 
+      width: 300px; 
+    }
+    .prayer-modal-content h3, .idiot-modal-content h3 { 
+      margin-bottom: 1rem; 
+    }
+    .prayer-modal-content p, .idiot-modal-content p { 
+      margin-bottom: 1rem; 
+    }
+    .prayer-modal-content button { 
+      margin: 0.5rem; 
+      padding: 0.5rem 1rem; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      color: var(--text-light); 
+      background: var(--accent-color); 
+    }
     /* Fatwa Modal */
-    .fatwa-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
-    .fatwa-modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
-    .fatwa-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
-
-    /* ========================================================
-       Responsive Styles
-    ========================================================== */
-    @media (max-width:768px) { main { padding: 1rem; } .side-nav { width: 250px; left: -250px; } .section-title { font-size: 1.5rem; } }
-    @media (max-width:480px) { header { padding: 0 1rem; } .logo { font-size: 1.5rem; } }
+    .fatwa-modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.8); 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 4000; 
+    }
+    .fatwa-modal-content { 
+      background: var(--card-bg); 
+      padding: 20px; 
+      border-radius: 10px; 
+      width: 300px; 
+      text-align: center; 
+    }
+    .fatwa-modal-content button { 
+      margin: 0.5rem; 
+      padding: 0.5rem 1rem; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      color: var(--text-light); 
+      background: var(--accent-color); 
+    }
+    /* Responsive Styles */
+    @media (max-width:768px) { 
+      main { padding: 1rem; } 
+      .side-nav { width: 250px; left: -250px; } 
+      .section-title { font-size: 1.5rem; } 
+    }
+    @media (max-width:480px) { 
+      header { padding: 0 1rem; } 
+      .logo { font-size: 1.5rem; } 
+    }
   </style>
 </head>
 <body>
-  <!-- Intro Modal: Single Message for 4 Seconds -->
-  <div id="introModal">
-    <div id="introContent">Ammas, Fatwaa fi Contact Us qofa hojjetu; gara fuula dura fooyya'aa ni taasifna.<br>
-      <span style="font-size:0.8em; color:#fff;">(4 seconds)</span>
-    </div>
-  </div>
-
   <!-- Background Elements -->
   <div class="islamic-pattern"></div>
   <div class="floating-ornament" style="left: 10%; animation-delay: 2s"></div>
@@ -199,7 +406,8 @@
   <nav class="side-nav">
     <a href="#" class="nav-link" id="dashboardLink"><i class="fas fa-home"></i> <span data-key="dashboard">Dashboard</span></a>
     <a href="quran.html" class="nav-link" id="quranLink"><i class="fas fa-book-quran"></i> <span data-key="quran">Quran</span></a>
-    <a href="pay.html" class="nav-link" id="prayerLink"><i class="fas fa-pray"></i> <span data-key="prayerTimes">Nu gargaaruuf</span></a>
+    <!-- Replace Prayer Times with Donate -->
+    <a href="pay.html" class="nav-link" id="donateLink"><i class="fas fa-donate"></i> <span data-key="donate">Donate</span></a>
     <!-- Fatwa Link -->
     <a href="#" class="nav-link" id="fatwaLink"><i class="fas fa-comments"></i> <span data-key="fatwa">Fatwa</span></a>
     <!-- Fatwa Dropdown for Not Signed In Users -->
@@ -263,7 +471,9 @@
       <button id="saveAccountBtn" style="font-size:1.2em; padding:10px 20px; margin-top:10px;">Save</button>
       <button id="cancelAccountBtn" style="font-size:1.2em; padding:10px 20px; margin-top:10px;">Cancel</button>
       <br>
-      <span id="saveSpinner" style="display:none; font-size:1.1em; color: var(--secondary-color);"><i class="fas fa-spinner fa-spin"></i> Updating...</span>
+      <span id="saveSpinner" style="display:none; font-size:1.1em; color: var(--secondary-color);">
+        <i class="fas fa-spinner fa-spin"></i> Updating...
+      </span>
     </div>
   </div>
 
@@ -279,15 +489,14 @@
       <div id="upcomingPrayer"></div>
     </section>
     
-    <!-- Fadis Sheik Section -->
-    <section class="dashboard-section" id="fadisSection">
+    <!-- Donate Section (Replaces Fadis Sheik Section) -->
+    <section class="dashboard-section" id="donateSection">
       <div class="section-header">
-        <i class="fas fa-sync-alt refresh-icon" id="refreshFadis" title="Refresh"></i>
-        <h2 class="section-title" data-key="fadisSheik">Ikhwat al-imaan gargaraa</h2>
+        <h2 class="section-title" data-key="donate">Donate</h2>
       </div>
       <div style="text-align:center;">
-        <p data-key="fadisDescription">Nuu gargaaruu yoo kan barbaaddan tahee buttonii armaan gadii cuqaasaa.</p>
-        <button onclick="window.location.href='pay.html'" style="padding:10px 20px; font-size:1em; border:none; border-radius:5px; background: var(--accent-color); color: var(--text-light); cursor:pointer;" data-key="viewFadis">View Fadis Sheik</button>
+        <p data-key="donateDesc">Click the button below to donate.</p>
+        <button onclick="window.location.href='pay.html'" style="padding:10px 20px; font-size:1em; border:none; border-radius:5px; background: var(--accent-color); color: var(--text-light); cursor:pointer;" data-key="donateBtn">Donate Now</button>
       </div>
     </section>
     
@@ -326,6 +535,23 @@
   </div>
 
   <!-- ========================================================
+       Service Worker Registration
+  ========================================================== -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+
+  <!-- ========================================================
        JavaScript: Global Functions & Initialization
   ========================================================== -->
   <script>
@@ -341,14 +567,13 @@
     let prayerModalTimerInterval;
     let idiotModalTimerInterval;
     const flashTopics = [
-      { title: "Ikhwat Al-inaam", desc: "Hin irranfattin yeroo Hunda atifi atumaatu waliin dorgamaadha" },
-      { title: "Fadis Youth", desc: "Its always have to ne you versus you" },
+      { title: "Ikhwat Al-inaam", desc: "Motivational message 1" },
+      { title: "Fadis Youth", desc: "Motivational message 2" },
       { title: "Waliin Hojjannee", desc: "Motivational message 3" },
       { title: "Ofis Has Jijjiruu", desc: "Motivational message 4" },
       { title: "Other Motivation", desc: "Motivational message 5" }
     ];
     let flashIndex = 0;
-
     /* ---------------------------
        Translation Data
     --------------------------- */
@@ -356,17 +581,17 @@
       en: {
         dashboard: "Dashboard",
         quran: "Quran",
-        prayerTimes: "Donate to support Us",
+        prayerTimes: "Prayer Times",
         fatwa: "Fatwa",
         settings: "Settings",
         contactUs: "Contact Us",
         aboutUs: "About Us",
-        prayerSection: "prayer times",
-        fadisSheik: "Donation",
-        fadisDescription: "Click the button below to help us with what u can.",
-        viewFadis: "Donate now",
-        prayerNowTitle: "prayer is now",
-        prayerNowMessage: "The prayer has started.",
+        prayerSection: "Prayer Times",
+        fadisSheik: "Fadis Sheik",
+        fadisDescription: "Click the button below to view details about Fadis Sheik.",
+        viewFadis: "View Fadis Sheik",
+        prayerNowTitle: "Dhuhr prayer is now",
+        prayerNowMessage: "The Dhuhr prayer has started.",
         btnGoToPrayer: "Go to Prayer",
         btnImAnIdiot: "I'm an idiot",
         idiotNotificationTitle: "Warning",
@@ -381,50 +606,56 @@
         featuredTopicTitle: "Ikhwat Al-inaam",
         featuredTopicDescription: "Click here to explore the featured topic.",
         userContact: "User Contact",
-        adminContact: "Admin Contact"
+        adminContact: "Admin Contact",
+        donate: "Donate",
+        donateDesc: "Click the button below to donate.",
+        donateBtn: "Donate Now"
       },
       om: {
         dashboard: "Balbala",
         quran: "Quraana",
-        prayerTimes: "donate for us",
+        prayerTimes: "Yeroo kadhannaa",
         fatwa: "Fatawaa",
-        settings: "To'annaa",
+        settings: "To’annaa",
         contactUs: "Nu qunnamaa",
-        aboutUs: "Wa'ee keenyaa",
-        prayerSection: "yerroon salaata",
-        fadisSheik: "Gargaarsa",
-        fadisDescription: "Fadis youth gargaaruu kan barbaaddan yoo tahee buttonii armaan gadii irrattii cuqasuun nu gargaara.",
-        viewFadis: "Nu gargaaruuf",
-        prayerNowTitle: "Kadhannaa amma jalqabamee jiraa",
-        prayerNowMessage: "Kadhannaa  jalqabameera.",
+        aboutUs: "Ilaalcha",
+        prayerSection: "Yeroo kadhannaa",
+        fadisSheik: "Fadis Sheik",
+        fadisDescription: "Tartiiba Fadis Sheik ilaalchisee odeeffannoo argachuuf cuqaasaa.",
+        viewFadis: "Fadis Sheik Ilaali",
+        prayerNowTitle: "Kadhannaa Zuhur ammaa jirti",
+        prayerNowMessage: "Kadhannaa Zuhur jalqabameera.",
         btnGoToPrayer: "Kadhannaa deemi",
-        btnImAnIdiot: "Ani dadhabaadha",
+        btnImAnIdiot: "Ani dadhabne",
         idiotNotificationTitle: "Beeksisa",
-        idiotNotificationMessage: "Daqiiqaa 14 fii app kana fayyadamuun hin danda'amu. Yeroo hafe:",
+        idiotNotificationMessage: "Kuni 14 daqiiqaa hin dhiyaatu. Yeroo hafe:",
         accounts: "Akaawuntii",
         language: "Afaan",
-        editAccount: "Account sirrefadhu",
-        logout: "kessa bahii",
+        editAccount: "Edit Account",
+        logout: "Logout",
         editAccountTitle: "Edit Account",
         login: "Seensa",
         topicSection: "Mata Duree Filatamaa",
-        featuredTopicTitle: "Ikhwat Al-imaaan",
+        featuredTopicTitle: "Ikhwat Al-inaam",
         featuredTopicDescription: "Asitti, mata duree filatamaa ilaali.",
         userContact: "Nu qunnamaa",
-        adminContact: "Dhorkaadha"
+        adminContact: "Qunnamtii Bulchaa",
+        donate: "Kennaa",
+        donateDesc: "Asitti, kennaa gochuuf cuqaasaa.",
+        donateBtn: "Ammas Kennaa"
       },
       am: {
         dashboard: "ዳሽቦርድ",
         quran: "ቁርአን",
-        prayerTimes: "Donation",
+        prayerTimes: "የጸሎት ሰዓታት",
         fatwa: "ፋትዋ",
         settings: "ቅንብሮች",
         contactUs: "አድራሻ",
         aboutUs: "ስለ እኛ",
-        prayerSection: "prayer times",
-        fadisSheik: "Donate now",
-        fadisDescription: "ፋዲስ ወጣቶች እርዳታ ይፈልጋሉ ከሆነ፣ በታች ያለውን ቁልፍ በመጫን እኛን ይረዳዋሉ።.",
-        viewFadis: " Donation",
+        prayerSection: "የጸሎት ሰዓታት",
+        fadisSheik: "Fadis Sheik",
+        fadisDescription: "በFadis Sheik ዙሪያ ዝርዝር መረጃ ለማግኘት አድርጉ.",
+        viewFadis: "Fadis Sheik አሳይ",
         prayerNowTitle: "ዱሁር ጸሎት አሁን ይቀርባል",
         prayerNowMessage: "ዱሁር ጸሎት ጀምሯል።",
         btnGoToPrayer: "ወደ ጸሎት ሂድ",
@@ -441,7 +672,10 @@
         featuredTopicTitle: "ኢክህዋት አል-ኢናም",
         featuredTopicDescription: "ተጨማሪ ርእስ ለማየት እዚህ ጠቅ ያድርጉ።",
         userContact: "የተጠቃሚ አድራሻ",
-        adminContact: "የአስተዳደር አድራሻ"
+        adminContact: "የአስተዳደር አድራሻ",
+        donate: "Donate",
+        donateDesc: "Click the button below to donate.",
+        donateBtn: "Donate Now"
       }
     };
 
@@ -535,7 +769,8 @@
         let hours = parseInt(parts[0], 10);
         let minutes = parseInt(parts[1], 10);
         upcomingPrayerName = "Fajr";
-        let tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+        let tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
         upcomingPrayerTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), hours, minutes, 0);
       }
       let diffSec = Math.floor((upcomingPrayerTime - now) / 1000);
@@ -614,7 +849,10 @@
     --------------------------- */
     const contactLink = document.getElementById('contactLink');
     const contactDropdown = document.getElementById('contactDropdown');
-    contactLink.addEventListener('click', (e) => { e.preventDefault(); contactDropdown.style.display = (contactDropdown.style.display === 'none' || contactDropdown.style.display === '') ? 'flex' : 'none'; });
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      contactDropdown.style.display = (contactDropdown.style.display === 'none' || contactDropdown.style.display === '') ? 'flex' : 'none';
+    });
 
     /* ---------------------------
        Fatwa Dropdown for Not Signed In Users
@@ -652,8 +890,10 @@
           e.preventDefault();
           const unsubscribe = firebase.auth().onAuthStateChanged(u => {
             unsubscribe();
-            if (!u) { alert("You don't have an account. Please sign in."); window.location.href = "login.html"; }
-            else {
+            if (!u) {
+              alert("You don't have an account. Please sign in.");
+              window.location.href = "login.html";
+            } else {
               document.getElementById("userInfo").innerText = "Logged in as: " + (u.displayName || "Unknown") + " (" + u.email + ")";
               document.getElementById("newName").value = "";
               document.getElementById("newEmail").value = "";
@@ -724,13 +964,22 @@
     --------------------------- */
     const settingsLink = document.getElementById('settingsLink');
     const settingsDropdown = document.getElementById('settingsDropdown');
-    settingsLink.addEventListener('click', (e) => { e.preventDefault(); settingsDropdown.style.display = (settingsDropdown.style.display === 'none' || settingsDropdown.style.display === '') ? 'flex' : 'none'; });
+    settingsLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      settingsDropdown.style.display = (settingsDropdown.style.display === 'none' || settingsDropdown.style.display === '') ? 'flex' : 'none';
+    });
     const accountsHeader = document.getElementById('accountsHeader');
     const accountsSubmenu = document.getElementById('accountsSubmenu');
-    accountsHeader.addEventListener('click', (e) => { e.preventDefault(); accountsSubmenu.style.display = (accountsSubmenu.style.display === 'none' || accountsSubmenu.style.display === '') ? 'flex' : 'none'; });
+    accountsHeader.addEventListener('click', (e) => {
+      e.preventDefault();
+      accountsSubmenu.style.display = (accountsSubmenu.style.display === 'none' || accountsSubmenu.style.display === '') ? 'flex' : 'none';
+    });
     const languageHeader = document.getElementById('languageHeader');
     const languageSubmenu = document.getElementById('languageSubmenu');
-    languageHeader.addEventListener('click', (e) => { e.preventDefault(); languageSubmenu.style.display = (languageSubmenu.style.display === 'none' || languageSubmenu.style.display === '') ? 'flex' : 'none'; });
+    languageHeader.addEventListener('click', (e) => {
+      e.preventDefault();
+      languageSubmenu.style.display = (languageSubmenu.style.display === 'none' || languageSubmenu.style.display === '') ? 'flex' : 'none';
+    });
     const langLinks = languageSubmenu.querySelectorAll('a');
     langLinks.forEach(link => {
       link.addEventListener('click', (e) => {
@@ -759,20 +1008,6 @@
       }
       // Update accounts submenu on auth state change.
       firebase.auth().onAuthStateChanged(() => { updateAccountsSubmenu(); });
-    });
-
-    /* ---------------------------
-       Intro Modal Animation (4 seconds only)
-    --------------------------- */
-    document.addEventListener('DOMContentLoaded', () => {
-      // The intro modal is already in the HTML.
-      const introModal = document.getElementById('introModal');
-      // Ensure the text is clearly visible (using a large font-size and contrasting color in #introContent)
-      // Automatically fade out after 4 seconds.
-      setTimeout(() => {
-        introModal.style.opacity = 0;
-        setTimeout(() => { introModal.remove(); }, 1000);
-      }, 4000);
     });
   </script>
 </body>
