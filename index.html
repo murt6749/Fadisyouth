@@ -45,52 +45,36 @@
        Background Elements
     ========================================================== */
     .islamic-pattern { 
-      position: fixed; 
-      width: 100vw; 
-      height: 100vh; 
-      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
+      position: fixed; width: 100vw; height: 100vh; 
+      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), 
+                        repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
       z-index: -1; 
     }
     .floating-ornament { 
-      position: fixed; 
-      width: 50px; 
-      height: 50px; 
+      position: fixed; width: 50px; height: 50px; 
       background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23009688" d="M50 0L100 50 50 100 0 50 50 0" opacity="0.1"/></svg>'); 
-      animation: float 20s linear infinite; 
-      pointer-events: none; 
+      animation: float 20s linear infinite; pointer-events: none; 
     }
     @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
     /* ========================================================
        Header
     ========================================================== */
     header { 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100%; height: 70px; 
-      background: rgba(10,25,49,0.95); 
-      backdrop-filter: blur(10px); 
-      display: flex; align-items: center; 
-      padding: 0 2rem; 
-      z-index: 1000; 
-      border-bottom: 2px solid var(--secondary-color); 
+      position: fixed; top: 0; left: 0; width: 100%; height: 70px; 
+      background: rgba(10,25,49,0.95); backdrop-filter: blur(10px); 
+      display: flex; align-items: center; padding: 0 2rem; 
+      z-index: 1000; border-bottom: 2px solid var(--secondary-color); 
     }
     .logo { 
-      font-size: 1.8rem; 
-      color: var(--secondary-color); 
-      text-decoration: none; 
-      margin-right: auto; 
+      font-size: 1.8rem; color: var(--secondary-color); 
+      text-decoration: none; margin-right: auto; 
     }
     .hamburger { 
-      width: 35px; height: 25px; 
-      cursor: pointer; 
+      width: 35px; height: 25px; cursor: pointer; 
       display: flex; flex-direction: column; justify-content: space-between; 
       margin-left: 1.5rem; 
     }
-    .hamburger span { 
-      height: 3px; 
-      background: var(--secondary-color); 
-      transition: all 0.3s ease; 
-    }
+    .hamburger span { height: 3px; background: var(--secondary-color); transition: all 0.3s ease; }
     .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px,8px); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px,-8px); }
@@ -98,139 +82,58 @@
        Side Navigation
     ========================================================== */
     .side-nav { 
-      position: fixed; 
-      left: -300px; top: 0; 
-      width: 300px; height: 100vh; 
-      background: rgba(16,36,60,0.98); 
-      backdrop-filter: blur(15px); 
-      padding: 80px 1.5rem 2rem; 
-      transition: left 0.3s ease; 
-      z-index: 999; 
-      border-right: 2px solid var(--secondary-color); 
+      position: fixed; left: -300px; top: 0; width: 300px; height: 100vh; 
+      background: rgba(16,36,60,0.98); backdrop-filter: blur(15px); 
+      padding: 80px 1.5rem 2rem; transition: left 0.3s ease; 
+      z-index: 999; border-right: 2px solid var(--secondary-color); 
       overflow-y: auto; 
     }
     .side-nav.active { left: 0; }
     .nav-link { 
-      display: flex; 
-      align-items: center; 
-      padding: 1rem; 
-      margin: 0.5rem 0; 
-      color: var(--text-light); 
-      text-decoration: none; 
-      border-radius: 8px; 
+      display: flex; align-items: center; padding: 1rem; margin: 0.5rem 0; 
+      color: var(--text-light); text-decoration: none; border-radius: 8px; 
       transition: all 0.3s ease; 
     }
-    .nav-link:hover { 
-      background: rgba(255,215,0,0.1); 
-      transform: translateX(10px); 
-    }
-    .nav-link i { 
-      margin-right: 1rem; 
-      width: 25px; 
-      text-align: center; 
-    }
+    .nav-link:hover { background: rgba(255,215,0,0.1); transform: translateX(10px); }
+    .nav-link i { margin-right: 1rem; width: 25px; text-align: center; }
     /* ========================================================
        Settings Dropdown in Side Nav
     ========================================================== */
-    .settings-dropdown { 
-      display: none; 
-      flex-direction: column; 
-      padding: 0.5rem; 
-      background: rgba(16,36,60,0.95); 
-      margin-bottom: 1rem; 
-      border-radius: 5px; 
-    }
-    .settings-section { 
-      margin-bottom: 1rem; 
-    }
-    .settings-header { 
-      display: flex; 
-      align-items: center; 
-      padding: 0.5rem; 
-      cursor: pointer; 
-    }
-    .settings-header i { 
-      margin-right: 0.5rem; 
-    }
-    .settings-submenu { 
-      display: none; 
-      flex-direction: column; 
-      margin-left: 1.5rem; 
-    }
-    .settings-submenu a { 
-      padding: 0.5rem; 
-      text-decoration: none; 
-      color: var(--text-light); 
-      border-top: 1px solid rgba(255,215,0,0.2); 
-    }
+    .settings-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-bottom: 1rem; border-radius: 5px; }
+    .settings-section { margin-bottom: 1rem; }
+    .settings-header { display: flex; align-items: center; padding: 0.5rem; cursor: pointer; }
+    .settings-header i { margin-right: 0.5rem; }
+    .settings-submenu { display: none; flex-direction: column; margin-left: 1.5rem; }
+    .settings-submenu a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
     /* ========================================================
        Contact Dropdown – Simple Vertical List
     ========================================================== */
-    .contact-dropdown { 
-      display: none; 
-      flex-direction: column; 
-      padding: 0.5rem; 
-      background: rgba(16,36,60,0.95); 
-      margin-top: 0.5rem; 
-      border-radius: 5px; 
-    }
-    .contact-dropdown a { 
-      padding: 0.5rem; 
-      text-decoration: none; 
-      color: var(--text-light); 
-      border-top: 1px solid rgba(255,215,0,0.2); 
-    }
+    .contact-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-top: 0.5rem; border-radius: 5px; }
+    .contact-dropdown a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
     /* ========================================================
        Main Content Sections
     ========================================================== */
-    main { 
-      margin-top: 90px; 
-      padding: 2rem; 
-      max-width: 1200px; 
-      margin-left: auto; 
-      margin-right: auto; 
-    }
-    .dashboard-section { 
-      background: var(--card-bg); 
-      border-radius: 15px; 
-      padding: 2rem; 
-      margin-bottom: 2rem; 
-      backdrop-filter: blur(10px); 
-      border: 1px solid rgba(255,215,0,0.2); 
-      box-shadow: var(--shadow); 
-    }
-    .section-header { 
-      display: flex; 
-      align-items: center; 
-      margin-bottom: 1.5rem; 
-      padding-bottom: 1rem; 
-      border-bottom: 2px solid var(--accent-color); 
-    }
-    .section-title { 
-      font-size: 1.8rem; 
-      color: var(--secondary-color); 
-      margin-left: 1rem; 
-    }
+    main { margin-top: 90px; padding: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
+    .dashboard-section { background: var(--card-bg); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.2); box-shadow: var(--shadow); }
+    .section-header { display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--accent-color); }
+    .section-title { font-size: 1.8rem; color: var(--secondary-color); margin-left: 1rem; }
     /* --------------------------------------------------------
        Profile Card Section (New)
     --------------------------------------------------------- */
-    #profileCardSection { display: none; } 
-    .profile-card { text-align: center; }
+    #profileCardSection { display: none; margin-bottom: 2rem; }
+    .profile-card { text-align: center; padding: 1rem; border: 1px solid var(--secondary-color); border-radius: 10px; background: var(--card-bg); }
     .profile-card #profileCircle { 
-      width: 150px; 
-      height: 150px; 
-      margin: 0 auto; 
-      border-radius: 50%; 
-      background: #ccc; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer; 
-      overflow: hidden; 
+      width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; 
+      background: #ccc; display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; overflow: hidden; 
     }
     .profile-card #profileCircle i { font-size: 4rem; color: #fff; }
     .profile-card #profileCircle img { display: none; width: 100%; height: 100%; object-fit: cover; }
-    .profile-card div { margin-top: 10px; }
+    .profile-card #profileBio { margin-top: 10px; }
+    /* --------------------------------------------------------
+       Auth Status Checking Animation (in Prayer Section)
+    --------------------------------------------------------- */
+    #authCheck { text-align: center; padding: 1rem; }
     /* --------------------------------------------------------
        Prayer Times Section
     --------------------------------------------------------- */
@@ -372,13 +275,14 @@
 
   <!-- Main Content -->
   <main>
-    <!-- Profile Card Section (New, displayed only when user is logged in) -->
+    <!-- Profile Card Section (New) -->
     <section class="dashboard-section" id="profileCardSection" style="display:none;">
-      <div class="profile-card" style="text-align:center;">
-        <div id="profileCircle" style="width:150px; height:150px; margin:0 auto; border-radius:50%; background:#ccc; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
-          <i class="fas fa-user" style="font-size:4rem; color:#fff;"></i>
-          <img id="profileImage" src="" alt="Profile Picture" style="display:none; width:100%; height:100%; object-fit:cover;">
+      <div class="profile-card">
+        <div id="profileCircle">
+          <i class="fas fa-user"></i>
+          <img id="profileImage" src="" alt="Profile Picture">
         </div>
+        <div id="profileBio" style="margin-top:10px; color: var(--text-light);"></div>
         <div style="margin-top:10px;">
           <button id="profileLogoutBtn" class="submit-btn" style="margin-right:10px;">Logout</button>
           <button id="profileEditBtn" class="submit-btn">Edit</button>
@@ -387,12 +291,14 @@
       </div>
     </section>
 
+    <!-- Auth Checking Animation (in Prayer Section) -->
+    <div id="authCheck">
+      <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
+      <p>Checking account status...</p>
+    </div>
+
     <!-- Prayer Times Section -->
     <section class="dashboard-section" id="prayerSection">
-      <div class="section-header">
-        <i class="fas fa-mosque fa-2x" style="color: var(--accent-color)"></i>
-        <h2 class="section-title" data-key="prayerSection">Prayer Times</h2>
-      </div>
       <div id="dateDisplay"></div>
       <div id="upcomingPrayer"></div>
     </section>
@@ -879,12 +785,15 @@
       const profileCircle = document.getElementById('profileCircle');
       const profileFileInput = document.getElementById('profileFileInput');
       const profileImage = document.getElementById('profileImage');
+      const profileBio = document.getElementById('profileBio');
       const profileLogoutBtn = document.getElementById('profileLogoutBtn');
       const profileEditBtn = document.getElementById('profileEditBtn');
 
       const user = firebase.auth().currentUser;
       if (user) {
         profileCardSection.style.display = 'block';
+        // Set bio: display name, email, and a short message
+        profileBio.innerHTML = `<strong>${user.displayName || "User"}</strong><br>${user.email}<br>This is your account.`;
         if (user.photoURL) {
           profileImage.src = user.photoURL;
           profileImage.style.display = 'block';
@@ -978,8 +887,13 @@
       }
       firebase.auth().onAuthStateChanged(user => {
         updateAccountsSubmenu();
-        if (user) { setupProfileCard(); }
-        else { document.getElementById('profileCardSection').style.display = 'none'; }
+        if (user) { 
+          setupProfileCard(); 
+        } else { 
+          document.getElementById('profileCardSection').style.display = 'none'; 
+        }
+        // Hide the auth-check spinner now that auth state is known.
+        document.getElementById('authCheck').style.display = 'none';
       });
     });
   </script>
