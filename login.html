@@ -420,7 +420,7 @@
             profilePic: user.photoURL || "default_profile.png"
           };
           localStorage.setItem("loggedInUser", JSON.stringify(userData));
-          window.location.href = "home.html";
+          window.location.href = "index.html";
         })
         .catch((error) => {
           showNotification("Google sign in failed: " + error.message, "error");
