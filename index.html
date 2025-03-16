@@ -70,7 +70,8 @@
       background: rgba(10,25,49,0.95); 
       backdrop-filter: blur(10px); 
       display: flex; align-items: center; 
-      padding: 0 2rem; z-index: 1000; 
+      padding: 0 2rem; 
+      z-index: 1000; 
       border-bottom: 2px solid var(--secondary-color); 
     }
     .logo { 
@@ -211,178 +212,70 @@
       margin-left: 1rem; 
     }
     /* --------------------------------------------------------
+       Profile Card Section (New)
+    --------------------------------------------------------- */
+    #profileCardSection { display: none; } 
+    .profile-card { text-align: center; }
+    .profile-card #profileCircle { 
+      width: 150px; 
+      height: 150px; 
+      margin: 0 auto; 
+      border-radius: 50%; 
+      background: #ccc; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      overflow: hidden; 
+    }
+    .profile-card #profileCircle i { font-size: 4rem; color: #fff; }
+    .profile-card #profileCircle img { display: none; width: 100%; height: 100%; object-fit: cover; }
+    .profile-card div { margin-top: 10px; }
+    /* --------------------------------------------------------
        Prayer Times Section
     --------------------------------------------------------- */
-    #dateDisplay { 
-      text-align: center; 
-      font-size: 1.2rem; 
-      margin-bottom: 1rem; 
-    }
-    #upcomingPrayer { 
-      text-align: center; 
-      padding: 1.5rem; 
-      background: linear-gradient(145deg, rgba(16,36,60,0.9), rgba(8,18,32,0.9)); 
-      border-radius: 12px; 
-    }
+    #dateDisplay { text-align: center; font-size: 1.2rem; margin-bottom: 1rem; }
+    #upcomingPrayer { text-align: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(16,36,60,0.9), rgba(8,18,32,0.9)); border-radius: 12px; }
     /* --------------------------------------------------------
        Donate Section (Replaces Fadis Sheik Section)
     --------------------------------------------------------- */
-    #donateSection { 
-      text-align: center; 
-    }
+    #donateSection { text-align: center; }
     /* --------------------------------------------------------
        Featured Topic Flashcard Section
     --------------------------------------------------------- */
-    #topicSection { 
-      margin-bottom: 2rem; 
-    }
-    #topicSection .topic-card { 
-      background: var(--card-bg); 
-      border-radius: 12px; 
-      padding: 1rem; 
-      text-align: center; 
-      cursor: pointer; 
-      transition: transform 0.3s ease; 
-    }
-    #topicSection .topic-card:hover { 
-      transform: scale(1.02); 
-    }
-    #topicSection .topic-image { 
-      width: 100%; 
-      height: 150px; 
-      object-fit: cover; 
-      border-radius: 5px; 
-      margin-bottom: 0.5rem; 
-    }
-    #topicSection .topic-title { 
-      font-size: 1.1rem; 
-      margin-bottom: 0.5rem; 
-      color: var(--secondary-color); 
-    }
-    #topicSection .topic-description { 
-      font-size: 0.95rem; 
-      opacity: 0.9; 
-      margin-bottom: 1rem; 
-    }
+    #topicSection { margin-bottom: 2rem; }
+    #topicSection .topic-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: transform 0.3s ease; }
+    #topicSection .topic-card:hover { transform: scale(1.02); }
+    #topicSection .topic-image { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; margin-bottom: 0.5rem; }
+    #topicSection .topic-title { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--secondary-color); }
+    #topicSection .topic-description { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1rem; }
     /* --------------------------------------------------------
        Buttons
     --------------------------------------------------------- */
-    .submit-btn { 
-      padding: 0.5rem 1rem; 
-      background: var(--accent-color); 
-      border: none; 
-      border-radius: 5px; 
-      color: var(--text-light); 
-      cursor: pointer; 
-      transition: transform 0.3s ease; 
-    }
-    .submit-btn:hover { 
-      transform: scale(1.05); 
-    }
+    .submit-btn { padding: 0.5rem 1rem; background: var(--accent-color); border: none; border-radius: 5px; color: var(--text-light); cursor: pointer; transition: transform 0.3s ease; }
+    .submit-btn:hover { transform: scale(1.05); }
     /* --------------------------------------------------------
        Footer
     --------------------------------------------------------- */
-    footer { 
-      background: rgba(10,25,49,0.95); 
-      padding: 2rem; 
-      margin-top: 4rem; 
-      border-top: 2px solid var(--secondary-color); 
-      text-align: center; 
-    }
+    footer { background: rgba(10,25,49,0.95); padding: 2rem; margin-top: 4rem; border-top: 2px solid var(--secondary-color); text-align: center; }
     /* ========================================================
        Modals
     ========================================================== */
-    .modal { 
-      display: none; 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.8); 
-      align-items: center; 
-      justify-content: center; 
-      z-index: 4000; 
-    }
-    .modal-content { 
-      background: var(--card-bg); 
-      padding: 20px; 
-      border-radius: 10px; 
-      width: 300px; 
-      text-align: center; 
-    }
-    .modal-content input { 
-      width: 100%; 
-      margin: 5px 0; 
-      padding: 8px; 
-    }
-    .prayer-modal, .idiot-modal { 
-      display: none; 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.8); 
-      align-items: center; 
-      justify-content: center; 
-      z-index: 3000; 
-    }
-    .prayer-modal-content, .idiot-modal-content { 
-      background: var(--card-bg); 
-      padding: 1rem; 
-      border-radius: 10px; 
-      text-align: center; 
-      width: 300px; 
-    }
-    .prayer-modal-content h3, .idiot-modal-content h3 { 
-      margin-bottom: 1rem; 
-    }
-    .prayer-modal-content p, .idiot-modal-content p { 
-      margin-bottom: 1rem; 
-    }
-    .prayer-modal-content button { 
-      margin: 0.5rem; 
-      padding: 0.5rem 1rem; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      color: var(--text-light); 
-      background: var(--accent-color); 
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
+    .modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
+    .modal-content input { width: 100%; margin: 5px 0; padding: 8px; }
+    .prayer-modal, .idiot-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 3000; }
+    .prayer-modal-content, .idiot-modal-content { background: var(--card-bg); padding: 1rem; border-radius: 10px; text-align: center; width: 300px; }
+    .prayer-modal-content h3, .idiot-modal-content h3 { margin-bottom: 1rem; }
+    .prayer-modal-content p, .idiot-modal-content p { margin-bottom: 1rem; }
+    .prayer-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
     /* Fatwa Modal */
-    .fatwa-modal { 
-      display: none; 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.8); 
-      align-items: center; 
-      justify-content: center; 
-      z-index: 4000; 
-    }
-    .fatwa-modal-content { 
-      background: var(--card-bg); 
-      padding: 20px; 
-      border-radius: 10px; 
-      width: 300px; 
-      text-align: center; 
-    }
-    .fatwa-modal-content button { 
-      margin: 0.5rem; 
-      padding: 0.5rem 1rem; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      color: var(--text-light); 
-      background: var(--accent-color); 
-    }
+    .fatwa-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
+    .fatwa-modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
+    .fatwa-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
     /* Responsive Styles */
-    @media (max-width:768px) { 
-      main { padding: 1rem; } 
-      .side-nav { width: 250px; left: -250px; } 
-      .section-title { font-size: 1.5rem; } 
-    }
-    @media (max-width:480px) { 
-      header { padding: 0 1rem; } 
-      .logo { font-size: 1.5rem; } 
-    }
+    @media (max-width:768px) { main { padding: 1rem; } .side-nav { width: 250px; left: -250px; } .section-title { font-size: 1.5rem; } }
+    @media (max-width:480px) { header { padding: 0 1rem; } .logo { font-size: 1.5rem; } }
   </style>
 </head>
 <body>
@@ -479,6 +372,21 @@
 
   <!-- Main Content -->
   <main>
+    <!-- Profile Card Section (New, displayed only when user is logged in) -->
+    <section class="dashboard-section" id="profileCardSection" style="display:none;">
+      <div class="profile-card" style="text-align:center;">
+        <div id="profileCircle" style="width:150px; height:150px; margin:0 auto; border-radius:50%; background:#ccc; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
+          <i class="fas fa-user" style="font-size:4rem; color:#fff;"></i>
+          <img id="profileImage" src="" alt="Profile Picture" style="display:none; width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div style="margin-top:10px;">
+          <button id="profileLogoutBtn" class="submit-btn" style="margin-right:10px;">Logout</button>
+          <button id="profileEditBtn" class="submit-btn">Edit</button>
+        </div>
+        <input type="file" id="profileFileInput" accept="image/png, image/jpeg, image/jpg" style="display:none;">
+      </div>
+    </section>
+
     <!-- Prayer Times Section -->
     <section class="dashboard-section" id="prayerSection">
       <div class="section-header">
@@ -574,6 +482,7 @@
       { title: "Other Motivation", desc: "Motivational message 5" }
     ];
     let flashIndex = 0;
+    
     /* ---------------------------
        Translation Data
     --------------------------- */
@@ -616,7 +525,7 @@
         quran: "Quraana",
         prayerTimes: "Yeroo kadhannaa",
         fatwa: "Fatawaa",
-        settings: "To’annaa",
+        settings: "To'annaa",
         contactUs: "Nu qunnamaa",
         aboutUs: "Ilaalcha",
         prayerSection: "Yeroo kadhannaa",
@@ -727,7 +636,10 @@
     --------------------------- */
     const hamburger = document.querySelector('.hamburger');
     const sideNav = document.querySelector('.side-nav');
-    hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); sideNav.classList.toggle('active'); });
+    hamburger.addEventListener('click', () => { 
+      hamburger.classList.toggle('active'); 
+      sideNav.classList.toggle('active'); 
+    });
 
     /* ---------------------------
        Prayer Times & Countdown Functions
@@ -960,6 +872,64 @@
     });
 
     /* ---------------------------
+       Profile Card Setup (New)
+    --------------------------- */
+    function setupProfileCard() {
+      const profileCardSection = document.getElementById('profileCardSection');
+      const profileCircle = document.getElementById('profileCircle');
+      const profileFileInput = document.getElementById('profileFileInput');
+      const profileImage = document.getElementById('profileImage');
+      const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+      const profileEditBtn = document.getElementById('profileEditBtn');
+
+      const user = firebase.auth().currentUser;
+      if (user) {
+        profileCardSection.style.display = 'block';
+        if (user.photoURL) {
+          profileImage.src = user.photoURL;
+          profileImage.style.display = 'block';
+          profileCircle.querySelector('i').style.display = 'none';
+        } else {
+          profileImage.style.display = 'none';
+          profileCircle.querySelector('i').style.display = 'block';
+        }
+      } else {
+        profileCardSection.style.display = 'none';
+      }
+
+      profileCircle.addEventListener('click', () => { profileFileInput.click(); });
+
+      profileFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async function(evt) {
+            profileImage.src = evt.target.result;
+            profileImage.style.display = 'block';
+            profileCircle.querySelector('i').style.display = 'none';
+            try {
+              await firebase.auth().currentUser.updateProfile({ photoURL: evt.target.result });
+              alert("Profile picture updated!");
+            } catch (err) {
+              alert("Failed to update profile picture: " + err.message);
+            }
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+
+      profileLogoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        firebase.auth().signOut().then(() => { window.location.href = "login.html"; }).catch(err => { console.error(err); });
+      });
+
+      profileEditBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = "account.html";
+      });
+    }
+
+    /* ---------------------------
        Language & Settings Dropdown
     --------------------------- */
     const settingsLink = document.getElementById('settingsLink');
@@ -1006,8 +976,11 @@
         ornament.style.animationDelay = `${Math.random() * 10}s`;
         document.body.appendChild(ornament);
       }
-      // Update accounts submenu on auth state change.
-      firebase.auth().onAuthStateChanged(() => { updateAccountsSubmenu(); });
+      firebase.auth().onAuthStateChanged(user => {
+        updateAccountsSubmenu();
+        if (user) { setupProfileCard(); }
+        else { document.getElementById('profileCardSection').style.display = 'none'; }
+      });
     });
   </script>
 </body>
