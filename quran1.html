@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qur'aana - Barumsa Islaamaa</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #2c5d2c;
+      --secondary-color: #4a7856;
+      --accent-color: #f39c12;
+      --sidebar-width: 250px;
+      --header-gradient: linear-gradient(135deg, #2c5d2c, #4a7856, #f39c12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans Ethiopic', Arial, sans-serif;
+    }
+
+    body {
+      background: #f0f8ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Styles */
+    .header {
+      background: var(--header-gradient);
+      color: white;
+      padding: 1rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .menu-toggle:hover {
+      transform: rotate(90deg);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      background: #fff;
+      width: var(--sidebar-width);
+      position: fixed;
+      left: 0;
+      top: 60px;
+      bottom: 0;
+      padding: 1rem;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      overflow-y: auto;
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-item {
+      margin: 0.8rem 0;
+    }
+
+    .sidebar-link {
+      color: #333;
+      text-decoration: none;
+      padding: 0.8rem;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .sidebar-link:hover {
+      background: #f0f0f0;
+      transform: scale(1.05);
+      color: var(--primary-color);
+    }
+
+    .sidebar-link i {
+      width: 25px;
+      text-align: center;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      margin-top: 60px;
+      padding: 2rem;
+      flex: 1;
+      transition: margin-left 0.3s ease;
+    }
+
+    .quran-section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .quran-definition {
+      line-height: 1.8;
+      color: #444;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .chapter-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .chapter-item {
+      background: #f8f8f8;
+      padding: 1.2rem;
+      border-radius: 8px;
+      border-left: 5px solid var(--primary-color);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .chapter-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .chapter-item h4 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .chapter-item p {
+      font-size: 0.9rem;
+      margin: 0.2rem 0;
+    }
+
+    .quran-benefits {
+      margin: 2rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .quran-benefits li {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background: #f0f0f0;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .quran-benefits li:hover {
+      background: #e8e8e8;
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: linear-gradient(135deg, #2c5d2c, #1e401e);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: auto;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-links a {
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar.active + .main-content {
+        margin-left: 0;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .sidebar.active + .main-content {
+        margin-left: var(--sidebar-width);
+      }
+    }
+
+    /* Popup for random verse */
+    .verse-popup {
+      position: absolute;
+      background: var(--accent-color);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+      z-index: 2000;
+      opacity: 0;
+      animation: fadeInOut 4s forwards;
+      transform: scale(0.8);
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="menu-toggle">
+      <i class="fas fa-bars"></i>
+    </div>
+    <h1>Qur'aana Qulqulluu</h1>
+    <div></div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a href="quran.html" class="sidebar-link">
+          <i class="fas fa-book-quran"></i>
+          Qur'aana
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="hadith.html" class="sidebar-link">
+          <i class="fas fa-book-open"></i>
+          Haadiisa
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="tafsir.html" class="sidebar-link">
+          <i class="fas fa-comments"></i>
+          Tafsiira
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="prayer.html" class="sidebar-link">
+          <i class="fas fa-pray"></i>
+          Salaata
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="aqeedah.html" class="sidebar-link">
+          <i class="fas fa-star-and-crescent"></i>
+          Aqiida
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="history.html" class="sidebar-link">
+          <i class="fas fa-history"></i>
+          Taariikh
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="dua.html" class="sidebar-link">
+          <i class="fas fa-hands-praying"></i>
+          Kadhannoo
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="quran-section">
+      <h2 class="section-title">Qur'aana Waa'ee</h2>
+      <p class="quran-definition">
+        Qur'aanni kitaaba Rabbii qulqulluu Islaamaa ti. Kun kitaaba Rabbiin Nabii Muhammad SAW irratti buusee jira. Qur'aanni keessatti amantii, seera, jaalala, qajeelummaa fi haqaa tokko hundi ibsameera. Qur'aanni suuraa 114 qaba, suuraaleen kun immoo aayotaan kan hammatamanidha.
+      </p>
+
+      <h3 class="section-title">Suuraalee Qur'aanaa</h3>
+      <div class="chapter-list">
+        <div class="chapter-item" data-chapter="Al-Faatiha">
+          <h4>Al-Faatiha</h4>
+          <p>Aayota: 7</p>
+          <p>Bakka: Makkah</p>
+        </div>
+        <div class="chapter-item" data-chapter="Al-Baqara">
+          <h4>Al-Baqara</h4>
+          <p>Aayota: 286</p>
+          <p>Bakka: Madina</p>
+        </div>
+        <div class="chapter-item" data-chapter="Aali-Imraan">
+          <h4>Aali-Imraan</h4>
+          <p>Aayota: 200</p>
+          <p>Bakka: Madina</p>
+        </div>
+        <div class="chapter-item" data-chapter="An-Nisaa">
+          <h4>An-Nisaa</h4>
+          <p>Aayota: 176</p>
+          <p>Bakka: Madina</p>
+        </div>
+      </div>
+
+      <h3 class="section-title">Faayidaa Qur'aanaa</h3>
+      <ul class="quran-benefits">
+        <li>▶︎ Jireenya qulqulluu keessatti qajeelcha</li>
+        <li>▶︎ Amantii sirrii barsiisa</li>
+        <li>▶︎ Jireenya gaarii jiraachuuf qajeelcha</li>
+        <li>▶︎ Gara Rabbii qaqqabsiisa</li>
+        <li>▶︎ Nama badii irraa eegata</li>
+        <li>▶︎ Fayyaa fi ifa kenna</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2023 Barumsa Qur'aanaa. Hunda Ofii Eeyyamaa Qaba</p>
+    <p>Dhaggeeffachuu fi dubbisuu qulqullinaan hojjedhaa</p>
+    <div class="footer-links">
+      <a href="about.html">Waa'ee Nu</a> |
+      <a href="contact.html">Nu Qunnamti</a> |
+      <a href="privacy.html">Mala Dhoksaa</a>
+    </div>
+  </footer>
+
+  <script>
+    // Sidebar toggle functionality
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (
+        sidebar.classList.contains('active') &&
+        !sidebar.contains(e.target) &&
+        !menuToggle.contains(e.target)
+      ) {
+        sidebar.classList.remove('active');
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Data: sample verses for each chapter
+    const versesData = {
+      "Al-Faatiha": [
+        "In the name of Allah, the Most Gracious, the Most Merciful.",
+        "Praise be to Allah, the Lord of the Worlds.",
+        "The Most Gracious, the Most Merciful."
+      ],
+      "Al-Baqara": [
+        "This is the Book about which there is no doubt.",
+        "It is a guidance for those conscious of Allah.",
+        "Who believe in the unseen, establish prayer, and spend out of what We have provided for them."
+      ],
+      "Aali-Imraan": [
+        "Allah! There is no deity except Him, the Ever-Living.",
+        "You have a good word in the prophets.",
+        "Let not the disbelievers think they can thwart Allah's plan."
+      ],
+      "An-Nisaa": [
+        "O mankind, fear your Lord.",
+        "And give the orphans their property.",
+        "And do not approach unlawful sexual intercourse."
+      ]
+    };
+
+    // Show a random verse popup on chapter click
+    document.querySelectorAll('.chapter-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        const chapter = this.getAttribute('data-chapter');
+        const verses = versesData[chapter];
+        if (!verses) return;
+        const randomVerse = verses[Math.floor(Math.random() * verses.length)];
+
+        // Create popup element
+        const popup = document.createElement('div');
+        popup.classList.add('verse-popup');
+        popup.textContent = randomVerse;
+
+        // Position popup at the click location relative to the chapter item
+        const rect = this.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+        popup.style.left = offsetX + 'px';
+        popup.style.top = offsetY + 'px';
+
+        // Append popup and remove after 4 seconds
+        this.appendChild(popup);
+        setTimeout(() => {
+          if (popup.parentNode) {
+            popup.parentNode.removeChild(popup);
+          }
+        }, 4000);
+      });
+    });
+  </script>
+</body>
+</html>
