@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qorannoo Islaamaa - Barumsa Addaddumaa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c5d2c;
+            --secondary-color: #4a7856;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Ethiopic', Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f4f4;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem 0;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .subject-icon {
+            font-size: 2.5rem;
+            color: var(--card-color);
+            margin-bottom: 1rem;
+        }
+
+        .subject-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--card-color);
+        }
+
+        .subject-info {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .subject-name {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .subject-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .oromo-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #d32f2f;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .subject-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Barumsa Islaamaa Addaddumaa</h1>
+            <p>Qorannoowwan Islaamaa adda addaa barachuuf cardii filadhaa</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="subject-grid">
+            <!-- Quran -->
+            <div class="subject-card" style="--card-color: #2c5d2c">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="quran.html">
+                    <div class="subject-info">
+                        <i class="fas fa-book-quran subject-icon"></i>
+                        <h2 class="subject-name">Quraana</h2>
+                        <p class="subject-description">Kitaaba Qulqulluu Islaamaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Hadith -->
+            <div class="subject-card" style="--card-color: #2563eb">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="hadith.html">
+                    <div class="subject-info">
+                        <i class="fas fa-book-open subject-icon"></i>
+                        <h2 class="subject-name">Haadiisa</h2>
+                        <p class="subject-description">Dubbiifi Hojii Nabi Muhammad (SAW)</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Tafsir -->
+            <div class="subject-card" style="--card-color: #4a7856">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="tafsir.html">
+                    <div class="subject-info">
+                        <i class="fas fa-quran subject-icon"></i>
+                        <h2 class="subject-name">Tafsiira</h2>
+                        <p class="subject-description">Qur'aana Irraa Ibsa Guddaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Fiqh -->
+            <div class="subject-card" style="--card-color: #8d6e63">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="fiqh.html">
+                    <div class="subject-info">
+                        <i class="fas fa-balance-scale subject-icon"></i>
+                        <h2 class="subject-name">Fiqihii</h2>
+                        <p class="subject-description">Seera Islaamaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Seerah -->
+            <div class="subject-card" style="--card-color: #6d4c41">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="seerah.html">
+                    <div class="subject-info">
+                        <i class="fas fa-history subject-icon"></i>
+                        <h2 class="subject-name">Seera Nabii</h2>
+                        <p class="subject-description">Jireenya Nabi Muhammad (SAW)</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Aqeedah -->
+            <div class="subject-card" style="--card-color: #455a64">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="aqeedah.html">
+                    <div class="subject-info">
+                        <i class="fas fa-star-and-crescent subject-icon"></i>
+                        <h2 class="subject-name">Aqiida</h2>
+                        <p class="subject-description">Amantii Islaamaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Tajweed -->
+            <div class="subject-card" style="--card-color: #5d4037">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="tajweed.html">
+                    <div class="subject-info">
+                        <i class="fas fa-microphone-alt subject-icon"></i>
+                        <h2 class="subject-name">Tajwiidii</h2>
+                        <p class="subject-description">Qur'aana Dubbisuu Sirriitii</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Du'a -->
+            <div class="subject-card" style="--card-color: #d32f2f">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="dua.html">
+                    <div class="subject-info">
+                        <i class="fas fa-hands-praying subject-icon"></i>
+                        <h2 class="subject-name">Kadhannoo</h2>
+                        <p class="subject-description">Kadhannoo Islaamaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Islamic History -->
+            <div class="subject-card" style="--card-color: #7b1fa2">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="history.html">
+                    <div class="subject-info">
+                        <i class="fas fa-landmark subject-icon"></i>
+                        <h2 class="subject-name">Taariikhii Islaamaa</h2>
+                        <p class="subject-description">Taariikhii Ummata Muslimaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Arabic Language -->
+            <div class="subject-card" style="--card-color: #0288d1">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="arabic.html">
+                    <div class="subject-info">
+                        <i class="fas fa-language subject-icon"></i>
+                        <h2 class="subject-name">Afaan Arabiffaa</h2>
+                        <p class="subject-description">Barannoo Afaan Arabiffaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Zakat -->
+            <div class="subject-card" style="--card-color: #689f38">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="zakat.html">
+                    <div class="subject-info">
+                        <i class="fas fa-hand-holding-heart subject-icon"></i>
+                        <h2 class="subject-name">Zakaata</h2>
+                        <p class="subject-description">Kennuu Sadaqaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Hajj -->
+            <div class="subject-card" style="--card-color: #fbc02d">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="hajj.html">
+                    <div class="subject-info">
+                        <i class="fas fa-kaaba subject-icon"></i>
+                        <h2 class="subject-name">Hajjii</h2>
+                        <p class="subject-description">Imala Madiinaa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Sunnah -->
+            <div class="subject-card" style="--card-color: #e64a19">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="sunnah.html">
+                    <div class="subject-info">
+                        <i class="fas fa-person-walking subject-icon"></i>
+                        <h2 class="subject-name">Sunnah</h2>
+                        <p class="subject-description">Jireenya Nabii (SAW)</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Islamic Ethics -->
+            <div class="subject-card" style="--card-color: #00796b">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="ethics.html">
+                    <div class="subject-info">
+                        <i class="fas fa-handshake-angle subject-icon"></i>
+                        <h2 class="subject-name">Aadaa Islaamaa</h2>
+                        <p class="subject-description">Amala Gaarii Qabaachuu</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Supplications -->
+            <div class="subject-card" style="--card-color: #c2185b">
+                <span class="oromo-badge">Afaan Oromoo</span>
+                <a href="supplications.html">
+                    <div class="subject-info">
+                        <i class="fas fa-hands subject-icon"></i>
+                        <h2 class="subject-name">Kadhannoo</h2>
+                        <p class="subject-description">Kadhannoo Guyyaa</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/your-kit-code.js"></script>
+<!-- Add this just before closing body tag -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Waa'ee Nuuf</h3>
+                <p>Barsiisa Islaamaa keessatti qooda guddaa qabna</p>
+                <p>Barumsa Qur'aanaa fi Haadiisaa sirriitti dhiyeessinu</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Mooji</h3>
+                <ul>
+                    <li><a href="about.html">Waa'ee keenya</a></li>
+                    <li><a href="contact.html">Nu Qunnamuuf</a></li>
+                    <li><a href="privacy.html">Mala Dhoksaa</a></li>
+                    <li><a href="terms.html">Haala Itti Fayyadamuu</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Nu Qunnamuuf</h3>
+                <p>Email: livingistest.com</p>
+                <p>Bilbila: +251 921170188</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2023 Barumsa Islaamaa. Hunda Ofii Eeyyamaa Qaba</p>
+            <p>Dhimmoota Islaamaa irratti hojjetama</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background: linear-gradient(135deg, #2c5d2c, #1e401e);
+        color: white;
+        padding: 2rem 0 0;
+        margin-top: auto;
+    }
+
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+        color: #fff;
+        margin-bottom: 1rem;
+        border-left: 4px solid #d32f2f;
+        padding-left: 0.5rem;
+    }
+
+    .footer-section p {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    .footer-section a {
+        color: #ddd;
+        text-decoration: none;
+    }
+
+    .footer-section a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+    .social-links {
+        margin-top: 1rem;
+    }
+
+    .social-links a {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        color: #fff;
+        transition: opacity 0.3s;
+    }
+
+    .social-links a:hover {
+        opacity: 0.8;
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding: 1rem 0;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 2rem;
+    }
+
+    .footer-bottom p {
+        margin: 0.3rem 0;
+        font-size: 0.9rem;
+        color: #ccc;
+    }
+
+    @media (max-width: 768px) {
+        .footer-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .footer-section h3 {
+            border-left: none;
+            text-align: center;
+        }
+    }
+</style>
+</body>
+</html>
