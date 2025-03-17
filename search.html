@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quran Search</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #2F80ED;
+      --secondary: #B2FFDA;
+      --accent: #FFD700;
+    }
+
+    /* Main container to control vertical alignment */
+    #app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: justify-content 0.3s ease;
+    }
+    /* When search results appear, align items toward the top */
+    #app.has-results {
+      justify-content: flex-start;
+      padding-top: 50px;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f3443, #034159);
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Search container and count badge */
+    .search-container {
+      position: relative;
+      width: 80%;
+      max-width: 800px;
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+    .search-count-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .circle {
+      width: 60px;
+      height: 60px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .search-wrapper {
+      position: relative;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      padding: 5px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      animation: neonPulse 3s infinite;
+    }
+
+    .search-wrapper:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      padding: 10px 25px;
+      position: relative;
+    }
+
+    #quran-search {
+      width: 100%;
+      padding: 20px 40px 20px 30px;
+      font-size: 1.4em;
+      border: none;
+      background: transparent;
+      color: #fff;
+      outline: none;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    #quran-search::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
+    }
+
+    .search-icon {
+      color: var(--accent);
+      font-size: 1.8em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 15px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      margin-left: 20px;
+    }
+
+    .search-icon:hover {
+      transform: rotate(90deg) scale(1.1);
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    /* Animated Underline Effect */
+    .underline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    #quran-search:focus ~ .underline {
+      transform: scaleX(1);
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 4s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) scale(0); opacity: 0; }
+      50% { transform: translateY(-100px) scale(1); opacity: 0.4; }
+      100% { transform: translateY(-200px) scale(0); opacity: 0; }
+    }
+
+    /* Neon Pulse Effect */
+    @keyframes neonPulse {
+      0% { filter: drop-shadow(0 0 5px var(--primary)); }
+      50% { filter: drop-shadow(0 0 20px var(--primary)); }
+      100% { filter: drop-shadow(0 0 5px var(--primary)); }
+    }
+
+    /* Submit Button Animation */
+    .submit-btn {
+      position: absolute;
+      right: -50px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: all 0.3s ease;
+      background: var(--primary);
+      border: none;
+      padding: 15px 25px;
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    #quran-search:focus ~ .submit-btn {
+      opacity: 1;
+      right: 20px;
+    }
+
+    /* Results Container & Items */
+    #results {
+      width: 80%;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    .result-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .result-meta {
+      font-size: 0.9em;
+      margin-bottom: 5px;
+      color: #ffd700;
+    }
+    .result-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    /* Remove border for the last result item */
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .search-container {
+        width: 90%;
+      }
+      #quran-search {
+        font-size: 1.1em;
+        padding: 15px 20px 15px 15px;
+      }
+      .search-icon {
+        font-size: 1.4em;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="search-container">
+      <!-- Count Badge -->
+      <div class="search-count-container">
+        <div class="circle"><span id="verseCount">0</span></div>
+      </div>
+      <div class="search-wrapper">
+        <div class="search-box">
+          <input type="text" id="quran-search" placeholder="Enter Quranic verse or keyword..." />
+          <div class="underline"></div>
+          <i class="fas fa-search search-icon"></i>
+          <button class="submit-btn">Search</button>
+        </div>
+      </div>
+      <div class="particles">
+        <!-- JavaScript will add particles here -->
+      </div>
+    </div>
+    <!-- Results Container -->
+    <div id="results"></div>
+  </div>
+
+  <script>
+    // Create floating particles effect
+    function createParticles() {
+      const particles = document.querySelector('.particles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.width = particle.style.height = Math.random() * 5 + 2 + 'px';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        particles.appendChild(particle);
+      }
+    }
+    createParticles();
+
+    // Function to display search results
+    function displayResults(matches, totalCount) {
+      // Update the count badge with total number of verses found
+      document.getElementById('verseCount').textContent = totalCount || 0;
+
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = ''; // Clear previous results
+
+      if (!matches || matches.length === 0) {
+        resultsContainer.innerHTML = '<p>No results found.</p>';
+        return;
+      }
+
+      matches.forEach((match, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'result-item';
+
+        // Retrieve surah information (fallback if missing)
+        const surahName = match.surah && match.surah.name ? match.surah.name : "Unknown Surah";
+        const surahNumber = match.surah && match.surah.number ? match.surah.number : "";
+        const ayahNumber = match.number || '';
+
+        // Create meta info element
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'result-meta';
+        metaDiv.textContent = `Surah ${surahName} (${surahNumber}), Ayah ${ayahNumber}`;
+
+        // Create text element
+        const textDiv = document.createElement('div');
+        textDiv.className = 'result-text';
+        textDiv.textContent = match.text || '';
+
+        // Append meta and text to the result item
+        itemDiv.appendChild(metaDiv);
+        itemDiv.appendChild(textDiv);
+
+        resultsContainer.appendChild(itemDiv);
+      });
+    }
+
+    // Function to perform search using the API
+    function performSearch() {
+      const keyword = document.getElementById('quran-search').value.trim();
+      if (!keyword) return;
+
+      // Default values for surah and edition; these can be customized further
+      const surah = "all";
+      const edition = "en";
+      // Use HTTPS for the API endpoint to avoid mixed-content issues
+      const url = `https://api.alquran.cloud/v1/search/${encodeURIComponent(keyword)}/${surah}/${edition}`;
+
+      // Optionally, show a loading message
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '<p>Loading results...</p>';
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.data && data.data.matches) {
+            // Update the results and count badge
+            displayResults(data.data.matches, data.data.count);
+            // Add a class to move the search bar upward when results are shown
+            document.getElementById('app').classList.add('has-results');
+          } else {
+            resultsContainer.innerHTML = '<p>No results found.</p>';
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching Quran data:", error);
+          resultsContainer.innerHTML = '<p>Error fetching results. Please try again later.</p>';
+        });
+    }
+
+    // Event listeners for search functionality
+    const searchIcon = document.querySelector('.search-icon');
+    const submitBtn = document.querySelector('.submit-btn');
+    const searchInput = document.getElementById('quran-search');
+
+    searchIcon.addEventListener('click', performSearch);
+    submitBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+  </script>
+</body>
+</html>
