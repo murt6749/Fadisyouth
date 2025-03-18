@@ -1,107 +1,48 @@
 <!DOCTYPE html>
-<html lang="om">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Questions Dashboard - Admin Panel</title>
-  <!-- Font Awesome and Google Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- Firebase Libraries will be loaded in scripts below -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questions Dashboard</title>
+  <!-- Firebase Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Use Admin Panel Background */
-    body {
-      background: linear-gradient(135deg, #2c3e50, #3498db);
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-      font-family: 'Poppins', sans-serif;
+    :root {
+      --primary: #2B5A46;
+      --secondary: #7D9D6E;
+      --accent: #D4AF37;
+      --light: #F8F5F0;
+      --dark: #1E1E1E;
     }
-    h1, h2, h3 {
-      text-align: center;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 1rem;
     }
     h1 {
-      margin-bottom: 20px;
-      font-size: 2.8em;
-      color: #f1c40f;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 2rem;
     }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    /* Login Overlay */
-    #loginStatusOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      z-index: 4000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #f1c40f;
-      font-size: 1.5em;
-    }
-    /* Section Styles */
-    .section {
-      margin-bottom: 30px;
-    }
-    .section-header {
-      border-bottom: 2px solid #f1c40f;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
-    }
-    .section-content {
-      background: rgba(0,0,0,0.2);
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      animation: fadeIn 0.5s ease;
-    }
-    /* Admin Account Info */
-    #adminAccount p {
-      margin: 5px 0;
-      font-size: 1em;
-    }
-    #editInfoBtn {
-      background: #f1c40f;
-      color: #000;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s ease, transform 0.3s ease;
-      margin-top: 10px;
-      display: block;
-      width: 160px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #editInfoBtn:hover {
-      background: #e0b90f;
-      transform: scale(1.05);
-    }
-    /* Admin Users List */
-    .admin-user {
-      padding: 8px;
-      border-bottom: 1px solid rgba(241,196,15,0.5);
-    }
-    /* Cards for Questions Dashboard */
     .cards-container {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      margin-top: 40px;
+      max-width: 900px;
+      margin: 0 auto;
     }
     .card {
       background: linear-gradient(135deg, #ffffff, #f9f9f9);
       border-radius: 15px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       padding: 1.5rem;
-      color: #000;
+      position: relative;
     }
     .card h2 {
       text-align: center;
@@ -115,8 +56,6 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 1rem;
-      background: #fff;
-      color: #000;
     }
     th, td {
       padding: 0.75rem;
@@ -128,7 +67,7 @@
     }
     .card-button {
       background: var(--accent);
-      color: #000;
+      color: white;
       border: none;
       padding: 0.75rem 1.5rem;
       border-radius: 10px;
@@ -140,7 +79,57 @@
     .card-button:hover {
       background: #c19b2b;
     }
-    /* Answer Modal – Using a Neon-Style, Colorful design */
+    /* Download Icon and Dropdown Menu Styles */
+    .download-container {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .download-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+    .download-menu {
+      display: none;
+      position: absolute;
+      top: 30px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+      width: 200px;
+    }
+    .download-menu form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .download-menu label {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .download-submit-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    .download-submit-btn:hover {
+      background: #c19b2b;
+    }
+    /* Modal Styles – reused for answer modal */
     .modal {
       display: none;
       position: fixed;
@@ -155,14 +144,13 @@
       overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       z-index: 1100;
-      color: #000;
     }
     .modal.active {
       display: block;
     }
     .modal .modal-header {
       padding: 1.5rem;
-      border-bottom: 2px solid #f1c40f;
+      border-bottom: 2px solid var(--light);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -174,7 +162,7 @@
     .modal .modal-close {
       cursor: pointer;
       font-size: 1.5rem;
-      color: #000;
+      color: var(--dark);
     }
     .modal .modal-body {
       padding: 1.5rem;
@@ -196,7 +184,7 @@
     }
     .submit-btn {
       background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: #fff;
+      color: white;
       padding: 1.2rem 2.5rem;
       border: none;
       border-radius: 15px;
@@ -211,92 +199,129 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-    /* Remove Bottom Navigation Buttons */
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .card {
+        padding: 1rem;
+      }
+      th, td {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Login Status Overlay -->
-  <div id="loginStatusOverlay">
-    <div class="spinner" style="border:4px solid rgba(241,196,15,0.3); border-top:4px solid #f1c40f; border-radius:50%; width:40px; height:40px; animation: spin 1s linear infinite; margin-bottom:20px;"></div>
-    <p>Seensa ilaalchisee mirkaneeffamaa jira...</p>
+  <h1>Questions Dashboard</h1>
+  <div class="cards-container">
+    <!-- General Questions Card -->
+    <div class="card" id="generalCard">
+      <h2>General Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="generalTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="generalTableContainer">
+        <!-- General questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('general', null, 'generalTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Aliyyi Card -->
+    <div class="card" id="card-sheik-aliyyi">
+      <h2>Sheik Aliyyi Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikAliyyiTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikAliyyiTableContainer">
+        <!-- Sheik Aliyyi questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Aliyyi', 'sheikAliyyiTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Abdusalaam Fadis Card -->
+    <div class="card" id="card-sheik-abdusalaam-fadis">
+      <h2>Sheik Abdusalaam Fadis Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikAbdusalaamFadisTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikAbdusalaamFadisTableContainer">
+        <!-- Sheik Abdusalaam Fadis questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Abdusalaam Fadis', 'sheikAbdusalaamFadisTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheikh Abdurahmaan Card -->
+    <div class="card" id="card-sheikh-abdurahmaan">
+      <h2>Sheikh Abdurahmaan Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikhAbdurahmaanTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikhAbdurahmaanTableContainer">
+        <!-- Sheikh Abdurahmaan questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheikh Abdurahmaan', 'sheikhAbdurahmaanTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Nasraddiin Card -->
+    <div class="card" id="card-sheik-nasraddiin">
+      <h2>Sheik Nasraddiin Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikNasraddiinTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikNasraddiinTableContainer">
+        <!-- Sheik Nasraddiin questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Nasraddiin', 'sheikNasraddiinTableContainer')">Answer Questions</button>
+    </div>
   </div>
   
-  <!-- Main Admin Panel Content (hidden until logged in) -->
-  <div class="container" id="adminPanel" style="display:none;">
-    <h1>Bulchiinsa Ergaa - Admin Panel</h1>
-    
-    <!-- Section 1: Admin Account Info -->
-    <div class="section" id="adminAccount">
-      <div class="section-header">
-        <h2>Admin Account</h2>
-      </div>
-      <div class="section-content" id="adminAccountContent">
-        <!-- Filled dynamically from Firestore -->
-      </div>
-    </div>
-    
-    <!-- Section 2: Admin Users List -->
-    <div class="section" id="adminUsersSection">
-      <div class="section-header">
-        <h2>Admin Users</h2>
-      </div>
-      <div class="section-content" id="adminUsersList">
-        <p>Loading admin users...</p>
-      </div>
-    </div>
-    
-    <!-- Questions Dashboard: Cards for General & Sheikh Questions -->
-    <div class="cards-container">
-      <!-- General Questions Card -->
-      <div class="card" id="generalCard">
-        <h2>General Questions</h2>
-        <div class="table-container" id="generalTableContainer">
-          <!-- General questions table will load here -->
-        </div>
-        <button class="card-button" onclick="openAnswerModal('general', null, 'generalTableContainer')">Answer Questions</button>
-      </div>
-      <!-- Sheik Aliyyi Card -->
-      <div class="card" id="card-sheik-aliyyi">
-        <h2>Sheik Aliyyi Questions</h2>
-        <div class="table-container" id="sheikAliyyiTableContainer">
-          <!-- Sheik Aliyyi questions table will load here -->
-        </div>
-        <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Aliyyi', 'sheikAliyyiTableContainer')">Answer Questions</button>
-      </div>
-      <!-- Sheik Abdusalaam Fadis Card -->
-      <div class="card" id="card-sheik-abdusalaam-fadis">
-        <h2>Sheik Abdusalaam Fadis Questions</h2>
-        <div class="table-container" id="sheikAbdusalaamFadisTableContainer">
-          <!-- Sheik Abdusalaam Fadis questions table will load here -->
-        </div>
-        <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Abdusalaam Fadis', 'sheikAbdusalaamFadisTableContainer')">Answer Questions</button>
-      </div>
-      <!-- Sheikh Abdurahmaan Card -->
-      <div class="card" id="card-sheikh-abdurahmaan">
-        <h2>Sheikh Abdurahmaan Questions</h2>
-        <div class="table-container" id="sheikhAbdurahmaanTableContainer">
-          <!-- Sheikh Abdurahmaan questions table will load here -->
-        </div>
-        <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheikh Abdurahmaan', 'sheikhAbdurahmaanTableContainer')">Answer Questions</button>
-      </div>
-      <!-- Sheik Nasraddiin Card -->
-      <div class="card" id="card-sheik-nasraddiin">
-        <h2>Sheik Nasraddiin Questions</h2>
-        <div class="table-container" id="sheikNasraddiinTableContainer">
-          <!-- Sheik Nasraddiin questions table will load here -->
-        </div>
-        <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Nasraddiin', 'sheikNasraddiinTableContainer')">Answer Questions</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Answer Modal (for providing extra answer information) -->
-  <div class="modal" id="answerModal">
+  <!-- Answer Modal -->
+  <div class="modal answer-modal" id="answerModal">
     <div class="modal-header">
       <h2>Provide Answer</h2>
       <span class="modal-close" id="closeAnswerModal">&times;</span>
@@ -315,14 +340,8 @@
     </div>
   </div>
   
-  <!-- Firebase & App Scripts (Compat Libraries) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // Initialize Firebase
+    // Initialize Firebase (use your own config)
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -334,14 +353,13 @@
       measurementId: "G-Z02SPW9ZKW"
     };
     firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
     var db = firebase.firestore();
-    var auth = firebase.auth();
     var storage = firebase.storage();
     
-    /* ------------------------ FETCH DASHBOARD FUNCTIONS ------------------------ */
+    function hideNavButtons() { }
+    function showNavButtons() { }
     
-    // Helper: Build HTML table from query snapshot
+    // Build table from query snapshot
     function buildTableHTML(querySnapshot) {
       let html = "<table><thead><tr>" +
                  "<th>Select</th>" +
@@ -365,31 +383,27 @@
       return html;
     }
     
-    // Fetch general questions (where general == true)
+    // Fetch questions
     function fetchGeneralQuestions() {
       db.collection("questions").where("general", "==", true).get()
         .then(function(querySnapshot) {
           document.getElementById("generalTableContainer").innerHTML = buildTableHTML(querySnapshot);
         })
         .catch(function(error) {
-          console.error("Error fetching general questions:", error);
+          console.error("Error fetching general questions: ", error);
           document.getElementById("generalTableContainer").innerHTML = "<p>Error loading data.</p>";
         });
     }
-    
-    // Fetch questions for a given Sheikh (where sheikhName matches)
     function fetchSheikhQuestions(sheikhName, containerId) {
       db.collection("questions").where("sheikhName", "==", sheikhName).get()
         .then(function(querySnapshot) {
           document.getElementById(containerId).innerHTML = buildTableHTML(querySnapshot);
         })
         .catch(function(error) {
-          console.error("Error fetching questions for " + sheikhName + ":", error);
+          console.error("Error fetching questions for " + sheikhName + ": ", error);
           document.getElementById(containerId).innerHTML = "<p>Error loading data.</p>";
         });
     }
-    
-    // Fetch all questions for dashboard
     function fetchAllQuestions() {
       fetchGeneralQuestions();
       fetchSheikhQuestions("Sheik Aliyyi", "sheikAliyyiTableContainer");
@@ -398,14 +412,11 @@
       fetchSheikhQuestions("Sheik Nasraddiin", "sheikNasraddiinTableContainer");
     }
     
-    /* ------------------------ ANSWER MODAL FUNCTIONS ------------------------ */
-    // Global variables to store selected question IDs and card info
     window.selectedQuestionIds = [];
     window.currentCardType = "";
     window.currentSheikhName = "";
     window.currentContainerId = "";
     
-    // Open Answer Modal when "Answer Questions" button is clicked
     function openAnswerModal(cardType, sheikhName, containerId) {
       let container = document.getElementById(containerId);
       let checkboxes = container.querySelectorAll(".select-checkbox:checked");
@@ -422,15 +433,14 @@
       window.currentSheikhName = sheikhName;
       window.currentContainerId = containerId;
       document.getElementById("answerModal").classList.add("active");
+      hideNavButtons();
     }
     
-    // Close Answer Modal
     function closeAnswerModal() {
       document.getElementById("answerModal").classList.remove("active");
-      document.getElementById("answerForm").reset();
+      showNavButtons();
     }
     
-    // Mark a question as answered with extra answer info (text and optional audio)
     function markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile) {
       return db.collection("questions").doc(docId).get().then(function(doc) {
         if (doc.exists) {
@@ -457,7 +467,6 @@
       });
     }
     
-    // Handle answer modal submission
     document.getElementById("answerForm").addEventListener("submit", function(e) {
       e.preventDefault();
       let submitBtn = document.getElementById("answerSubmitBtn");
@@ -476,86 +485,100 @@
         } else if (window.currentCardType === "sheikh") {
           fetchSheikhQuestions(window.currentSheikhName, window.currentContainerId);
         }
+        document.getElementById("answerForm").reset();
         submitBtn.innerHTML = 'Submit Answer';
         submitBtn.disabled = false;
         closeAnswerModal();
       }).catch(function(error) {
-        console.error("Error marking questions as answered:", error);
+        console.error("Error marking questions as answered: ", error);
         alert("Error marking questions as answered.");
         submitBtn.innerHTML = 'Submit Answer';
         submitBtn.disabled = false;
       });
     });
     
-    /* ------------------------ ADMIN PANEL SECTIONS ------------------------ */
-    // After auth, load admin account info and admin users list
-    function loadAdminPanel(user) {
-      var adminName = user.displayName || user.email;
-      // Admin Account Info
-      db.collection("adminUsers").doc(adminName).get()
-        .then(function(doc) {
-          var accountContent = document.getElementById("adminAccountContent");
-          if (doc.exists) {
-            var data = doc.data();
-            accountContent.innerHTML = "<p><strong>Maqaa:</strong> " + adminName + "</p>" +
-              "<p><strong>Bilbila:</strong> " + (data.phone || "Hin ibsamin") + "</p>" +
-              '<button class="modal-btn" id="editInfoBtn"><i class="fas fa-edit"></i> Odeeffannoo Jijjiiri</button>';
-          } else {
-            accountContent.innerHTML = "<p><strong>Maqaa:</strong> " + adminName + "</p>" +
-              "<p><strong>Bilbila:</strong> Hin ibsamin</p>" +
-              '<button class="modal-btn" id="editInfoBtn"><i class="fas fa-edit"></i> Odeeffannoo Jijjiiri</button>';
-          }
-          document.getElementById("editInfoBtn").addEventListener("click", openEditModal);
-        })
-        .catch(function(error) {
-          console.error("Error loading admin account info:", error);
+    document.getElementById("closeAnswerModal").addEventListener("click", closeAnswerModal);
+    
+    // Download functionality
+    document.querySelectorAll('.download-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        let downloadMenu = this.nextElementSibling;
+        downloadMenu.style.display = (downloadMenu.style.display === 'block') ? 'none' : 'block';
+      });
+    });
+    
+    document.querySelectorAll('.download-submit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        let form = this.parentElement;
+        let downloadMenu = form.parentElement;
+        let selectedFields = Array.from(form.querySelectorAll('input[name="fields"]:checked')).map(function(input) {
+          return input.value;
         });
-      
-      // Admin Users List
-      db.collection("adminUsers").get()
-        .then(function(querySnapshot) {
-          var adminList = document.getElementById("adminUsersList");
-          var html = "";
-          querySnapshot.forEach(function(doc) {
-            var adminData = doc.data();
-            html += '<div class="admin-user"><strong>' + doc.id + "</strong> - " + (adminData.phone || "Hin ibsamin") + "</div>";
+        if(selectedFields.length === 0){
+          alert("Please select at least one field to download.");
+          return;
+        }
+        let downloadContainer = downloadMenu.parentElement;
+        let targetId = downloadContainer.getAttribute('data-target');
+        let tableContainer = document.getElementById(targetId);
+        let table = tableContainer.querySelector("table");
+        if(!table) {
+          alert("No data available to download.");
+          return;
+        }
+        const fieldToIndex = {
+          "userName": 1,
+          "questionText": 2,
+          "dynamicData": 3,
+          "submissionDate": 4
+        };
+        let csvContent = "";
+        let headerRow = [];
+        selectedFields.forEach(function(field) {
+          if(field === "userName") headerRow.push("User Name");
+          else if(field === "questionText") headerRow.push("Question");
+          else if(field === "dynamicData") headerRow.push("Dynamic Data");
+          else if(field === "submissionDate") headerRow.push("Submission Date");
+        });
+        csvContent += headerRow.join(",") + "\n";
+        let rows = table.querySelectorAll("tbody tr");
+        rows.forEach(function(row) {
+          let rowData = [];
+          selectedFields.forEach(function(field) {
+            let colIndex = fieldToIndex[field];
+            let cell = row.cells[colIndex];
+            rowData.push(cell ? cell.innerText : "");
           });
-          adminList.innerHTML = html;
-        })
-        .catch(function(error) {
-          console.error("Error loading admin users:", error);
+          csvContent += rowData.join(",") + "\n";
         });
-    }
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "data-download.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        downloadMenu.style.display = 'none';
+      });
+    });
     
-    /* ------------------------ EDIT MODAL (for admin info) ------------------------ */
-    function openEditModal() {
-      // For simplicity, we assume an edit modal is available.
-      // (Omitted here for brevity--you can integrate the edit modal code from your admin panel design.)
-      alert("Edit modal would open here (code from your admin panel design can be inserted).");
-    }
-    
-    /* ------------------------ AUTHENTICATION & INITIAL LOAD ------------------------ */
-    document.addEventListener('DOMContentLoaded', function() {
-      auth.onAuthStateChanged(function(user) {
-        var overlay = document.getElementById("loginStatusOverlay");
-        if (user) {
-          overlay.style.display = "none";
-          document.getElementById("adminPanel").style.display = "block";
-          loadAdminPanel(user);
-          fetchAllQuestions();
-        } else {
-          overlay.innerHTML = '<div class="spinner"></div><p>Mee, dura seeni (log in)!</p>';
-          setTimeout(function() {
-            window.location.href = "contactadmin.html";
-          }, 2000);
+    // Close download menus only when clicking outside their container.
+    document.addEventListener('click', function(e) {
+      document.querySelectorAll('.download-container').forEach(function(container) {
+        if (!container.contains(e.target)) {
+          let menu = container.querySelector('.download-menu');
+          if(menu) menu.style.display = 'none';
         }
       });
     });
     
-    // (Optional: Add spinner keyframes)
-    const style = document.createElement('style');
-    style.innerHTML = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
-    document.head.appendChild(style);
+    document.addEventListener("DOMContentLoaded", function() {
+      fetchAllQuestions();
+    });
   </script>
 </body>
 </html>
