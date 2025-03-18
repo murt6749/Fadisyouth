@@ -307,18 +307,419 @@
         </div>
       </div>
     </div>
-    
-    <!-- Section 4: Questions Grouped by Card -->
-    <div class="section" id="questionsSection">
-      <div class="section-header">
-        <h2>Questions (Group by Card)</h2>
+
+    //section 4
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questions Dashboard</title>
+  <!-- Firebase Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2B5A46;
+      --secondary: #7D9D6E;
+      --accent: #D4AF37;
+      --light: #F8F5F0;
+      --dark: #1E1E1E;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+    }
+    .card h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #e9ecef;
+    }
+    .card-button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      transition: background 0.3s ease;
+    }
+    .card-button:hover {
+      background: #c19b2b;
+    }
+    /* Modal Styles – reused for answer modal, similar to other modals */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #fff7e6, #ffedcc);
+      border-radius: 25px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 1100;
+    }
+    .modal.active {
+      display: block;
+    }
+    .modal .modal-header {
+      padding: 1.5rem;
+      border-bottom: 2px solid var(--light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .modal .modal-close {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+    .modal .modal-body {
+      padding: 1.5rem;
+    }
+    .modal .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .modal input, .modal textarea, .modal input[type="file"] {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .modal input:focus, .modal textarea:focus, .modal input[type="file"]:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(125,157,110,0.3);
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 1.2rem 2.5rem;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* Navigation Buttons (if any) – not used in this fetch page */
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .card {
+        padding: 1rem;
+      }
+      th, td {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Questions Dashboard</h1>
+  <div class="cards-container">
+    <!-- General Questions Card -->
+    <div class="card" id="generalCard">
+      <h2>General Questions</h2>
+      <div class="table-container" id="generalTableContainer">
+        <!-- General questions table will load here -->
       </div>
-      <div class="section-content" id="questionsGrouped">
-        <!-- Grouped questions will be loaded here -->
-        <p>Loading questions...</p>
+      <button class="card-button" onclick="openAnswerModal('general', null, 'generalTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Aliyyi Card -->
+    <div class="card" id="card-sheik-aliyyi">
+      <h2>Sheik Aliyyi Questions</h2>
+      <div class="table-container" id="sheikAliyyiTableContainer">
+        <!-- Sheik Aliyyi questions table will load here -->
       </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Aliyyi', 'sheikAliyyiTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Abdusalaam Fadis Card -->
+    <div class="card" id="card-sheik-abdusalaam-fadis">
+      <h2>Sheik Abdusalaam Fadis Questions</h2>
+      <div class="table-container" id="sheikAbdusalaamFadisTableContainer">
+        <!-- Sheik Abdusalaam Fadis questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Abdusalaam Fadis', 'sheikAbdusalaamFadisTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheikh Abdurahmaan Card -->
+    <div class="card" id="card-sheikh-abdurahmaan">
+      <h2>Sheikh Abdurahmaan Questions</h2>
+      <div class="table-container" id="sheikhAbdurahmaanTableContainer">
+        <!-- Sheikh Abdurahmaan questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheikh Abdurahmaan', 'sheikhAbdurahmaanTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Nasraddiin Card -->
+    <div class="card" id="card-sheik-nasraddiin">
+      <h2>Sheik Nasraddiin Questions</h2>
+      <div class="table-container" id="sheikNasraddiinTableContainer">
+        <!-- Sheik Nasraddiin questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Nasraddiin', 'sheikNasraddiinTableContainer')">Answer Questions</button>
     </div>
   </div>
+  
+  <!-- Answer Modal (for providing extra answer information) -->
+  <div class="modal answer-modal" id="answerModal">
+    <div class="modal-header">
+      <h2>Provide Answer</h2>
+      <span class="modal-close" id="closeAnswerModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="answerForm">
+        <div class="form-group">
+          <textarea id="answerText" placeholder="Write your answer here" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Upload Audio (optional):</label>
+          <input type="file" id="audioFile" accept="audio/*">
+        </div>
+        <button type="submit" class="submit-btn" id="answerSubmitBtn">Submit Answer</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Initialize Firebase (use your own config)
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+    var storage = firebase.storage();
+    
+    // Utility functions to hide and show navigation (if you have any; here we assume none on this dashboard)
+    function hideNavButtons() {
+      // For this demo, if there were nav buttons, hide them.
+      // document.getElementById('navButtons').style.display = 'none';
+    }
+    function showNavButtons() {
+      // document.getElementById('navButtons').style.display = 'flex';
+    }
+    
+    // Helper: Build HTML table from query snapshot
+    function buildTableHTML(querySnapshot) {
+      let html = "<table><thead><tr>" +
+                 "<th>Select</th>" +
+                 "<th>User Name</th>" +
+                 "<th>Question</th>" +
+                 "<th>Dynamic Data</th>" +
+                 "<th>Submission Date</th>" +
+                 "</tr></thead><tbody>";
+      querySnapshot.forEach(function(doc) {
+        const data = doc.data();
+        const dynamicData = data.dynamicData ? JSON.stringify(data.dynamicData) : "";
+        html += `<tr>
+          <td><input type="checkbox" class="select-checkbox" value="${doc.id}"></td>
+          <td>${data.userName || ""}</td>
+          <td>${data.questionText || ""}</td>
+          <td>${dynamicData}</td>
+          <td>${new Date(data.submissionDate).toLocaleString()}</td>
+        </tr>`;
+      });
+      html += "</tbody></table>";
+      return html;
+    }
+    
+    // Fetch general questions (documents where general is true)
+    function fetchGeneralQuestions() {
+      db.collection("questions").where("general", "==", true).get()
+        .then(function(querySnapshot) {
+          document.getElementById("generalTableContainer").innerHTML = buildTableHTML(querySnapshot);
+        })
+        .catch(function(error) {
+          console.error("Error fetching general questions: ", error);
+          document.getElementById("generalTableContainer").innerHTML = "<p>Error loading data.</p>";
+        });
+    }
+    
+    // Fetch questions for a given sheikh (where sheikhName equals the provided value)
+    function fetchSheikhQuestions(sheikhName, containerId) {
+      db.collection("questions").where("sheikhName", "==", sheikhName).get()
+        .then(function(querySnapshot) {
+          document.getElementById(containerId).innerHTML = buildTableHTML(querySnapshot);
+        })
+        .catch(function(error) {
+          console.error("Error fetching questions for " + sheikhName + ": ", error);
+          document.getElementById(containerId).innerHTML = "<p>Error loading data.</p>";
+        });
+    }
+    
+    // Fetch all questions for all cards
+    function fetchAllQuestions() {
+      fetchGeneralQuestions();
+      fetchSheikhQuestions("Sheik Aliyyi", "sheikAliyyiTableContainer");
+      fetchSheikhQuestions("Sheik Abdusalaam Fadis", "sheikAbdusalaamFadisTableContainer");
+      fetchSheikhQuestions("Sheikh Abdurahmaan", "sheikhAbdurahmaanTableContainer");
+      fetchSheikhQuestions("Sheik Nasraddiin", "sheikNasraddiinTableContainer");
+    }
+    
+    // Global variables to store selected question IDs and card info for answering
+    window.selectedQuestionIds = [];
+    window.currentCardType = "";
+    window.currentSheikhName = "";
+    window.currentContainerId = "";
+    
+    // Open Answer Modal – called when the "Answer Questions" button is clicked on a card
+    function openAnswerModal(cardType, sheikhName, containerId) {
+      let container = document.getElementById(containerId);
+      let checkboxes = container.querySelectorAll(".select-checkbox:checked");
+      if (checkboxes.length === 0) {
+        alert("Please select at least one question to mark as answered.");
+        return;
+      }
+      let selectedIds = [];
+      checkboxes.forEach(function(checkbox) {
+        selectedIds.push(checkbox.value);
+      });
+      window.selectedQuestionIds = selectedIds;
+      window.currentCardType = cardType;
+      window.currentSheikhName = sheikhName;
+      window.currentContainerId = containerId;
+      document.getElementById("answerModal").classList.add("active");
+      hideNavButtons();
+    }
+    
+    // Close Answer Modal
+    function closeAnswerModal() {
+      document.getElementById("answerModal").classList.remove("active");
+      showNavButtons();
+    }
+    
+    // Mark a question as answered with answer information (text and optional audio)
+    function markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile) {
+      return db.collection("questions").doc(docId).get().then(function(doc) {
+        if (doc.exists) {
+          let data = doc.data();
+          data.answerText = answerText;
+          data.answerDate = new Date().toISOString();
+          // If audio file is provided, upload to Firebase Storage first
+          if (audioFile) {
+            let filename = docId + "_" + Date.now() + "_" + audioFile.name;
+            let storageRef = storage.ref().child("audioAnswers/" + filename);
+            return storageRef.put(audioFile).then(function(snapshot) {
+              return snapshot.ref.getDownloadURL();
+            }).then(function(downloadURL) {
+              data.answerAudio = downloadURL;
+              return db.collection("questionsanswered").doc(docId).set(data).then(function() {
+                return db.collection("questions").doc(docId).delete();
+              });
+            });
+          } else {
+            // No audio file provided
+            return db.collection("questionsanswered").doc(docId).set(data).then(function() {
+              return db.collection("questions").doc(docId).delete();
+            });
+          }
+        }
+      });
+    }
+    
+    // Handle answer modal form submission
+    document.getElementById("answerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let submitBtn = document.getElementById("answerSubmitBtn");
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+      submitBtn.disabled = true;
+      let answerText = document.getElementById("answerText").value;
+      let audioFile = document.getElementById("audioFile").files[0];
+      let promises = [];
+      window.selectedQuestionIds.forEach(function(docId) {
+        promises.push(markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile));
+      });
+      Promise.all(promises).then(function() {
+        alert("Selected questions have been marked as answered with your response.");
+        if (window.currentCardType === "general") {
+          fetchGeneralQuestions();
+        } else if (window.currentCardType === "sheikh") {
+          fetchSheikhQuestions(window.currentSheikhName, window.currentContainerId);
+        }
+        document.getElementById("answerForm").reset();
+        submitBtn.innerHTML = 'Submit Answer';
+        submitBtn.disabled = false;
+        closeAnswerModal();
+      }).catch(function(error) {
+        console.error("Error marking questions as answered: ", error);
+        alert("Error marking questions as answered.");
+        submitBtn.innerHTML = 'Submit Answer';
+        submitBtn.disabled = false;
+      });
+    });
+    
+    // Close answer modal when clicking its X icon
+    document.getElementById("closeAnswerModal").addEventListener("click", closeAnswerModal);
+    
+    // Load all questions when the page loads
+    document.addEventListener("DOMContentLoaded", function() {
+      fetchAllQuestions();
+    });
+  </script>
+</body>
+</html>
   
   <!-- Response Modal (For Admin to Reply to a Message) -->
   <div class="modal-overlay" id="responseModal">
