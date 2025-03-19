@@ -46,8 +46,7 @@
     ========================================================== */
     .islamic-pattern { 
       position: fixed; width: 100vw; height: 100vh; 
-      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), 
-                        repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
+      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
       z-index: -1; 
     }
     .floating-ornament { 
@@ -131,7 +130,7 @@
     .profile-card #profileCircle img { display: none; width: 100%; height: 100%; object-fit: cover; }
     .profile-card #profileBio { margin-top: 10px; }
     /* --------------------------------------------------------
-       Auth Status Checking Animation (in Prayer Section)
+       Auth Checking Animation (in Prayer Section)
     --------------------------------------------------------- */
     #authCheck { text-align: center; padding: 1rem; }
     /* --------------------------------------------------------
@@ -431,7 +430,7 @@
         quran: "Quraana",
         prayerTimes: "Yeroo kadhannaa",
         fatwa: "Fatawaa",
-        settings: "To'annaa",
+        settings: "To’annaa",
         contactUs: "Nu qunnamaa",
         aboutUs: "Ilaalcha",
         prayerSection: "Yeroo kadhannaa",
@@ -894,6 +893,36 @@
         }
         // Hide the auth-check spinner now that auth state is known.
         document.getElementById('authCheck').style.display = 'none';
+      });
+    });
+  </script>
+
+  <!-- ========================================================
+       AI Agent Embedded Code
+  ========================================================== -->
+  <script src="https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      window.AgentInitializer.init({
+        agentRenderURL: "https://agent.jotform.com/0195ac7939af7170ac9db5210b74bd4a25fb",
+        rootId: "JotformAgent-0195ac7939af7170ac9db5210b74bd4a25fb",
+        formID: "0195ac7939af7170ac9db5210b74bd4a25fb",
+        queryParams: ["skipWelcome=1", "maximizable=1"],
+        domain: "https://www.jotform.com",
+        isDraggable: false,
+        background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
+        buttonBackgroundColor: "#0066C3",
+        buttonIconColor: "#FFFFFF",
+        variant: false,
+        customizations: {
+          "greeting": "Yes",
+          "greetingMessage": "Hi! Fadis youth ai assistant ",
+          "openByDefault": "No",
+          "pulse": "Yes",
+          "position": "right",
+          "autoOpenChatIn": "0"
+        },
+        isVoice: undefined
       });
     });
   </script>
