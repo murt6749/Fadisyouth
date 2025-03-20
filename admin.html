@@ -341,7 +341,7 @@
   </div>
   
   <script>
-    // Initialize Firebase (use your own config)
+    // Initialize Firebase (using your own config)
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -359,7 +359,7 @@
     function hideNavButtons() { }
     function showNavButtons() { }
     
-    // Build table from query snapshot
+    // Build table while skipping questions that have been marked as answered.
     function buildTableHTML(querySnapshot) {
       let html = "<table><thead><tr>" +
                  "<th>Select</th>" +
@@ -370,6 +370,7 @@
                  "</tr></thead><tbody>";
       querySnapshot.forEach(function(doc) {
         const data = doc.data();
+        if(data.questionText === "Your question is answered") return;
         const dynamicData = data.dynamicData ? JSON.stringify(data.dynamicData) : "";
         html += `<tr>
           <td><input type="checkbox" class="select-checkbox" value="${doc.id}"></td>
@@ -383,7 +384,7 @@
       return html;
     }
     
-    // Fetch questions
+    // Functions to fetch questions from Firestore
     function fetchGeneralQuestions() {
       db.collection("questions").where("general", "==", true).get()
         .then(function(querySnapshot) {
@@ -441,10 +442,17 @@
       showNavButtons();
     }
     
+    // Answer function:
+    // 1. Retrieves the original document from "questions"
+    // 2. Preserves the original question text
+    // 3. Adds answer details (text, date, and if provided audio URL)
+    // 4. Stores the answered document in "questionsanswered" with the original question text
+    // 5. Updates the original document's questionText to "Your question is answered"
     function markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile) {
       return db.collection("questions").doc(docId).get().then(function(doc) {
         if (doc.exists) {
           let data = doc.data();
+          let originalQuestionText = data.questionText;
           data.answerText = answerText;
           data.answerDate = new Date().toISOString();
           if (audioFile) {
@@ -454,14 +462,14 @@
               return snapshot.ref.getDownloadURL();
             }).then(function(downloadURL) {
               data.answerAudio = downloadURL;
-              return db.collection("questionsanswered").doc(docId).set(data).then(function() {
-                return db.collection("questions").doc(docId).delete();
-              });
+              data.questionText = originalQuestionText;
+              return db.collection("questionsanswered").doc(docId).set(data)
+                .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
             });
           } else {
-            return db.collection("questionsanswered").doc(docId).set(data).then(function() {
-              return db.collection("questions").doc(docId).delete();
-            });
+            data.questionText = originalQuestionText;
+            return db.collection("questionsanswered").doc(docId).set(data)
+              .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
           }
         }
       });
@@ -499,7 +507,7 @@
     
     document.getElementById("closeAnswerModal").addEventListener("click", closeAnswerModal);
     
-    // Download functionality
+    // Download functionality remains unchanged.
     document.querySelectorAll('.download-btn').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -566,7 +574,6 @@
       });
     });
     
-    // Close download menus only when clicking outside their container.
     document.addEventListener('click', function(e) {
       document.querySelectorAll('.download-container').forEach(function(container) {
         if (!container.contains(e.target)) {
