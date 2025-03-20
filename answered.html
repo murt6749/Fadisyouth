@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Answered Questions - Fadis Youth</title>
+  <title>Questions Dashboard</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <!-- Font Awesome for icons -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     :root {
@@ -18,275 +18,330 @@
       --accent: #D4AF37;
       --light: #F8F5F0;
       --dark: #1E1E1E;
-      --gradient: linear-gradient(135deg, #fff7e6, #ffedcc);
-    }
-    * {
-      box-sizing: border-box;
     }
     body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-      color: var(--dark);
-    }
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 1rem 0;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-    /* Controls: search, tabs, sorting drop-down */
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-    .controls input[type="text"] {
-      padding: 0.75rem;
-      width: 250px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-    .tabs {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .tab-btn {
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 5px;
-      background: var(--secondary);
-      color: white;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.3s;
-    }
-    .tab-btn.active, .tab-btn:hover {
-      background: var(--accent);
-    }
-    .sort-select {
-      padding: 0.75rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-      background: var(--secondary);
-      color: white;
-      cursor: pointer;
-    }
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
       padding: 1rem;
     }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
     .cards-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 1.5rem;
-      margin-top: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
     }
     .card {
-      background: #fff;
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
       border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 1.5rem;
       position: relative;
-      cursor: pointer;
-      user-select: none;
     }
-    /* Splash effect for double-tap */
-    .splash {
+    .card h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #e9ecef;
+    }
+    .card-button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      transition: background 0.3s ease;
+    }
+    .card-button:hover {
+      background: #c19b2b;
+    }
+    /* Download Icon and Dropdown Menu Styles */
+    .download-container {
       position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .download-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+    .download-menu {
+      display: none;
+      position: absolute;
+      top: 30px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+      width: 200px;
+    }
+    .download-menu form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .download-menu label {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .download-submit-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    .download-submit-btn:hover {
+      background: #c19b2b;
+    }
+    /* Modal Styles – reused for answer modal */
+    .modal {
+      display: none;
+      position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0.8;
-      color: var(--accent);
-      font-size: 4rem;
-      pointer-events: none;
-      animation: splash 0.8s forwards;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #fff7e6, #ffedcc);
+      border-radius: 25px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 1100;
     }
-    @keyframes splash {
-      to {
-        transform: translate(-50%, -50%) scale(2);
-        opacity: 0;
-      }
+    .modal.active {
+      display: block;
     }
-    .card-header {
-      background: var(--primary);
-      color: white;
-      padding: 0.75rem 1rem;
+    .modal .modal-header {
+      padding: 1.5rem;
+      border-bottom: 2px solid var(--light);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .card-header h2 {
+    .modal .modal-header h2 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
     }
-    .card-header span {
-      font-size: 0.9rem;
-      opacity: 0.85;
-    }
-    .question-section {
-      background: #fefefe;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px dashed var(--light);
-    }
-    .question-section p {
-      margin: 0.5rem 0;
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-    .question-section .field-label {
-      font-weight: 600;
-    }
-    .answer-section {
-      background: var(--gradient);
-      padding: 1rem 1.5rem;
-    }
-    .answer-section p {
-      margin: 0.5rem 0;
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-    .card-actions {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      border-top: 1px solid var(--light);
-      background: #fafafa;
-    }
-    .action-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
+    .modal .modal-close {
       cursor: pointer;
-      font-size: 1.3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .action-btn:hover {
-      color: var(--primary);
-    }
-    .action-btn span {
-      font-size: 0.8rem;
-    }
-    /* Additional Dislike button styling (similar to like) */
-    .dislike-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 1.3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    .dislike-btn:hover {
-      color: var(--primary);
-    }
-    /* Comment Section styling */
-    .comment-section {
-      background: #fff;
-      border-top: 1px solid var(--light);
-      padding: 0.75rem 1rem;
-      font-size: 0.8rem;
-      display: none;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .comment {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.25rem;
-      margin-bottom: 0.25rem;
-    }
-    .comment .comment-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-    .comment .comment-actions button {
-      background: none;
-      border: none;
-      color: var(--secondary);
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-    .comment-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .comment-input input {
-      flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 0.8rem;
-    }
-    .comment-input button {
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 5px;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .loading {
-      text-align: center;
-      font-size: 1.2rem;
-      padding: 2rem;
+      font-size: 1.5rem;
       color: var(--dark);
     }
-    .no-data {
-      text-align: center;
-      padding: 2rem;
-      font-style: italic;
-      color: var(--secondary);
+    .modal .modal-body {
+      padding: 1.5rem;
     }
-    .quran-verses {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: var(--primary);
+    .modal .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .modal input, .modal textarea, .modal input[type="file"] {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .modal input:focus, .modal textarea:focus, .modal input[type="file"]:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(125,157,110,0.3);
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 1.2rem 2.5rem;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .card {
+        padding: 1rem;
+      }
+      th, td {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Answered Questions</h1>
-    <div class="controls">
-      <input type="text" id="searchInput" placeholder="Search answers...">
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="general">General</button>
-        <button class="tab-btn" data-tab="sheikh">Sheikh</button>
+  <h1>Questions Dashboard</h1>
+  <div class="cards-container">
+    <!-- General Questions Card -->
+    <div class="card" id="generalCard">
+      <h2>General Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="generalTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
       </div>
-      <select id="sortSelect" class="sort-select">
-        <option value="recent" selected>Recent</option>
-        <option value="popular">Popular</option>
-        <option value="seen">Seen</option>
-      </select>
+      <div class="table-container" id="generalTableContainer">
+        <!-- General questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('general', null, 'generalTableContainer')">Answer Questions</button>
     </div>
-  </header>
-  <main>
-    <div id="cardsContainer" class="cards-container">
-      <div class="loading" id="loadingMessage">Loading answered questions...</div>
+    <!-- Sheik Aliyyi Card -->
+    <div class="card" id="card-sheik-aliyyi">
+      <h2>Sheik Aliyyi Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikAliyyiTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikAliyyiTableContainer">
+        <!-- Sheik Aliyyi questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Aliyyi', 'sheikAliyyiTableContainer')">Answer Questions</button>
     </div>
-  </main>
+    <!-- Sheik Abdusalaam Fadis Card -->
+    <div class="card" id="card-sheik-abdusalaam-fadis">
+      <h2>Sheik Abdusalaam Fadis Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikAbdusalaamFadisTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikAbdusalaamFadisTableContainer">
+        <!-- Sheik Abdusalaam Fadis questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Abdusalaam Fadis', 'sheikAbdusalaamFadisTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheikh Abdurahmaan Card -->
+    <div class="card" id="card-sheikh-abdurahmaan">
+      <h2>Sheikh Abdurahmaan Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikhAbdurahmaanTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikhAbdurahmaanTableContainer">
+        <!-- Sheikh Abdurahmaan questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheikh Abdurahmaan', 'sheikhAbdurahmaanTableContainer')">Answer Questions</button>
+    </div>
+    <!-- Sheik Nasraddiin Card -->
+    <div class="card" id="card-sheik-nasraddiin">
+      <h2>Sheik Nasraddiin Questions</h2>
+      <!-- Download Icon and Menu -->
+      <div class="download-container" data-target="sheikNasraddiinTableContainer">
+        <button class="download-btn"><i class="fas fa-download"></i></button>
+        <div class="download-menu">
+          <form>
+            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
+            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
+            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
+            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
+            <button type="button" class="download-submit-btn">Download</button>
+          </form>
+        </div>
+      </div>
+      <div class="table-container" id="sheikNasraddiinTableContainer">
+        <!-- Sheik Nasraddiin questions table will load here -->
+      </div>
+      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Nasraddiin', 'sheikNasraddiinTableContainer')">Answer Questions</button>
+    </div>
+  </div>
+  
+  <!-- Answer Modal -->
+  <div class="modal answer-modal" id="answerModal">
+    <div class="modal-header">
+      <h2>Provide Answer</h2>
+      <span class="modal-close" id="closeAnswerModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="answerForm">
+        <div class="form-group">
+          <textarea id="answerText" placeholder="Write your answer here" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Upload Audio (optional):</label>
+          <input type="file" id="audioFile" accept="audio/*">
+        </div>
+        <button type="submit" class="submit-btn" id="answerSubmitBtn">Submit Answer</button>
+      </form>
+    </div>
+  </div>
+  
   <script>
-    // Initialize Firebase – using your provided configuration
+    // Initialize Firebase (use your own config)
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -299,441 +354,243 @@
     };
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
-
-    // Global variables for data and filters
-    let allAnswered = [];
-    let currentTab = "general";
-    let currentSort = "recent";
-    let currentSearch = "";
-
-    // Use onSnapshot for real-time updates
-    db.collection("questionsanswered").onSnapshot(snapshot => {
-      let data = [];
-      snapshot.forEach(doc => {
-        let d = doc.data();
-        d.id = doc.id;
-        d.likes = d.likes || 0;
-        d.dislikes = d.dislikes || 0;
-        d.comments = d.comments || [];
-        data.push(d);
+    var storage = firebase.storage();
+    
+    function hideNavButtons() { }
+    function showNavButtons() { }
+    
+    // Build table, skipping questions that are marked as answered.
+    function buildTableHTML(querySnapshot) {
+      let html = "<table><thead><tr>" +
+                 "<th>Select</th>" +
+                 "<th>User Name</th>" +
+                 "<th>Question</th>" +
+                 "<th>Dynamic Data</th>" +
+                 "<th>Submission Date</th>" +
+                 "</tr></thead><tbody>";
+      querySnapshot.forEach(function(doc) {
+        const data = doc.data();
+        // Skip if questionText indicates it's answered.
+        if(data.questionText === "Your question is answered") return;
+        const dynamicData = data.dynamicData ? JSON.stringify(data.dynamicData) : "";
+        html += `<tr>
+          <td><input type="checkbox" class="select-checkbox" value="${doc.id}"></td>
+          <td>${data.userName || ""}</td>
+          <td>${data.questionText || ""}</td>
+          <td>${dynamicData}</td>
+          <td>${new Date(data.submissionDate).toLocaleString()}</td>
+        </tr>`;
       });
-      allAnswered = data;
-      renderCards();
-    });
-
-    // Set up sort drop-down
-    document.getElementById("sortSelect").addEventListener("change", function() {
-      currentSort = this.value;
-      renderCards();
-    });
-
-    // Set up tab switching
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.addEventListener("click", function() {
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        this.classList.add("active");
-        currentTab = this.getAttribute("data-tab");
-        renderCards();
-      });
-    });
-
-    // Set up search input listener
-    document.getElementById("searchInput").addEventListener("input", function() {
-      currentSearch = this.value;
-      renderCards();
-    });
-
-    // Render cards based on filters
-    function renderCards() {
-      const container = document.getElementById("cardsContainer");
-      container.innerHTML = "";
-      let filtered = allAnswered.filter(doc => {
-        if (currentTab === "general") {
-          return doc.general === true;
-        } else {
-          return doc.sheikhName && doc.general !== true;
-        }
-      });
-      if (currentSearch.trim() !== "") {
-        const kw = currentSearch.toLowerCase();
-        filtered = filtered.filter(doc =>
-          (doc.userName && doc.userName.toLowerCase().includes(kw)) ||
-          (doc.questionText && doc.questionText.toLowerCase().includes(kw)) ||
-          (doc.answerText && doc.answerText.toLowerCase().includes(kw))
-        );
-      }
-      if (currentSort === "recent") {
-        filtered.sort((a, b) => new Date(b.answerDate || b.submissionDate) - new Date(a.answerDate || a.submissionDate));
-      } else if (currentSort === "popular") {
-        filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-      } else if (currentSort === "seen") {
-        filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
-      }
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="no-data">
-          <p>No answered questions found for the current filter.</p>
-          <div class="quran-verses">
-            <p>"Indeed, with hardship comes ease." (Qur'an 94:6)</p>
-            <p>"And whoever puts their trust in Allah, He will be enough for them." (Qur'an 65:3)</p>
-          </div>
-        </div>`;
+      html += "</tbody></table>";
+      return html;
+    }
+    
+    // Fetch questions functions
+    function fetchGeneralQuestions() {
+      db.collection("questions").where("general", "==", true).get()
+        .then(function(querySnapshot) {
+          document.getElementById("generalTableContainer").innerHTML = buildTableHTML(querySnapshot);
+        })
+        .catch(function(error) {
+          console.error("Error fetching general questions: ", error);
+          document.getElementById("generalTableContainer").innerHTML = "<p>Error loading data.</p>";
+        });
+    }
+    function fetchSheikhQuestions(sheikhName, containerId) {
+      db.collection("questions").where("sheikhName", "==", sheikhName).get()
+        .then(function(querySnapshot) {
+          document.getElementById(containerId).innerHTML = buildTableHTML(querySnapshot);
+        })
+        .catch(function(error) {
+          console.error("Error fetching questions for " + sheikhName + ": ", error);
+          document.getElementById(containerId).innerHTML = "<p>Error loading data.</p>";
+        });
+    }
+    function fetchAllQuestions() {
+      fetchGeneralQuestions();
+      fetchSheikhQuestions("Sheik Aliyyi", "sheikAliyyiTableContainer");
+      fetchSheikhQuestions("Sheik Abdusalaam Fadis", "sheikAbdusalaamFadisTableContainer");
+      fetchSheikhQuestions("Sheikh Abdurahmaan", "sheikhAbdurahmaanTableContainer");
+      fetchSheikhQuestions("Sheik Nasraddiin", "sheikNasraddiinTableContainer");
+    }
+    
+    window.selectedQuestionIds = [];
+    window.currentCardType = "";
+    window.currentSheikhName = "";
+    window.currentContainerId = "";
+    
+    function openAnswerModal(cardType, sheikhName, containerId) {
+      let container = document.getElementById(containerId);
+      let checkboxes = container.querySelectorAll(".select-checkbox:checked");
+      if (checkboxes.length === 0) {
+        alert("Please select at least one question to mark as answered.");
         return;
       }
-      filtered.forEach(doc => {
-        container.appendChild(createAnsweredCard(doc));
+      let selectedIds = [];
+      checkboxes.forEach(function(checkbox) {
+        selectedIds.push(checkbox.value);
       });
+      window.selectedQuestionIds = selectedIds;
+      window.currentCardType = cardType;
+      window.currentSheikhName = sheikhName;
+      window.currentContainerId = containerId;
+      document.getElementById("answerModal").classList.add("active");
+      hideNavButtons();
     }
-
-    // Utility: prevent multiple likes/dislikes for logged-in users; allow up to 10 for non-logged in
-    function hasLiked(docId) {
-      return localStorage.getItem("liked_" + docId) === "true";
+    
+    function closeAnswerModal() {
+      document.getElementById("answerModal").classList.remove("active");
+      showNavButtons();
     }
-    function setLiked(docId) {
-      localStorage.setItem("liked_" + docId, "true");
-    }
-    function getNonLoggedLikeCount(docId) {
-      return parseInt(localStorage.getItem("liked_" + docId)) || 0;
-    }
-    function incrementNonLoggedLike(docId) {
-      let count = getNonLoggedLikeCount(docId);
-      localStorage.setItem("liked_" + docId, count + 1);
-    }
-    function hasDisliked(docId) {
-      return localStorage.getItem("disliked_" + docId) === "true";
-    }
-    function setDisliked(docId) {
-      localStorage.setItem("disliked_" + docId, "true");
-    }
-    function getNonLoggedDislikeCount(docId) {
-      return parseInt(localStorage.getItem("disliked_" + docId)) || 0;
-    }
-    function incrementNonLoggedDislike(docId) {
-      let count = getNonLoggedDislikeCount(docId);
-      localStorage.setItem("disliked_" + docId, count + 1);
-    }
-
-    // Update a comment's like count in Firestore for a given comment index
-    function updateCommentLike(docId, commentIndex, callback) {
-      db.collection("questionsanswered").doc(docId).get().then(docSnap => {
-        if (docSnap.exists) {
-          let comments = docSnap.data().comments || [];
-          if (comments[commentIndex]) {
-            comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
-            return db.collection("questionsanswered").doc(docId).update({ comments: comments })
-              .then(() => callback(comments[commentIndex].likes));
+    
+    // Updated answer function:
+    // 1. Retrieve the document from the "questions" collection.
+    // 2. Preserve the original question text in a variable.
+    // 3. Add answer info.
+    // 4. In the answered collection ("questionsanswered") store the original question text.
+    // 5. Then update the original document's questionText to "Your question is answered".
+    function markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile) {
+      return db.collection("questions").doc(docId).get().then(function(doc) {
+        if (doc.exists) {
+          let data = doc.data();
+          // Preserve original question text for the answered collection.
+          let originalQuestionText = data.questionText;
+          data.answerText = answerText;
+          data.answerDate = new Date().toISOString();
+          // In the answered collection, we want to keep the original question text.
+          // So we do not overwrite it here.
+          if (audioFile) {
+            let filename = docId + "_" + Date.now() + "_" + audioFile.name;
+            let storageRef = storage.ref().child("audioAnswers/" + filename);
+            return storageRef.put(audioFile).then(function(snapshot) {
+              return snapshot.ref.getDownloadURL();
+            }).then(function(downloadURL) {
+              data.answerAudio = downloadURL;
+              // Set the answered collection data with the original question text.
+              data.questionText = originalQuestionText;
+              return db.collection("questionsanswered").doc(docId).set(data)
+                .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
+            });
+          } else {
+            // For no audio, preserve original question text in answered collection.
+            data.questionText = originalQuestionText;
+            return db.collection("questionsanswered").doc(docId).set(data)
+              .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
           }
         }
-      }).catch(err => {
-        console.error("Error updating comment like:", err);
       });
     }
-
-    // Create a splash effect (heart) on double-tap
-    function createSplashEffect(cardElement) {
-      const splash = document.createElement("div");
-      splash.className = "splash";
-      splash.innerHTML = '<i class="fas fa-heart"></i>';
-      cardElement.appendChild(splash);
-      splash.addEventListener("animationend", () => splash.remove());
-    }
-
-    // Handle like button click
-    function handleLike(doc, likeBtn) {
-      if (firebase.auth().currentUser) {
-        if (hasLiked(doc.id)) {
-          alert("You have already liked this post.");
-          return;
-        }
-        db.collection("questionsanswered").doc(doc.id).update({ likes: (doc.likes || 0) + 1 })
-          .then(() => {
-            doc.likes = (doc.likes || 0) + 1;
-            likeBtn.querySelector("span").textContent = doc.likes;
-            setLiked(doc.id);
-            likeBtn.disabled = true;
-          })
-          .catch(err => console.error("Error updating like:", err));
-      } else {
-        // Non logged-in: allow up to 10 likes
-        let count = getNonLoggedLikeCount(doc.id);
-        if (count >= 10) {
-          alert("Maximum likes reached for non-logged in users on this post.");
-          return;
-        }
-        db.collection("questionsanswered").doc(doc.id).update({ likes: (doc.likes || 0) + 1 })
-          .then(() => {
-            doc.likes = (doc.likes || 0) + 1;
-            likeBtn.querySelector("span").textContent = doc.likes;
-            incrementNonLoggedLike(doc.id);
-          })
-          .catch(err => console.error("Error updating like:", err));
-      }
-    }
-
-    // Handle dislike button click (similar to like)
-    function handleDislike(doc, dislikeBtn) {
-      if (firebase.auth().currentUser) {
-        if (hasDisliked(doc.id)) {
-          alert("You have already disliked this post.");
-          return;
-        }
-        db.collection("questionsanswered").doc(doc.id).update({ dislikes: (doc.dislikes || 0) + 1 })
-          .then(() => {
-            doc.dislikes = (doc.dislikes || 0) + 1;
-            dislikeBtn.querySelector("span").textContent = doc.dislikes;
-            setDisliked(doc.id);
-            dislikeBtn.disabled = true;
-          })
-          .catch(err => console.error("Error updating dislike:", err));
-      } else {
-        // Non logged-in: allow up to 10 dislikes
-        let count = getNonLoggedDislikeCount(doc.id);
-        if (count >= 10) {
-          alert("Maximum dislikes reached for non-logged in users on this post.");
-          return;
-        }
-        db.collection("questionsanswered").doc(doc.id).update({ dislikes: (doc.dislikes || 0) + 1 })
-          .then(() => {
-            doc.dislikes = (doc.dislikes || 0) + 1;
-            dislikeBtn.querySelector("span").textContent = doc.dislikes;
-            incrementNonLoggedDislike(doc.id);
-          })
-          .catch(err => console.error("Error updating dislike:", err));
-      }
-    }
-
-    // Create a card element for an answered question
-    function createAnsweredCard(doc) {
-      const card = document.createElement("div");
-      card.className = "card";
-      
-      // Double-tap (dblclick) for like with splash effect
-      card.addEventListener("dblclick", function(e) {
-        if (!hasLiked(doc.id)) {
-          handleLike(doc, card.querySelector(".like-btn"));
-          createSplashEffect(card);
-        }
+    
+    document.getElementById("answerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let submitBtn = document.getElementById("answerSubmitBtn");
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+      submitBtn.disabled = true;
+      let answerText = document.getElementById("answerText").value;
+      let audioFile = document.getElementById("audioFile").files[0];
+      let promises = [];
+      window.selectedQuestionIds.forEach(function(docId) {
+        promises.push(markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile));
       });
-      
-      // Card header: Title and answered date
-      const header = document.createElement("div");
-      header.className = "card-header";
-      const title = document.createElement("h2");
-      title.textContent = doc.sheikhName ? doc.sheikhName : "General";
-      const dateSpan = document.createElement("span");
-      const ad = doc.answerDate ? new Date(doc.answerDate) : new Date(doc.submissionDate);
-      dateSpan.textContent = ad.toLocaleString();
-      header.appendChild(title);
-      header.appendChild(dateSpan);
-      card.appendChild(header);
-      
-      // Question Section
-      const questionSection = document.createElement("div");
-      questionSection.className = "question-section";
-      questionSection.innerHTML = `
-        <p><span class="field-label">User:</span> ${doc.userName || ""}</p>
-        <p><span class="field-label">Question:</span> ${doc.questionText || ""}</p>
-      `;
-      if (doc.dynamicData) {
-        questionSection.innerHTML += `<p><span class="field-label">Additional Info:</span> ${JSON.stringify(doc.dynamicData)}</p>`;
-      }
-      card.appendChild(questionSection);
-      
-      // Answer Section
-      const answerSection = document.createElement("div");
-      answerSection.className = "answer-section";
-      answerSection.innerHTML = `<p><span class="field-label">Answer:</span> ${doc.answerText || ""}</p>`;
-      if (doc.answerAudio) {
-        answerSection.innerHTML += `<p><span class="field-label">Audio Answer:</span></p>`;
-        const audioPlayer = document.createElement("audio");
-        audioPlayer.controls = true;
-        audioPlayer.src = doc.answerAudio;
-        answerSection.appendChild(audioPlayer);
-      }
-      card.appendChild(answerSection);
-      
-      // Actions Section
-      const actions = document.createElement("div");
-      actions.className = "card-actions";
-      // Like button
-      const likeBtn = document.createElement("button");
-      likeBtn.className = "action-btn like-btn";
-      likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i><span>${doc.likes || 0}</span>`;
-      likeBtn.addEventListener("click", function(e) {
+      Promise.all(promises).then(function() {
+        alert("Selected questions have been marked as answered with your response.");
+        if (window.currentCardType === "general") {
+          fetchGeneralQuestions();
+        } else if (window.currentCardType === "sheikh") {
+          fetchSheikhQuestions(window.currentSheikhName, window.currentContainerId);
+        }
+        document.getElementById("answerForm").reset();
+        submitBtn.innerHTML = 'Submit Answer';
+        submitBtn.disabled = false;
+        closeAnswerModal();
+      }).catch(function(error) {
+        console.error("Error marking questions as answered: ", error);
+        alert("Error marking questions as answered.");
+        submitBtn.innerHTML = 'Submit Answer';
+        submitBtn.disabled = false;
+      });
+    });
+    
+    document.getElementById("closeAnswerModal").addEventListener("click", closeAnswerModal);
+    
+    // Download functionality remains unchanged.
+    document.querySelectorAll('.download-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        handleLike(doc, likeBtn);
+        let downloadMenu = this.nextElementSibling;
+        downloadMenu.style.display = (downloadMenu.style.display === 'block') ? 'none' : 'block';
       });
-      actions.appendChild(likeBtn);
-      // Dislike button
-      const dislikeBtn = document.createElement("button");
-      dislikeBtn.className = "action-btn dislike-btn";
-      dislikeBtn.innerHTML = `<i class="fas fa-thumbs-down"></i><span>${doc.dislikes || 0}</span>`;
-      dislikeBtn.addEventListener("click", function(e) {
+    });
+    
+    document.querySelectorAll('.download-submit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        handleDislike(doc, dislikeBtn);
-      });
-      actions.appendChild(dislikeBtn);
-      // Share button
-      const shareBtn = document.createElement("button");
-      shareBtn.className = "action-btn";
-      shareBtn.innerHTML = `<i class="fas fa-share"></i><span>Share</span>`;
-      shareBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        const shareData = {
-          title: "Answered Question",
-          text: doc.questionText,
-          url: window.location.href + "#" + doc.id
+        let form = this.parentElement;
+        let downloadMenu = form.parentElement;
+        let selectedFields = Array.from(form.querySelectorAll('input[name="fields"]:checked')).map(function(input) {
+          return input.value;
+        });
+        if(selectedFields.length === 0){
+          alert("Please select at least one field to download.");
+          return;
+        }
+        let downloadContainer = downloadMenu.parentElement;
+        let targetId = downloadContainer.getAttribute('data-target');
+        let tableContainer = document.getElementById(targetId);
+        let table = tableContainer.querySelector("table");
+        if(!table) {
+          alert("No data available to download.");
+          return;
+        }
+        const fieldToIndex = {
+          "userName": 1,
+          "questionText": 2,
+          "dynamicData": 3,
+          "submissionDate": 4
         };
-        if (navigator.share) {
-          navigator.share(shareData).catch(err => console.error("Share failed:", err));
-        } else {
-          navigator.clipboard.writeText(shareData.url)
-            .then(() => alert("Link copied to clipboard!"))
-            .catch(err => console.error("Clipboard error:", err));
-        }
-      });
-      actions.appendChild(shareBtn);
-      // Comment button
-      const commentBtn = document.createElement("button");
-      commentBtn.className = "action-btn";
-      commentBtn.innerHTML = `<i class="fas fa-comment"></i><span>${(doc.comments && doc.comments.length) || 0}</span>`;
-      commentBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        const cs = card.querySelector(".comment-section");
-        cs.style.display = cs.style.display === "none" ? "flex" : "none";
-      });
-      actions.appendChild(commentBtn);
-      card.appendChild(actions);
-      
-      // Comment Section
-      const commentSection = document.createElement("div");
-      commentSection.className = "comment-section";
-      commentSection.style.display = "none";
-      // Comments list
-      const commentsList = document.createElement("div");
-      commentsList.className = "comments-list";
-      if (doc.comments && doc.comments.length > 0) {
-        doc.comments.forEach((comm, index) => {
-          commentsList.appendChild(createCommentElement(comm, doc.id, index));
+        let csvContent = "";
+        let headerRow = [];
+        selectedFields.forEach(function(field) {
+          if(field === "userName") headerRow.push("User Name");
+          else if(field === "questionText") headerRow.push("Question");
+          else if(field === "dynamicData") headerRow.push("Dynamic Data");
+          else if(field === "submissionDate") headerRow.push("Submission Date");
         });
-      }
-      commentSection.appendChild(commentsList);
-      // Comment input area
-      const commentInputDiv = document.createElement("div");
-      commentInputDiv.className = "comment-input";
-      const commentInput = document.createElement("input");
-      commentInput.type = "text";
-      commentInput.placeholder = "Add a comment...";
-      const commentSubmit = document.createElement("button");
-      commentSubmit.textContent = "Post";
-      commentSubmit.addEventListener("click", function(e) {
-        e.stopPropagation();
-        const text = commentInput.value.trim();
-        if (!text) return;
-        let userName = "I'm Muslim";
-        if (firebase.auth().currentUser) {
-          userName = firebase.auth().currentUser.displayName || firebase.auth().currentUser.email;
-        }
-        const newComment = { user: userName, text: text, replies: [], likes: 0 };
-        db.collection("questionsanswered").doc(doc.id).update({
-          comments: firebase.firestore.FieldValue.arrayUnion(newComment)
-        }).then(function() {
-          doc.comments = doc.comments ? [...doc.comments, newComment] : [newComment];
-          commentsList.appendChild(createCommentElement(newComment, doc.id, doc.comments.length - 1));
-          commentInput.value = "";
-          commentBtn.querySelector("span").textContent = doc.comments.length;
-        }).catch(function(error) {
-          console.error("Error posting comment:", error);
-        });
-      });
-      commentInputDiv.appendChild(commentInput);
-      commentInputDiv.appendChild(commentSubmit);
-      commentSection.appendChild(commentInputDiv);
-      card.appendChild(commentSection);
-      
-      return card;
-    }
-
-    // Create a comment element with like and reply functionality
-    function createCommentElement(comm, docId, index) {
-      const commDiv = document.createElement("div");
-      commDiv.className = "comment";
-      commDiv.innerHTML = `<strong>${comm.user}:</strong> ${comm.text}`;
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "comment-actions";
-      // Like on comment button
-      const likeCommBtn = document.createElement("button");
-      likeCommBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> <span>${comm.likes || 0}</span>`;
-      likeCommBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        updateCommentLike(docId, index, function(newLikes) {
-          likeCommBtn.querySelector("span").textContent = newLikes;
-        });
-      });
-      actionsDiv.appendChild(likeCommBtn);
-      // Reply button
-      const replyBtn = document.createElement("button");
-      replyBtn.textContent = "Reply";
-      replyBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        let replyDiv = commDiv.querySelector(".reply-input");
-        if (!replyDiv) {
-          replyDiv = document.createElement("div");
-          replyDiv.className = "reply-input";
-          replyDiv.style.marginTop = "0.5rem";
-          replyDiv.innerHTML = `<input type="text" placeholder="Write a reply..." style="width:80%; padding:0.25rem; font-size:0.8rem;"> 
-                                <button style="padding:0.25rem 0.5rem; font-size:0.8rem;">Post</button>`;
-          commDiv.appendChild(replyDiv);
-          const inp = replyDiv.querySelector("input");
-          const btn = replyDiv.querySelector("button");
-          btn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            const replyText = inp.value.trim();
-            if (!replyText) return;
-            let replyUser = "I'm Muslim";
-            if (firebase.auth().currentUser) {
-              replyUser = firebase.auth().currentUser.displayName || firebase.auth().currentUser.email;
-            }
-            const replyObj = { user: replyUser, text: replyText, likes: 0 };
-            // For demonstration, we simply add the reply to UI; in production, update Firestore accordingly.
-            const replyElem = document.createElement("div");
-            replyElem.className = "reply";
-            replyElem.innerHTML = `<strong>${replyUser}:</strong> ${replyText}`;
-            commDiv.appendChild(replyElem);
-            inp.value = "";
+        csvContent += headerRow.join(",") + "\n";
+        let rows = table.querySelectorAll("tbody tr");
+        rows.forEach(function(row) {
+          let rowData = [];
+          selectedFields.forEach(function(field) {
+            let colIndex = fieldToIndex[field];
+            let cell = row.cells[colIndex];
+            rowData.push(cell ? cell.innerText : "");
           });
-        } else {
-          replyDiv.style.display = replyDiv.style.display === "none" ? "block" : "none";
+          csvContent += rowData.join(",") + "\n";
+        });
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "data-download.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        downloadMenu.style.display = 'none';
+      });
+    });
+    
+    document.addEventListener('click', function(e) {
+      document.querySelectorAll('.download-container').forEach(function(container) {
+        if (!container.contains(e.target)) {
+          let menu = container.querySelector('.download-menu');
+          if(menu) menu.style.display = 'none';
         }
       });
-      actionsDiv.appendChild(replyBtn);
-      // Share comment button
-      const shareCommBtn = document.createElement("button");
-      shareCommBtn.innerHTML = `<i class="fas fa-share"></i>`;
-      shareCommBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        alert("Share comment functionality (dummy).");
-      });
-      actionsDiv.appendChild(shareCommBtn);
-      commDiv.appendChild(actionsDiv);
-      return commDiv;
-    }
-
-    // Initial real-time listener on page load
+    });
+    
     document.addEventListener("DOMContentLoaded", function() {
-      // Real-time listener for answered questions
-      db.collection("questionsanswered").onSnapshot(snapshot => {
-        let data = [];
-        snapshot.forEach(doc => {
-          let d = doc.data();
-          d.id = doc.id;
-          d.likes = d.likes || 0;
-          d.dislikes = d.dislikes || 0;
-          d.comments = d.comments || [];
-          data.push(d);
-        });
-        allAnswered = data;
-        renderCards();
-      });
+      fetchAllQuestions();
     });
   </script>
 </body>
