@@ -1,348 +1,436 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Questions Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Divine Answers - Fadis Youth</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Provided Design CSS (unchanged) */
     :root {
+      --celestial-gradient: linear-gradient(135deg, #e6f3ff 0%, #f8f9fa 100%);
       --primary: #2B5A46;
-      --secondary: #7D9D6E;
+      --secondary: #4A8C72;
       --accent: #D4AF37;
-      --light: #F8F5F0;
-      --dark: #1E1E1E;
+      --light: #FFFFFF;
+      --dark: #1A2E25;
+      --shadow: 0 4px 24px rgba(0,32,24,0.08);
+      --header-height: 60px;
+      --gradient: linear-gradient(135deg, #fff7e6, #ffedcc);
     }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    @keyframes ripple {
+      from { transform: scale(0); opacity: 1; }
+      to { transform: scale(4); opacity: 0; }
+    }
+    
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(40px) rotateX(90deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+      }
+    }
+    
+    /* Base Styles */
+    * {
       margin: 0;
-      padding: 1rem;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      touch-action: manipulation;
     }
-    h1 {
-      text-align: center;
-      color: var(--primary);
-      margin-bottom: 2rem;
+    
+    body {
+      background: var(--celestial-gradient);
+      color: var(--dark);
+      overflow-x: hidden;
     }
-    .cards-container {
+    
+    /* Full-screen Spinner Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid var(--accent);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Header – Neotic, with two rows */
+    .neotic-header {
+      background: rgba(43,90,70,0.98);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0.5rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      max-width: 900px;
-      margin: 0 auto;
     }
-    .card {
-      background: linear-gradient(135deg, #ffffff, #f9f9f9);
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      padding: 1.5rem;
-      position: relative;
-    }
-    .card h2 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: var(--primary);
-    }
-    .table-container {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
-    th, td {
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
-    th {
-      background: #e9ecef;
-    }
-    .card-button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 10px;
-      cursor: pointer;
-      display: block;
-      margin: 0 auto;
-      transition: background 0.3s ease;
-    }
-    .card-button:hover {
-      background: #c19b2b;
-    }
-    /* Download Icon and Dropdown Menu Styles */
-    .download-container {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-    }
-    .download-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: var(--primary);
-    }
-    .download-menu {
-      display: none;
-      position: absolute;
-      top: 30px;
-      right: 0;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      padding: 10px;
-      width: 200px;
-    }
-    .download-menu form {
+    
+    /* Header Rows */
+    .header-row {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    
+    /* Row 1: Topic & Search */
+    .header-row-1 {
+      margin-bottom: 0.5rem;
+    }
+    .header-topic {
+      flex: 1;
+    }
+    .header-topic .angelic-title {
+      font-size: 1.4rem;
+      color: var(--light);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .header-search {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .header-search input {
+      width: 100%;
+      max-width: 200px;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+    }
+    
+    /* Row 2: 4 Uniform Controls */
+    .header-row-2 {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .header-row-2 > * {
+      flex: 1;
+      text-align: center;
+      min-width: 90px;
+    }
+    /* Keep the sacred-button design exactly as you had it */
+    .sacred-button, .post-link {
+      background: var(--accent);
+      color: var(--dark);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+      font-size: 0.9rem;
+    }
+    .sacred-button:hover::after, .post-link:hover::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.2);
+      animation: ripple 0.6s linear;
+    }
+    .sacred-button.active {
+      background: var(--primary);
+      color: var(--light);
+    }
+    /* For the edit icon, show only the icon (no text) */
+    .post-link {
+      text-decoration: none;
+      font-size: 1.2rem;
+      padding: 0.6rem;
+    }
+    
+    /* Main Content Area */
+    main {
+      margin-top: calc(100px + 20px);
+      padding: 1rem;
+    }
+    
+    .seraphic-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      perspective: 1000px;
+    }
+    
+    .celestial-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transform-style: preserve-3d;
+      animation: cardEntrance 0.6s ease-out both;
+      transition: transform 0.3s ease;
+    }
+    
+    .celestial-card:hover {
+      transform: translateY(-5px) rotateZ(1deg);
+    }
+    
+    /* Card Header – Green background with smaller date */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      background-color: var(--primary);
+      color: var(--light);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .card-header span {
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+    
+    /* Underlined question text */
+    .question {
+      text-decoration: underline;
+      color: blue;
+      margin-bottom: 1rem;
+    }
+    
+    /* Action Bar – card reaction buttons (unchanged design) */
+    .action-bar {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+    .action-btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      background: none;
+      border: none;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+    .action-btn:hover {
+      color: var(--primary);
+    }
+    .action-btn span {
+      font-size: 0.8rem;
+    }
+    .dislike-btn {
+      background: none;
+      border: none;
+      color: var(--secondary);
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s;
+    }
+    .dislike-btn:hover {
+      color: var(--primary);
+    }
+    
+    /* Comment Section */
+    .comment-section {
+      background: #fff;
+      border-top: 1px solid var(--light);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      display: none;
       flex-direction: column;
       gap: 0.5rem;
     }
-    .download-menu label {
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+    .comment {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.25rem;
     }
-    .download-submit-btn {
+    .comment .comment-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .comment .comment-actions button {
+      background: none;
+      border: none;
+      color: var(--secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .comment-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .comment-input input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 0.8rem;
+    }
+    .comment-input button {
+      padding: 0.5rem 0.75rem;
+      border: none;
+      border-radius: 5px;
       background: var(--accent);
       color: white;
-      border: none;
-      padding: 0.5rem;
-      border-radius: 5px;
       cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 5px;
+      font-size: 0.8rem;
     }
-    .download-submit-btn:hover {
-      background: #c19b2b;
+    
+    /* Reply styling: very small and indented */
+    .reply {
+      margin-left: 1rem;
+      font-size: 0.6rem;
+      color: var(--secondary);
     }
-    /* Modal Styles – reused for answer modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #fff7e6, #ffedcc);
-      border-radius: 25px;
-      width: 90%;
-      max-width: 700px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      z-index: 1100;
+    .reply-marker {
+      font-size: 0.6rem;
+      color: var(--secondary);
+      margin-bottom: 0.25rem;
     }
-    .modal.active {
-      display: block;
-    }
-    .modal .modal-header {
-      padding: 1.5rem;
-      border-bottom: 2px solid var(--light);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal .modal-header h2 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-    .modal .modal-close {
-      cursor: pointer;
-      font-size: 1.5rem;
+    
+    /* Loading & No-data messages */
+    .loading {
+      text-align: center;
+      font-size: 1.2rem;
+      padding: 2rem;
       color: var(--dark);
     }
-    .modal .modal-body {
-      padding: 1.5rem;
+    .no-data {
+      text-align: center;
+      padding: 2rem;
+      font-style: italic;
+      color: var(--secondary);
     }
-    .modal .form-group {
-      margin-bottom: 1.5rem;
+    .quran-verses {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--primary);
     }
-    .modal input, .modal textarea, .modal input[type="file"] {
-      width: 100%;
-      padding: 1rem;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    .modal input:focus, .modal textarea:focus, .modal input[type="file"]:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(125,157,110,0.3);
-    }
-    .submit-btn {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      padding: 1.2rem 2.5rem;
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    /* Responsive adjustments */
-    @media (max-width: 600px) {
-      .card {
-        padding: 1rem;
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .neotic-header {
+        padding: 0.4rem 0.8rem;
       }
-      th, td {
-        font-size: 0.9rem;
+      .angelic-title {
+        font-size: 1.2rem;
+      }
+      .header-row-2 > * {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      .celestial-card {
+        padding: 1rem;
+        animation-duration: 0.4s;
+      }
+      main {
+        margin-top: calc(80px + 20px);
+        padding: 0.8rem;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Questions Dashboard</h1>
-  <div class="cards-container">
-    <!-- General Questions Card -->
-    <div class="card" id="generalCard">
-      <h2>General Questions</h2>
-      <!-- Download Icon and Menu -->
-      <div class="download-container" data-target="generalTableContainer">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="table-container" id="generalTableContainer">
-        <!-- General questions table will load here -->
-      </div>
-      <button class="card-button" onclick="openAnswerModal('general', null, 'generalTableContainer')">Answer Questions</button>
-    </div>
-    <!-- Sheik Aliyyi Card -->
-    <div class="card" id="card-sheik-aliyyi">
-      <h2>Sheik Aliyyi Questions</h2>
-      <!-- Download Icon and Menu -->
-      <div class="download-container" data-target="sheikAliyyiTableContainer">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="table-container" id="sheikAliyyiTableContainer">
-        <!-- Sheik Aliyyi questions table will load here -->
-      </div>
-      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Aliyyi', 'sheikAliyyiTableContainer')">Answer Questions</button>
-    </div>
-    <!-- Sheik Abdusalaam Fadis Card -->
-    <div class="card" id="card-sheik-abdusalaam-fadis">
-      <h2>Sheik Abdusalaam Fadis Questions</h2>
-      <!-- Download Icon and Menu -->
-      <div class="download-container" data-target="sheikAbdusalaamFadisTableContainer">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="table-container" id="sheikAbdusalaamFadisTableContainer">
-        <!-- Sheik Abdusalaam Fadis questions table will load here -->
-      </div>
-      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Abdusalaam Fadis', 'sheikAbdusalaamFadisTableContainer')">Answer Questions</button>
-    </div>
-    <!-- Sheikh Abdurahmaan Card -->
-    <div class="card" id="card-sheikh-abdurahmaan">
-      <h2>Sheikh Abdurahmaan Questions</h2>
-      <!-- Download Icon and Menu -->
-      <div class="download-container" data-target="sheikhAbdurahmaanTableContainer">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="table-container" id="sheikhAbdurahmaanTableContainer">
-        <!-- Sheikh Abdurahmaan questions table will load here -->
-      </div>
-      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheikh Abdurahmaan', 'sheikhAbdurahmaanTableContainer')">Answer Questions</button>
-    </div>
-    <!-- Sheik Nasraddiin Card -->
-    <div class="card" id="card-sheik-nasraddiin">
-      <h2>Sheik Nasraddiin Questions</h2>
-      <!-- Download Icon and Menu -->
-      <div class="download-container" data-target="sheikNasraddiinTableContainer">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="table-container" id="sheikNasraddiinTableContainer">
-        <!-- Sheik Nasraddiin questions table will load here -->
-      </div>
-      <button class="card-button" onclick="openAnswerModal('sheikh', 'Sheik Nasraddiin', 'sheikNasraddiinTableContainer')">Answer Questions</button>
-    </div>
+  <!-- Full-screen spinner overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
   </div>
   
-  <!-- Answer Modal -->
-  <div class="modal answer-modal" id="answerModal">
-    <div class="modal-header">
-      <h2>Provide Answer</h2>
-      <span class="modal-close" id="closeAnswerModal">&times;</span>
+  <!-- Magical Header (unchanged design) -->
+  <header class="neotic-header">
+    <!-- Row 1: Topic & Search -->
+    <div class="header-row header-row-1">
+      <div class="header-topic">
+        <h1 class="angelic-title">Answered Questions</h1>
+      </div>
+      <div class="header-search">
+        <input type="text" id="searchInput" placeholder="Search answers...">
+      </div>
     </div>
-    <div class="modal-body">
-      <form id="answerForm">
-        <div class="form-group">
-          <textarea id="answerText" placeholder="Write your answer here" rows="4" required></textarea>
-        </div>
-        <div class="form-group">
-          <label>Upload Audio (optional):</label>
-          <input type="file" id="audioFile" accept="audio/*">
-        </div>
-        <button type="submit" class="submit-btn" id="answerSubmitBtn">Submit Answer</button>
-      </form>
+    <!-- Row 2: 4 Uniform Controls -->
+    <div class="header-row header-row-2">
+      <!-- Edit icon only -->
+      <button class="sacred-button" id="editPost" onclick="window.location.href='post.html'">
+        <i class="fas fa-edit"></i>
+      </button>
+      <!-- Tab: General -->
+      <button class="sacred-button active" data-tab="general">General</button>
+      <!-- Tab: Scholars -->
+      <button class="sacred-button" data-tab="sheikh">Scholars</button>
+      <!-- Sort drop-down remains unchanged -->
+      <select id="sortSelect" class="sort-select">
+        <option value="recent" selected>Recent</option>
+        <option value="popular">Popular</option>
+        <option value="seen">Seen</option>
+      </select>
     </div>
-  </div>
+  </header>
+  
+  <!-- Main Content Area -->
+  <main>
+    <div id="cardsContainer" class="seraphic-grid">
+      <div class="loading" id="loadingMessage">Loading answered questions...</div>
+    </div>
+  </main>
   
   <script>
-    // Initialize Firebase (use your own config)
-    var firebaseConfig = {
+    // Initialize Firebase – replace with your configuration if needed
+    const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
       databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
@@ -353,245 +441,332 @@
       measurementId: "G-Z02SPW9ZKW"
     };
     firebase.initializeApp(firebaseConfig);
-    var db = firebase.firestore();
-    var storage = firebase.storage();
+    const db = firebase.firestore();
     
-    function hideNavButtons() { }
-    function showNavButtons() { }
+    // Global variables for posts and filters
+    let allAnswered = [];
+    let currentTab = "general";
+    let currentSort = "recent";
+    let currentSearch = "";
+    let replyTarget = null;
     
-    // Build table, skipping questions that are marked as answered.
-    function buildTableHTML(querySnapshot) {
-      let html = "<table><thead><tr>" +
-                 "<th>Select</th>" +
-                 "<th>User Name</th>" +
-                 "<th>Question</th>" +
-                 "<th>Dynamic Data</th>" +
-                 "<th>Submission Date</th>" +
-                 "</tr></thead><tbody>";
-      querySnapshot.forEach(function(doc) {
-        const data = doc.data();
-        // Skip if questionText indicates it's answered.
-        if(data.questionText === "Your question is answered") return;
-        const dynamicData = data.dynamicData ? JSON.stringify(data.dynamicData) : "";
-        html += `<tr>
-          <td><input type="checkbox" class="select-checkbox" value="${doc.id}"></td>
-          <td>${data.userName || ""}</td>
-          <td>${data.questionText || ""}</td>
-          <td>${dynamicData}</td>
-          <td>${new Date(data.submissionDate).toLocaleString()}</td>
-        </tr>`;
+    // Global spinner functions (full screen)
+    function showGlobalSpinner() {
+      document.getElementById("loadingOverlay").style.display = "flex";
+    }
+    function hideGlobalSpinner() {
+      document.getElementById("loadingOverlay").style.display = "none";
+    }
+    
+    // Real-time listener for posts
+    db.collection("questionsanswered").onSnapshot(snapshot => {
+      let data = [];
+      snapshot.forEach(doc => {
+        let d = doc.data();
+        d.id = doc.id;
+        d.likes = d.likes || 0;
+        d.dislikes = d.dislikes || 0;
+        d.comments = d.comments || [];
+        d.views = d.views || 0;
+        data.push(d);
       });
-      html += "</tbody></table>";
-      return html;
-    }
+      allAnswered = data;
+      renderCards();
+    });
     
-    // Fetch questions functions
-    function fetchGeneralQuestions() {
-      db.collection("questions").where("general", "==", true).get()
-        .then(function(querySnapshot) {
-          document.getElementById("generalTableContainer").innerHTML = buildTableHTML(querySnapshot);
-        })
-        .catch(function(error) {
-          console.error("Error fetching general questions: ", error);
-          document.getElementById("generalTableContainer").innerHTML = "<p>Error loading data.</p>";
-        });
-    }
-    function fetchSheikhQuestions(sheikhName, containerId) {
-      db.collection("questions").where("sheikhName", "==", sheikhName).get()
-        .then(function(querySnapshot) {
-          document.getElementById(containerId).innerHTML = buildTableHTML(querySnapshot);
-        })
-        .catch(function(error) {
-          console.error("Error fetching questions for " + sheikhName + ": ", error);
-          document.getElementById(containerId).innerHTML = "<p>Error loading data.</p>";
-        });
-    }
-    function fetchAllQuestions() {
-      fetchGeneralQuestions();
-      fetchSheikhQuestions("Sheik Aliyyi", "sheikAliyyiTableContainer");
-      fetchSheikhQuestions("Sheik Abdusalaam Fadis", "sheikAbdusalaamFadisTableContainer");
-      fetchSheikhQuestions("Sheikh Abdurahmaan", "sheikhAbdurahmaanTableContainer");
-      fetchSheikhQuestions("Sheik Nasraddiin", "sheikNasraddiinTableContainer");
-    }
+    // Sort drop-down listener
+    document.getElementById("sortSelect").addEventListener("change", function() {
+      currentSort = this.value;
+      renderCards();
+    });
     
-    window.selectedQuestionIds = [];
-    window.currentCardType = "";
-    window.currentSheikhName = "";
-    window.currentContainerId = "";
+    // Tab switching for General / Scholars
+    document.querySelectorAll(".sacred-button[data-tab]").forEach(btn => {
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".sacred-button[data-tab]").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        currentTab = this.getAttribute("data-tab");
+        renderCards();
+      });
+    });
     
-    function openAnswerModal(cardType, sheikhName, containerId) {
-      let container = document.getElementById(containerId);
-      let checkboxes = container.querySelectorAll(".select-checkbox:checked");
-      if (checkboxes.length === 0) {
-        alert("Please select at least one question to mark as answered.");
+    // Search input listener
+    document.getElementById("searchInput").addEventListener("input", function() {
+      currentSearch = this.value;
+      renderCards();
+    });
+    
+    // Render posts based on filters
+    function renderCards() {
+      const container = document.getElementById("cardsContainer");
+      container.innerHTML = "";
+      let filtered = allAnswered.filter(doc => {
+        if (currentTab === "general") {
+          return doc.general === true;
+        } else {
+          return doc.sheikhName && doc.general !== true;
+        }
+      });
+      if (currentSearch.trim() !== "") {
+        const kw = currentSearch.toLowerCase();
+        filtered = filtered.filter(doc =>
+          (doc.userName && doc.userName.toLowerCase().includes(kw)) ||
+          (doc.questionText && doc.questionText.toLowerCase().includes(kw)) ||
+          (doc.answerText && doc.answerText.toLowerCase().includes(kw))
+        );
+      }
+      if (currentSort === "recent") {
+        filtered.sort((a, b) => new Date(b.answerDate || b.submissionDate) - new Date(a.answerDate || a.submissionDate));
+      } else if (currentSort === "popular") {
+        filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+      } else if (currentSort === "seen") {
+        filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+      }
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="no-data">
+          <p>No answered questions found for the current filter.</p>
+          <div class="quran-verses">
+            <p>"Indeed, with hardship comes ease." (Qur'an 94:6)</p>
+            <p>"And whoever puts their trust in Allah, He will be enough for them." (Qur'an 65:3)</p>
+          </div>
+        </div>`;
         return;
       }
-      let selectedIds = [];
-      checkboxes.forEach(function(checkbox) {
-        selectedIds.push(checkbox.value);
+      filtered.forEach(doc => {
+        updateViewCount(doc);
+        container.innerHTML += createCardHTML(doc);
       });
-      window.selectedQuestionIds = selectedIds;
-      window.currentCardType = cardType;
-      window.currentSheikhName = sheikhName;
-      window.currentContainerId = containerId;
-      document.getElementById("answerModal").classList.add("active");
-      hideNavButtons();
     }
     
-    function closeAnswerModal() {
-      document.getElementById("answerModal").classList.remove("active");
-      showNavButtons();
+    // Increase view count (one view per device per post)
+    function updateViewCount(doc) {
+      if (!localStorage.getItem("viewed_" + doc.id)) {
+        db.collection("questionsanswered").doc(doc.id).update({ views: (doc.views || 0) + 1 })
+          .then(() => {
+            doc.views = (doc.views || 0) + 1;
+            localStorage.setItem("viewed_" + doc.id, "true");
+          })
+          .catch(err => console.error("Error updating view count:", err));
+      }
     }
     
-    // Updated answer function:
-    // 1. Retrieve the document from the "questions" collection.
-    // 2. Preserve the original question text in a variable.
-    // 3. Add answer info.
-    // 4. In the answered collection ("questionsanswered") store the original question text.
-    // 5. Then update the original document's questionText to "Your question is answered".
-    function markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile) {
-      return db.collection("questions").doc(docId).get().then(function(doc) {
-        if (doc.exists) {
-          let data = doc.data();
-          // Preserve original question text for the answered collection.
-          let originalQuestionText = data.questionText;
-          data.answerText = answerText;
-          data.answerDate = new Date().toISOString();
-          // In the answered collection, we want to keep the original question text.
-          // So we do not overwrite it here.
-          if (audioFile) {
-            let filename = docId + "_" + Date.now() + "_" + audioFile.name;
-            let storageRef = storage.ref().child("audioAnswers/" + filename);
-            return storageRef.put(audioFile).then(function(snapshot) {
-              return snapshot.ref.getDownloadURL();
-            }).then(function(downloadURL) {
-              data.answerAudio = downloadURL;
-              // Set the answered collection data with the original question text.
-              data.questionText = originalQuestionText;
-              return db.collection("questionsanswered").doc(docId).set(data)
-                .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
-            });
-          } else {
-            // For no audio, preserve original question text in answered collection.
-            data.questionText = originalQuestionText;
-            return db.collection("questionsanswered").doc(docId).set(data)
-              .then(() => db.collection("questions").doc(docId).update({ questionText: "Your question is answered" }));
+    // Utility: Check login status and show global spinner during auth check
+    async function requireLogin(action) {
+      showGlobalSpinner();
+      const user = await new Promise(resolve => {
+        const unsubscribe = firebase.auth().onAuthStateChanged(u => {
+          unsubscribe();
+          resolve(u);
+        });
+      });
+      hideGlobalSpinner();
+      if (!user) {
+        alert("Please log in to " + action + ".");
+        return false;
+      }
+      return true;
+    }
+    
+    // Like/dislike utilities via localStorage for logged-in users
+    function hasLiked(docId) {
+      return localStorage.getItem("liked_" + docId) === "true";
+    }
+    function setLiked(docId) {
+      localStorage.setItem("liked_" + docId, "true");
+    }
+    function hasDisliked(docId) {
+      return localStorage.getItem("disliked_" + docId) === "true";
+    }
+    function setDisliked(docId) {
+      localStorage.setItem("disliked_" + docId, "true");
+    }
+    
+    // Update a comment's like count in Firestore for a given comment index
+    function updateCommentLikeFB(docId, commentIndex, callback) {
+      db.collection("questionsanswered").doc(docId).get().then(docSnap => {
+        if (docSnap.exists) {
+          let comments = docSnap.data().comments || [];
+          if (comments[commentIndex]) {
+            comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
+            return db.collection("questionsanswered").doc(docId).update({ comments: comments })
+              .then(() => callback(comments[commentIndex].likes));
           }
         }
+      }).catch(err => {
+        console.error("Error updating comment like:", err);
       });
     }
     
-    document.getElementById("answerForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      let submitBtn = document.getElementById("answerSubmitBtn");
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-      submitBtn.disabled = true;
-      let answerText = document.getElementById("answerText").value;
-      let audioFile = document.getElementById("audioFile").files[0];
-      let promises = [];
-      window.selectedQuestionIds.forEach(function(docId) {
-        promises.push(markQuestionAsAnsweredWithAnswer(docId, answerText, audioFile));
-      });
-      Promise.all(promises).then(function() {
-        alert("Selected questions have been marked as answered with your response.");
-        if (window.currentCardType === "general") {
-          fetchGeneralQuestions();
-        } else if (window.currentCardType === "sheikh") {
-          fetchSheikhQuestions(window.currentSheikhName, window.currentContainerId);
-        }
-        document.getElementById("answerForm").reset();
-        submitBtn.innerHTML = 'Submit Answer';
-        submitBtn.disabled = false;
-        closeAnswerModal();
-      }).catch(function(error) {
-        console.error("Error marking questions as answered: ", error);
-        alert("Error marking questions as answered.");
-        submitBtn.innerHTML = 'Submit Answer';
-        submitBtn.disabled = false;
-      });
-    });
+    // Create TikTok-style heart splash effect
+    function createSplashEffect(cardElement) {
+      const splash = document.createElement("div");
+      splash.className = "splash";
+      splash.innerHTML = '<i class="fas fa-heart"></i>';
+      cardElement.insertAdjacentElement('afterbegin', splash);
+      splash.addEventListener("animationend", () => splash.remove());
+    }
     
-    document.getElementById("closeAnswerModal").addEventListener("click", closeAnswerModal);
+    // Show full-screen spinner on reaction buttons
+    function showGlobalSpinnerOnReaction() {
+      showGlobalSpinner();
+    }
     
-    // Download functionality remains unchanged.
-    document.querySelectorAll('.download-btn').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        let downloadMenu = this.nextElementSibling;
-        downloadMenu.style.display = (downloadMenu.style.display === 'block') ? 'none' : 'block';
-      });
-    });
+    function hideGlobalSpinnerOnReaction() {
+      hideGlobalSpinner();
+    }
     
-    document.querySelectorAll('.download-submit-btn').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        let form = this.parentElement;
-        let downloadMenu = form.parentElement;
-        let selectedFields = Array.from(form.querySelectorAll('input[name="fields"]:checked')).map(function(input) {
-          return input.value;
+    // Build card HTML (keeping design unchanged)
+    function createCardHTML(q) {
+      let commentsHTML = "";
+      if (q.comments && q.comments.length > 0) {
+        q.comments.forEach((comm, index) => {
+          commentsHTML += createCommentHTML(comm, q.id, index);
         });
-        if(selectedFields.length === 0){
-          alert("Please select at least one field to download.");
-          return;
+      }
+      return `
+      <article class="celestial-card" ondblclick="(async function(){
+        if(await requireLogin('like')) {
+          if(!hasLiked('${q.id}')){
+            document.querySelector('[data-id="${q.id}"].like-btn').click();
+            createSplashEffect(this);
+          }
         }
-        let downloadContainer = downloadMenu.parentElement;
-        let targetId = downloadContainer.getAttribute('data-target');
-        let tableContainer = document.getElementById(targetId);
-        let table = tableContainer.querySelector("table");
-        if(!table) {
-          alert("No data available to download.");
-          return;
-        }
-        const fieldToIndex = {
-          "userName": 1,
-          "questionText": 2,
-          "dynamicData": 3,
-          "submissionDate": 4
-        };
-        let csvContent = "";
-        let headerRow = [];
-        selectedFields.forEach(function(field) {
-          if(field === "userName") headerRow.push("User Name");
-          else if(field === "questionText") headerRow.push("Question");
-          else if(field === "dynamicData") headerRow.push("Dynamic Data");
-          else if(field === "submissionDate") headerRow.push("Submission Date");
-        });
-        csvContent += headerRow.join(",") + "\n";
-        let rows = table.querySelectorAll("tbody tr");
-        rows.forEach(function(row) {
-          let rowData = [];
-          selectedFields.forEach(function(field) {
-            let colIndex = fieldToIndex[field];
-            let cell = row.cells[colIndex];
-            rowData.push(cell ? cell.innerText : "");
-          });
-          csvContent += rowData.join(",") + "\n";
-        });
-        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        let url = URL.createObjectURL(blob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = "data-download.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        downloadMenu.style.display = 'none';
-      });
-    });
+      }).call(this)">
+        <div class="card-header">
+          <div><strong>${q.sheikhName || 'General'}</strong></div>
+          <div><small>${new Date(q.answerDate || q.submissionDate).toLocaleDateString()}</small></div>
+        </div>
+        <div class="card-body">
+          <p class="question">${q.questionText}</p>
+          <div class="answer-content" style="margin: 1rem 0;">
+            <p>${q.answerText}</p>
+            ${q.answerAudio ? `<audio src="${q.answerAudio}" controls></audio>` : ''}
+          </div>
+          <div class="action-bar" style="display:flex; justify-content: space-around; margin-bottom: 1rem;">
+            <button class="action-btn like-btn" data-id="${q.id}" onclick="(async function(){
+              if(await requireLogin('like')) {
+                if(hasLiked('${q.id}')) { alert('You have already liked this post.'); return; }
+                showGlobalSpinnerOnReaction();
+                await db.collection('questionsanswered').doc('${q.id}').update({ likes: firebase.firestore.FieldValue.increment(1) });
+                setLiked('${q.id}');
+                hideGlobalSpinnerOnReaction();
+              }
+            })()">
+              <i class="fas fa-thumbs-up"></i> <span>${q.likes}</span>
+            </button>
+            <button class="action-btn dislike-btn" data-id="${q.id}" onclick="(async function(){
+              if(await requireLogin('dislike')) {
+                if(hasDisliked('${q.id}')) { alert('You have already disliked this post.'); return; }
+                showGlobalSpinnerOnReaction();
+                await db.collection('questionsanswered').doc('${q.id}').update({ dislikes: firebase.firestore.FieldValue.increment(1) });
+                setDisliked('${q.id}');
+                hideGlobalSpinnerOnReaction();
+              }
+            })()">
+              <i class="fas fa-thumbs-down"></i> <span>${q.dislikes}</span>
+            </button>
+            <button class="action-btn comment-btn" onclick="this.closest('.celestial-card').querySelector('.comment-section').classList.toggle('expanded')">
+              <i class="fas fa-comment"></i> <span>${q.comments.length}</span>
+            </button>
+            <button class="action-btn share-btn" data-id="${q.id}" onclick="(function(){
+              const shareURL = window.location.href.split('?')[0] + '?post=${q.id}';
+              if(navigator.share){
+                navigator.share({ title: 'Divine Answers', text: 'Check out this answer!', url: shareURL })
+                  .catch(err => console.error('Share failed:', err));
+              } else {
+                navigator.clipboard.writeText(shareURL)
+                  .then(() => alert('Link copied to clipboard'))
+                  .catch(err => alert('Failed to copy link'));
+              }
+            })()">
+              <i class="fas fa-share-alt"></i> <span>Share</span>
+            </button>
+          </div>
+          <div class="comment-section">
+            <div class="comments">
+              ${commentsHTML}
+            </div>
+            <div class="comment-input" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+              <input type="text" placeholder="Add a comment...">
+              <button class="sacred-button send-comment-btn" data-id="${q.id}" onclick="(async function(){
+                const btn = this;
+                const input = btn.parentElement.querySelector('input');
+                let text = input.value.trim();
+                if(!text) return;
+                if(!(await requireLogin('comment'))) return;
+                showGlobalSpinnerOnReaction();
+                if(replyTarget) {
+                  text = 'Replied to ' + replyTarget + ': ' + text;
+                }
+                const user = firebase.auth().currentUser;
+                const userName = user.displayName || user.email;
+                await db.collection('questionsanswered').doc('${q.id}').update({
+                  comments: firebase.firestore.FieldValue.arrayUnion({ user: userName, text: text, likes: 0 })
+                });
+                input.value = '';
+                replyTarget = null;
+                input.placeholder = 'Add a comment...';
+                hideGlobalSpinnerOnReaction();
+              }).call(this)">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      `;
+    }
     
-    document.addEventListener('click', function(e) {
-      document.querySelectorAll('.download-container').forEach(function(container) {
-        if (!container.contains(e.target)) {
-          let menu = container.querySelector('.download-menu');
-          if(menu) menu.style.display = 'none';
-        }
-      });
-    });
+    // Build comment HTML as string
+    function createCommentHTML(comm, docId, index) {
+      return `
+      <div class="comment">
+        <strong>${comm.user}:</strong> ${comm.text}
+        <div class="comment-actions" style="display:flex; gap:0.5rem; margin-top:0.25rem;">
+          <button class="action-btn" onclick="updateCommentLike('${docId}', ${index}, this)">
+            <i class="fas fa-thumbs-up"></i> <span>${comm.likes || 0}</span>
+          </button>
+          <button class="action-btn" onclick="setReplyTarget('${comm.user}', this)">
+            Reply
+          </button>
+          <button class="action-btn" onclick="alert('Share comment functionality (dummy)')">
+            <i class="fas fa-share"></i>
+          </button>
+        </div>
+      </div>
+      `;
+    }
     
-    document.addEventListener("DOMContentLoaded", function() {
-      fetchAllQuestions();
-    });
+    // Global function for updating comment like
+    function updateCommentLike(docId, index, btn) {
+      showGlobalSpinnerOnReaction();
+      updateCommentLikeFB(docId, index, function(newLikes) {
+        btn.querySelector("span").textContent = newLikes;
+        hideGlobalSpinnerOnReaction();
+      });
+    }
+    
+    // Set reply target and update placeholder in corresponding card's comment input
+    function setReplyTarget(user, btn) {
+      replyTarget = user;
+      const parentCard = btn.closest('.celestial-card');
+      const inputField = parentCard.querySelector('.comment-input input');
+      if(inputField) {
+        inputField.placeholder = 'Reply to ' + user + '...';
+      }
+    }
+    
+    // Increase view count (one per device per post)
+    function updateViewCount(doc) {
+      if(!localStorage.getItem("viewed_" + doc.id)) {
+        db.collection("questionsanswered").doc(doc.id).update({ views: (doc.views || 0) + 1 })
+          .then(() => {
+            doc.views = (doc.views || 0) + 1;
+            localStorage.setItem("viewed_" + doc.id, "true");
+          })
+          .catch(err => console.error("Error updating view count:", err));
+      }
+    }
   </script>
 </body>
 </html>
