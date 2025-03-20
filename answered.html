@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Provided Design CSS (unchanged) */
+    /* Provided Design CSS (unchanged design) */
     :root {
       --celestial-gradient: linear-gradient(135deg, #e6f3ff 0%, #f8f9fa 100%);
       --primary: #2B5A46;
@@ -181,7 +181,7 @@
       background: var(--primary);
       color: var(--light);
     }
-    /* For the edit icon, show only the icon (no text) */
+    /* For the edit icon, show only the icon */
     .post-link {
       text-decoration: none;
       font-size: 1.2rem;
@@ -234,14 +234,21 @@
       opacity: 0.85;
     }
     
-    /* Underlined question text */
+    /* Display the "Asked by" info before the question */
+    .asked-by {
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--secondary);
+    }
+    
+    /* Underlined, blue question text */
     .question {
       text-decoration: underline;
       color: blue;
       margin-bottom: 1rem;
     }
     
-    /* Action Bar – card reaction buttons (unchanged design) */
+    /* Action Bar (reaction buttons) – unchanged */
     .action-bar {
       display: flex;
       justify-content: space-around;
@@ -383,6 +390,21 @@
         padding: 0.8rem;
       }
     }
+    
+    /* Spinner for reaction checking */
+    .spinner {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -429,7 +451,7 @@
   </main>
   
   <script>
-    // Initialize Firebase – replace with your configuration if needed
+    // Initialize Firebase – replace config if needed
     const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -538,7 +560,7 @@
       });
     }
     
-    // Increase view count (one view per device per post)
+    // Increase view count (one per device per post)
     function updateViewCount(doc) {
       if (!localStorage.getItem("viewed_" + doc.id)) {
         db.collection("questionsanswered").doc(doc.id).update({ views: (doc.views || 0) + 1 })
@@ -550,7 +572,7 @@
       }
     }
     
-    // Utility: Check login status and show global spinner during auth check
+    // Utility: Check login status with full-screen spinner
     async function requireLogin(action) {
       showGlobalSpinner();
       const user = await new Promise(resolve => {
@@ -610,12 +632,11 @@
     function showGlobalSpinnerOnReaction() {
       showGlobalSpinner();
     }
-    
     function hideGlobalSpinnerOnReaction() {
       hideGlobalSpinner();
     }
     
-    // Build card HTML (keeping design unchanged)
+    // Build card HTML (keeping design unchanged, with added "Asked by" info)
     function createCardHTML(q) {
       let commentsHTML = "";
       if (q.comments && q.comments.length > 0) {
@@ -637,6 +658,8 @@
           <div><small>${new Date(q.answerDate || q.submissionDate).toLocaleDateString()}</small></div>
         </div>
         <div class="card-body">
+          <!-- New: Display "Asked by" username before question -->
+          <div class="asked-by">Asked by: <strong>${q.userName || "Anonymous"}</strong></div>
           <p class="question">${q.questionText}</p>
           <div class="answer-content" style="margin: 1rem 0;">
             <p>${q.answerText}</p>
@@ -675,8 +698,8 @@
                   .catch(err => console.error('Share failed:', err));
               } else {
                 navigator.clipboard.writeText(shareURL)
-                  .then(() => alert('Link copied to clipboard'))
-                  .catch(err => alert('Failed to copy link'));
+                  .then(() => alert('Link copied to clipboard!'))
+                  .catch(err => console.error('Clipboard error:', err));
               }
             })()">
               <i class="fas fa-share-alt"></i> <span>Share</span>
@@ -746,7 +769,7 @@
       });
     }
     
-    // Set reply target and update placeholder in corresponding card's comment input
+    // Set reply target and update placeholder in card's comment input
     function setReplyTarget(user, btn) {
       replyTarget = user;
       const parentCard = btn.closest('.celestial-card');
@@ -756,7 +779,14 @@
       }
     }
     
-    // Increase view count (one per device per post)
+    // Event delegation for send comment buttons (also handled inline)
+    document.addEventListener("click", async (e) => {
+      if (e.target.closest(".send-comment-btn")) {
+        // Already handled inline in createCardHTML's onclick
+      }
+    });
+    
+    // Increase view count (one view per device per post)
     function updateViewCount(doc) {
       if(!localStorage.getItem("viewed_" + doc.id)) {
         db.collection("questionsanswered").doc(doc.id).update({ views: (doc.views || 0) + 1 })
