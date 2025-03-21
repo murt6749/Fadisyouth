@@ -11,7 +11,7 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Reset and Typography */
+    /* Reset & Typography */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
     
@@ -256,8 +256,23 @@
     </div>
   </div>
   
+  <!-- Navigation Modal (only opens when avatar is clicked) -->
+  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeNavModal()">X</button>
+      <h2>Fadis Youth Portal</h2>
+      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
+      <div class="nav-buttons">
+        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
+        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
+        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
+      </div>
+      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
+    </div>
+  </div>
+  
   <script>
-    // Firebase configuration – replace with your own config details
+    // Initialize Firebase – replace with your own configuration
     var firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -271,7 +286,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    
+
     // --- Search Functionality ---
     function toggleSearch() {
       const searchBox = document.getElementById("searchBox");
@@ -292,7 +307,7 @@
         resultsDiv.style.display = "none";
         return;
       }
-      // Search in the "users" collection by displayName (assuming it's indexed)
+      // Search in "users" collection by displayName (ensure it's indexed)
       db.collection("users").where("displayName", ">=", query)
         .where("displayName", "<=", query + "\uf8ff")
         .limit(10)
@@ -307,7 +322,6 @@
         });
     });
     function goToUserProfile(userId) {
-      // Redirect to a user profile page (adjust URL as needed)
       window.location.href = "profile.html?uid=" + userId;
     }
     
@@ -317,15 +331,12 @@
         document.getElementById("loading").style.display = "none";
         document.getElementById("postsSection").style.display = "block";
         document.getElementById("newPostForm").style.display = "block";
-        // Set account icon letter
         const displayName = user.displayName || "A";
         document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
         loadPosts();
       } else {
-        setTimeout(() => {
-          alert("You are not logged in. Redirecting to login page.");
-          window.location.href = "login.html";
-        }, 1500);
+        alert("You are not logged in. Redirecting to login page.");
+        window.location.href = "login.html";
       }
     });
     
@@ -350,7 +361,6 @@
     // --- Render a Post Card ---
     function renderPost(id, post) {
       let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
-      // Render author avatar (if exists, use image; else, a colored circle with first letter)
       let avatarHTML = "";
       if (post.authorAvatar) {
         avatarHTML = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
@@ -359,7 +369,6 @@
         const hue = Math.floor(Math.random() * 360);
         avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
       }
-      // Follow button appears if current user is not the post's author
       let followBtn = "";
       if (auth.currentUser && auth.currentUser.uid !== post.authorUID) {
         followBtn = `<button class="btn-post" id="follow-${id}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
@@ -449,7 +458,6 @@
         loadComments(postId);
       }
     }
-    
     function loadComments(postId) {
       const commentsSection = document.getElementById("comments-" + postId);
       db.collection("posts").doc(postId).collection("comments")
@@ -479,24 +487,11 @@
           commentsSection.innerHTML = html;
         });
     }
-    
-    // Post a comment in the comments subcollection
-    function postComment(e, postId) {
-      e.stopPropagation();
-      const postCard = document.getElementById("post-" + postId);
-      const commentInput = postCard.querySelector(".comment-input");
-      if (!commentInput || commentInput.value.trim() === "") return;
-      const user = auth.currentUser;
-      const comment = {
-        authorName: user.displayName || "User",
-        text: commentInput.value,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      db.collection("posts").doc(postId).collection("comments").add(comment)
-        .then(() => { commentInput.value = ""; });
+    function toggleLikeComment(el) { el.classList.toggle("active"); }
+    function toggleReplyForm(el) {
+      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
+      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
     }
-    
-    // Post reply from reply form
     function postReply(e, postId, btn) {
       e.stopPropagation();
       const replyForm = btn.closest(".reply-form");
@@ -512,28 +507,19 @@
         .then(() => { replyInput.value = ""; replyForm.style.display = "none"; });
     }
     
-    // Dummy toggle for comment like
-    function toggleLikeComment(el) {
-      el.classList.toggle("active");
-    }
-    
-    // Toggle reply form display
-    function toggleReplyForm(el) {
-      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
-      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
-    }
-    
     // --- Share Functionality ---
     function sharePost(e, postId) {
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
-      if(navigator.share) {
+      if (navigator.share) {
         navigator.share({
           title: "Check out this post",
           url: postURL
         }).catch(err => console.error("Error sharing:", err));
       } else {
-        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
+        navigator.clipboard.writeText(postURL).then(() => {
+          alert("Post URL copied to clipboard.");
+        });
       }
     }
     
@@ -541,7 +527,10 @@
     function postNewPost() {
       const topic = document.getElementById("postTopic").value.trim();
       const body = document.getElementById("postBody").value.trim();
-      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
+      if (topic === "" || body === "") {
+        alert("Please fill in both a topic and body.");
+        return;
+      }
       const user = auth.currentUser;
       const post = {
         authorName: user.displayName || "Anonymous",
@@ -563,15 +552,20 @@
     
     // --- Firebase Auth Check ---
     firebase.auth().onAuthStateChanged(function(user) {
-      if (!user) {
-        setTimeout(() => {
-          alert("You are not logged in. Redirecting to login page.");
-          window.location.href = "login.html";
-        }, 1500);
+      if (user) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("postsSection").style.display = "block";
+        document.getElementById("newPostForm").style.display = "block";
+        const displayName = user.displayName || "A";
+        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        loadPosts();
+      } else {
+        alert("You are not logged in. Redirecting to login page.");
+        window.location.href = "login.html";
       }
     });
     
-    // --- Navigation Modal (only opens when avatar is clicked) ---
+    // --- Navigation Modal (opens only when avatar is clicked) ---
     function openNavModal(sheikhName) {
       document.getElementById("navModal").classList.add("active");
     }
@@ -585,7 +579,7 @@
         let sparkleContainer = document.createElement('div');
         sparkleContainer.className = 'sparkles';
         card.appendChild(sparkleContainer);
-        for (let i = 0; i < 15; i++) {
+        for(let i = 0; i < 15; i++){
           const sparkle = document.createElement('div');
           sparkle.className = 'sparkle';
           sparkle.style.left = Math.random() * 100 + '%';
@@ -596,7 +590,7 @@
       });
     });
   </script>
-  <!-- Load Firebase Auth script last -->
+  <!-- Ensure firebase-auth loads last -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </body>
 </html>
