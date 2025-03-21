@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Post Dashboard</title>
+  <title>Manage My Posts</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -82,55 +82,13 @@
     .loading { text-align: center; font-size: 1.2rem; margin-top: 50px; }
     h1 { text-align: center; margin-bottom: 20px; color: #2B5A46; }
     
-    /* Tabs for Active/Trash */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
+    /* Sections */
+    .section-heading {
+      margin: 20px 0;
+      font-size: 1.3rem;
+      color: #2B5A46;
+      text-align: center;
     }
-    .tab {
-      padding: 10px 20px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #65676b;
-    }
-    .tab.active { border-bottom: 3px solid #ff6f61; color: #2B5A46; }
-    
-    /* New Post Form */
-    .new-post {
-      background: linear-gradient(135deg, #86a8e7, #7f7fd5);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      padding: 20px;
-      margin-bottom: 30px;
-      color: white;
-    }
-    .new-post h2 { margin-bottom: 15px; }
-    .new-post input[type="text"],
-    .new-post textarea,
-    .new-post select {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    .new-post input[type="text"] { font-weight: 600; }
-    .new-post textarea { resize: vertical; min-height: 100px; }
-    .new-post .btn-post {
-      background: #ff6f61;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.3s ease;
-    }
-    .new-post .btn-post:hover { background: #e65b50; }
     
     /* Post Card Styles */
     .post-card {
@@ -144,11 +102,7 @@
     }
     .post-card:hover { transform: translateY(-3px); }
     
-    .post-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+    .post-header { display: flex; align-items: center; margin-bottom: 15px; }
     .author-avatar {
       width: 45px;
       height: 45px;
@@ -349,34 +303,14 @@
     <h1>My Post Dashboard</h1>
     <div id="loading" class="loading">Checking login status...</div>
     
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active" id="tab-active" onclick="switchTab('active')">My Posts</div>
-      <div class="tab" id="tab-trash" onclick="switchTab('trash')">Trash</div>
-    </div>
-    
     <!-- Active Posts Section -->
     <div id="activePostsSection"></div>
+    
     <!-- Trash Posts Section -->
     <div id="trashPostsSection" style="display:none;"></div>
     
     <!-- No Posts Message -->
-    <div id="noPostsMessage" class="no-posts" style="display:none;">No posts yet. Be the first to post!</div>
-    
-    <!-- New Post Form (only visible if logged in) -->
-    <div class="new-post" id="newPostForm" style="display:none;">
-      <h2>Create a New Post</h2>
-      <input type="text" id="postTopic" placeholder="Topic">
-      <textarea id="postBody" placeholder="What's on your mind?"></textarea>
-      <div class="privacy-selector">
-        <select id="postPrivacy">
-          <option value="public">Public</option>
-          <option value="private">Private</option>
-          <option value="followers">Followers Only</option>
-        </select>
-      </div>
-      <button class="btn-post" onclick="postNewPost()">Post</button>
-    </div>
+    <div id="noPostsMessage" class="no-posts" style="display:none;">No posts yet.</div>
   </div>
   
   <!-- Edit Post Modal -->
@@ -447,9 +381,9 @@
     auth.onAuthStateChanged(function(user) {
       authResolved = true;
       clearTimeout(authTimeout);
+      document.getElementById("loading").style.display = "none";
       if (user) {
         isLoggedIn = true;
-        document.getElementById("newPostForm").style.display = "block";
         const displayName = user.displayName || "A";
         document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
         loadUserPosts();
@@ -461,69 +395,48 @@
           loadUserPosts();
         }
       }
-      document.getElementById("loading").style.display = "none";
     });
     
-    // --- Tab Switching ---
-    function switchTab(tab) {
-      if(tab === "active") {
-        document.getElementById("activePostsSection").style.display = "block";
-        document.getElementById("trashPostsSection").style.display = "none";
-        document.getElementById("tab-active").classList.add("active");
-        document.getElementById("tab-trash").classList.remove("active");
-        loadUserPosts();
-      } else if(tab === "trash") {
-        document.getElementById("activePostsSection").style.display = "none";
-        document.getElementById("trashPostsSection").style.display = "block";
-        document.getElementById("tab-trash").classList.add("active");
-        document.getElementById("tab-active").classList.remove("active");
-        loadTrashPosts();
-      }
-    }
-    
-    // --- Load User Posts (active posts only) ---
+    // --- Load User Posts (active and trash) ---
     function loadUserPosts() {
       if (isLoggedIn && auth.currentUser) {
+        // Active posts
         db.collection("posts").where("authorUID", "==", auth.currentUser.uid)
           .where("trashed", "==", false)
           .orderBy("timestamp", "desc")
           .onSnapshot(snapshot => {
-            const section = document.getElementById("activePostsSection");
-            section.innerHTML = "";
-            if (snapshot.empty) {
+            const activeSection = document.getElementById("activePostsSection");
+            activeSection.innerHTML = "";
+            let hasActive = false;
+            snapshot.forEach(doc => {
+              const post = doc.data();
+              hasActive = true;
+              activeSection.innerHTML += renderUserPost(doc.id, post);
+            });
+            if (!hasActive) {
               document.getElementById("noPostsMessage").style.display = "block";
             } else {
               document.getElementById("noPostsMessage").style.display = "none";
+            }
+          });
+        // Trash posts
+        db.collection("posts").where("authorUID", "==", auth.currentUser.uid)
+          .where("trashed", "==", true)
+          .orderBy("timestamp", "desc")
+          .onSnapshot(snapshot => {
+            const trashSection = document.getElementById("trashPostsSection");
+            trashSection.innerHTML = "";
+            if (snapshot.empty) {
+              trashSection.innerHTML = "<p style='text-align:center;'>Trash is empty.</p>";
+            } else {
               snapshot.forEach(doc => {
                 const post = doc.data();
-                section.innerHTML += renderUserPost(doc.id, post);
+                trashSection.innerHTML += renderUserPost(doc.id, post, true);
               });
             }
           });
       } else {
         document.getElementById("activePostsSection").innerHTML = "<p style='text-align:center;'>Please log in to see your posts.</p>";
-      }
-    }
-    
-    // --- Load Trash Posts ---
-    function loadTrashPosts() {
-      if (isLoggedIn && auth.currentUser) {
-        db.collection("posts").where("authorUID", "==", auth.currentUser.uid)
-          .where("trashed", "==", true)
-          .orderBy("timestamp", "desc")
-          .onSnapshot(snapshot => {
-            const section = document.getElementById("trashPostsSection");
-            section.innerHTML = "";
-            if (snapshot.empty) {
-              section.innerHTML = "<p style='text-align:center;'>Trash is empty.</p>";
-            } else {
-              snapshot.forEach(doc => {
-                const post = doc.data();
-                section.innerHTML += renderUserPost(doc.id, post, true);
-              });
-            }
-          });
-      } else {
         document.getElementById("trashPostsSection").innerHTML = "<p style='text-align:center;'>Please log in to see your trash.</p>";
       }
     }
@@ -540,7 +453,6 @@
         const hue = Math.floor(Math.random() * 360);
         avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
       }
-      // Privacy selector shows the current setting
       let privacyHTML = `<div class="privacy-selector">
                            <label>Visibility:
                              <select onchange="updatePrivacy('${id}', this.value)">
@@ -623,7 +535,7 @@
       });
     }
     
-    // --- Delete Post (move to trash) ---
+    // --- Delete Post (mark as trashed) ---
     function deletePost(postId) {
       if (confirm("Are you sure you want to delete this post? It will be moved to trash.")) {
         db.collection("posts").doc(postId).update({
@@ -762,7 +674,7 @@
     function sharePost(e, postId) {
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
-      if(navigator.share) {
+      if (navigator.share) {
         navigator.share({ title: "Check out this post", url: postURL })
           .catch(err => console.error("Error sharing:", err));
       } else {
@@ -770,35 +682,7 @@
       }
     }
     
-    // --- New Post Functionality ---
-    function postNewPost() {
-      const topic = document.getElementById("postTopic").value.trim();
-      const body = document.getElementById("postBody").value.trim();
-      const privacy = document.getElementById("postPrivacy").value;
-      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
-      if (!isLoggedIn) { alert("Please log in to create posts."); return; }
-      const user = auth.currentUser;
-      const post = {
-        authorName: user.displayName || "Anonymous",
-        authorUID: user.uid,
-        authorAvatar: user.photoURL || null,
-        topic: topic,
-        body: body,
-        privacy: privacy,
-        trashed: false,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        likes: [],
-        likesCount: 0
-      };
-      db.collection("posts").add(post)
-        .then(() => {
-          document.getElementById("postTopic").value = "";
-          document.getElementById("postBody").value = "";
-        })
-        .catch(error => { console.error("Error posting new post:", error); });
-    }
-    
-    // --- Navigation Modal (for Top Navigation) ---
+    // --- Navigation Modal for Top Navigation ---
     function openNavModalTop() {
       document.getElementById("navModalTop").classList.add("active");
     }
