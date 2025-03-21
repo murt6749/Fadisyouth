@@ -283,6 +283,76 @@
       to { box-shadow: 0 0 20px rgba(255,0,0,1); }
     }
 
+    /* Edit Post Modal */
+    .edit-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 20000;
+    }
+    .edit-modal .edit-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    }
+    .edit-modal .close-edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+    }
+    .edit-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .edit-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .edit-tab.active {
+      background: #7f7fd5;
+      color: white;
+    }
+    .edit-section { display: none; }
+    .edit-section.active { display: block; }
+    .edit-section input[type="text"],
+    .edit-section textarea,
+    .edit-section select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .btn-action {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-action:hover { background: #e65b50; }
+
     /* Sparkle Animation */
     .sparkles {
       position: absolute;
@@ -341,6 +411,8 @@
       <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
     </div>
   </div>
+  
+  <!-- Edit Post Modal (will be injected dynamically) -->
   
   <script>
     // Initialize Firebase using your configuration
@@ -418,8 +490,10 @@
         resultsDiv.style.display = "none";
         return;
       }
-      db.collection("users").where("displayName", ">=", query)
-        .where("displayName", "<=", query + "\uf8ff")
+      db.collection("users")
+        .orderBy("displayName")
+        .startAt(query)
+        .endAt(query + "\uf8ff")
         .limit(10)
         .get().then(snapshot => {
           let html = "";
@@ -449,6 +523,8 @@
               const post = doc.data();
               postsSection.innerHTML += renderPost(doc.id, post);
             });
+            // After rendering all posts, update follow button states
+            updateFollowButtons();
           }
         });
     }
@@ -466,7 +542,14 @@
       }
       let followBtn = "";
       if (isLoggedIn && auth.currentUser && auth.currentUser.uid !== post.authorUID) {
-        followBtn = `<button class="btn-post" id="follow-${id}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
+        followBtn = `<button class="btn-post follow-btn" id="follow-${id}" data-author="${post.authorUID}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
+      }
+      // Add edit icon if the current user is the author
+      let editIcon = "";
+      if (isLoggedIn && auth.currentUser && auth.currentUser.uid === post.authorUID) {
+        editIcon = `<div class="action-btn" onclick="openEditMenu(event, '${id}')">
+                      <i class="fas fa-edit"></i> Edit
+                    </div>`;
       }
       return `
       <div class="post-card" id="post-${id}">
@@ -493,6 +576,7 @@
           <div class="action-btn" onclick="sharePost(event, '${id}')">
             <i class="fas fa-share"></i> Share
           </div>
+          ${editIcon}
         </div>
         <div class="comments-section" id="comments-${id}"></div>
         <!-- Comment Input Section (initially hidden) -->
@@ -501,6 +585,18 @@
           <button class="btn-post" onclick="postComment(event, '${id}')">Post Comment</button>
         </div>
       </div>`;
+    }
+    
+    // --- Update Follow Buttons on Render ---
+    function updateFollowButtons() {
+      if (!isLoggedIn || !auth.currentUser) return;
+      document.querySelectorAll('.follow-btn').forEach(btn => {
+        let authorUID = btn.getAttribute('data-author');
+        let followDocId = auth.currentUser.uid + "_" + authorUID;
+        db.collection("follows").doc(followDocId).get().then(doc => {
+          btn.innerText = doc.exists ? "Following" : "+";
+        });
+      });
     }
     
     // --- Like Functionality ---
@@ -652,7 +748,12 @@
         body: body,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         likes: [],
-        likesCount: 0
+        likesCount: 0,
+        // Default reaction permissions and visibility
+        allowLike: true,
+        allowShare: true,
+        allowComment: true,
+        visibility: "public"
       };
       db.collection("posts").add(post)
         .then(() => {
@@ -668,6 +769,93 @@
     }
     function closeNavModal() {
       document.getElementById("navModal").classList.remove("active");
+    }
+    
+    // --- Edit Post Modal Functionality ---
+    function openEditMenu(e, postId) {
+      e.stopPropagation();
+      // Fetch current post data
+      db.collection("posts").doc(postId).get().then(doc => {
+        if (!doc.exists) return;
+        const postData = doc.data();
+        // Create modal container
+        const modal = document.createElement("div");
+        modal.className = "edit-modal";
+        modal.innerHTML = `
+          <div class="edit-content">
+            <button class="close-edit" onclick="this.parentElement.parentElement.remove()">X</button>
+            <div class="edit-tabs">
+              <div class="edit-tab active" data-tab="postTab" onclick="switchEditTab(event)">Post</div>
+              <div class="edit-tab" data-tab="reactionTab" onclick="switchEditTab(event)">Reactions & Visibility</div>
+            </div>
+            <div id="postTab" class="edit-section active">
+              <input type="text" id="editTopic" placeholder="Topic" value="${postData.topic || ''}">
+              <textarea id="editBody" placeholder="Post body">${postData.body || ''}</textarea>
+              <button class="btn-action" onclick="updatePost('${postId}')">Update Post</button>
+            </div>
+            <div id="reactionTab" class="edit-section">
+              <label><input type="checkbox" id="editAllowLike" ${postData.allowLike ? 'checked' : ''}> Allow Likes</label><br>
+              <label><input type="checkbox" id="editAllowShare" ${postData.allowShare ? 'checked' : ''}> Allow Shares</label><br>
+              <label><input type="checkbox" id="editAllowComment" ${postData.allowComment ? 'checked' : ''}> Allow Comments</label><br>
+              <select id="editVisibility">
+                <option value="public" ${postData.visibility==="public" ? "selected" : ""}>Public</option>
+                <option value="private" ${postData.visibility==="private" ? "selected" : ""}>Private</option>
+                <option value="friends" ${postData.visibility==="friends" ? "selected" : ""}>Friends</option>
+              </select>
+              <button class="btn-action" onclick="updatePost('${postId}')">Update Settings</button>
+            </div>
+            <hr>
+            <button class="btn-action" style="background:red;" onclick="deletePost('${postId}', this)">Delete Post</button>
+          </div>`;
+        document.body.appendChild(modal);
+      });
+    }
+    
+    function switchEditTab(e) {
+      const tabs = e.target.parentElement.querySelectorAll(".edit-tab");
+      tabs.forEach(tab => tab.classList.remove("active"));
+      e.target.classList.add("active");
+      const sections = e.target.parentElement.parentElement.querySelectorAll(".edit-section");
+      sections.forEach(sec => sec.classList.remove("active"));
+      document.getElementById(e.target.getAttribute("data-tab")).classList.add("active");
+    }
+    
+    function updatePost(postId) {
+      // Retrieve updated values from the modal
+      const newTopic = document.getElementById("editTopic").value.trim();
+      const newBody = document.getElementById("editBody").value.trim();
+      const allowLike = document.getElementById("editAllowLike").checked;
+      const allowShare = document.getElementById("editAllowShare").checked;
+      const allowComment = document.getElementById("editAllowComment").checked;
+      const visibility = document.getElementById("editVisibility").value;
+      if(newTopic === "" || newBody === "") {
+        alert("Topic and body cannot be empty.");
+        return;
+      }
+      db.collection("posts").doc(postId).update({
+        topic: newTopic,
+        body: newBody,
+        allowLike: allowLike,
+        allowShare: allowShare,
+        allowComment: allowComment,
+        visibility: visibility
+      }).then(() => {
+        // Remove the modal after update
+        document.querySelector(".edit-modal").remove();
+      }).catch(err => {
+        console.error("Error updating post:", err);
+      });
+    }
+    
+    function deletePost(postId, btn) {
+      if(confirm("Are you sure you want to delete this post?")) {
+        db.collection("posts").doc(postId).delete().then(() => {
+          // Remove the modal
+          document.querySelector(".edit-modal").remove();
+        }).catch(err => {
+          console.error("Error deleting post:", err);
+        });
+      }
     }
     
     // --- Sparkle Animation ---
