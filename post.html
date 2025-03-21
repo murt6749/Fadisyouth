@@ -172,7 +172,10 @@
       border-radius: 10px;
       flex-grow: 1;
     }
-    .comment-input-section { margin-top: 10px; display: none; }
+    .comment-input-section {
+      display: none;
+      margin-top: 10px;
+    }
     .comment-input {
       width: 100%;
       padding: 10px;
@@ -279,7 +282,7 @@
       from { box-shadow: 0 0 5px rgba(255,0,0,0.8); }
       to { box-shadow: 0 0 20px rgba(255,0,0,1); }
     }
-    
+
     /* Sparkle Animation */
     .sparkles {
       position: absolute;
@@ -324,7 +327,7 @@
     </div>
   </div>
   
-  <!-- Navigation Modal (opens when account icon is clicked) -->
+  <!-- Navigation Modal -->
   <div class="nav-modal" id="navModal" onclick="closeNavModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="close-btn" onclick="closeNavModal()">X</button>
@@ -340,7 +343,7 @@
   </div>
   
   <script>
-    // Firebase configuration (using your Firebase project)
+    // Initialize Firebase using your configuration
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -399,7 +402,7 @@
     function toggleSearch() {
       const searchBox = document.getElementById("searchBox");
       const resultsDiv = document.getElementById("searchResults");
-      if(searchBox.style.display === "block") {
+      if (searchBox.style.display === "block") {
         searchBox.style.display = "none";
         resultsDiv.style.display = "none";
       } else {
@@ -450,7 +453,7 @@
         });
     }
     
-    // --- Render a Post Card ---
+    // --- Render a Post Card with Comment Input Section ---
     function renderPost(id, post) {
       let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
       let avatarHTML = "";
@@ -492,6 +495,11 @@
           </div>
         </div>
         <div class="comments-section" id="comments-${id}"></div>
+        <!-- Comment Input Section (initially hidden) -->
+        <div class="comment-input-section" id="commentInput-${id}" style="display:none;">
+          <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
+          <button class="btn-post" onclick="postComment(event, '${id}')">Post Comment</button>
+        </div>
       </div>`;
     }
     
@@ -543,10 +551,13 @@
     function toggleComments(e, postId) {
       e.stopPropagation();
       const commentsSection = document.getElementById("comments-" + postId);
+      const commentInputSection = document.getElementById("commentInput-" + postId);
       if (commentsSection.style.display === "block") {
         commentsSection.style.display = "none";
+        commentInputSection.style.display = "none";
       } else {
         commentsSection.style.display = "block";
+        commentInputSection.style.display = "block";
         loadComments(postId);
       }
     }
@@ -599,11 +610,26 @@
         .then(() => { replyInput.value = ""; replyForm.style.display = "none"; });
     }
     
+    // Post Comment using the comment input section
+    function postComment(e, postId) {
+      e.stopPropagation();
+      const commentInput = document.getElementById("commentText-" + postId);
+      if (!commentInput || commentInput.value.trim() === "") return;
+      const user = auth.currentUser;
+      const comment = {
+        authorName: user.displayName || "User",
+        text: commentInput.value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("posts").doc(postId).collection("comments").add(comment)
+        .then(() => { commentInput.value = ""; });
+    }
+    
     // --- Share Functionality ---
     function sharePost(e, postId) {
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
-      if(navigator.share) {
+      if (navigator.share) {
         navigator.share({ title: "Check out this post", url: postURL })
           .catch(err => console.error("Error sharing:", err));
       } else {
