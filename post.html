@@ -23,6 +23,11 @@
       padding: 10px 20px;
       background: linear-gradient(45deg, #7f7fd5, #86a8e7);
     }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     .account-icon {
       width: 45px;
       height: 45px;
@@ -36,6 +41,16 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+    .chat-btn {
+      background: #fff;
+      color: #1877f2;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
     }
     .search-container { position: relative; }
     .search-icon { font-size: 1.5rem; color: white; cursor: pointer; }
@@ -151,6 +166,7 @@
     }
     .comment {
       display: flex;
+      flex-direction: column;
       margin-bottom: 10px;
     }
     .comment-avatar {
@@ -165,23 +181,50 @@
       align-items: center;
       justify-content: center;
       margin-right: 10px;
+      flex-shrink: 0;
     }
     .comment-content {
       background: #f0f2f5;
       padding: 10px;
       border-radius: 10px;
       flex-grow: 1;
+      font-size: 0.95rem;
+    }
+    .sub-comment {
+      margin-left: 40px;
+      font-size: 0.85rem;
+      background: #e9ecef;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 5px;
     }
     .comment-input-section {
       display: none;
       margin-top: 10px;
     }
+    .comment-input-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
     .comment-input {
-      width: 100%;
+      flex-grow: 1;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 20px;
       resize: none;
+    }
+    .send-btn {
+      background: #ff6f61;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
     /* New Post Form */
@@ -301,6 +344,7 @@
       width: 90%;
       max-width: 600px;
       position: relative;
+      min-height: 400px; /* Increased height */
     }
     .edit-modal .close-edit {
       position: absolute;
@@ -375,7 +419,10 @@
 <body>
   <!-- Top Navigation -->
   <div class="top-nav">
-    <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
+    <div class="nav-left">
+      <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
+      <button class="chat-btn" onclick="window.location.href='chat.html'">Chat</button>
+    </div>
     <div class="search-container">
       <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
       <input type="text" class="search-box" id="searchBox" placeholder="Search users...">
@@ -581,8 +628,12 @@
         <div class="comments-section" id="comments-${id}"></div>
         <!-- Comment Input Section (initially hidden) -->
         <div class="comment-input-section" id="commentInput-${id}" style="display:none;">
-          <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
-          <button class="btn-post" onclick="postComment(event, '${id}')">Post Comment</button>
+          <div class="comment-input-container">
+            <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
+            <button class="send-btn" onclick="postComment(event, '${id}')">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
         </div>
       </div>`;
     }
@@ -666,7 +717,9 @@
           snapshot.forEach(doc => {
             const comment = doc.data();
             let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
-            html += `<div class="comment">
+            // Check if this is a reply to another comment
+            let replyClass = comment.parentId ? "sub-comment" : "";
+            html += `<div class="comment ${replyClass}">
                         <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
                         <div class="comment-content">
                           <div class="comment-author">${comment.authorName || "Anonymous"}</div>
@@ -677,8 +730,12 @@
                             <span onclick="toggleReplyForm(this)">Reply</span>
                           </div>
                           <div class="reply-form" style="display:none;">
-                            <textarea class="comment-input" placeholder="Write a reply..."></textarea>
-                            <button class="btn-post" onclick="postReply(event, '${postId}', this)">Post</button>
+                            <div class="comment-input-container">
+                              <textarea class="comment-input" placeholder="Write a reply..."></textarea>
+                              <button class="send-btn" onclick="postReply(event, '${postId}', this)">
+                                <i class="fas fa-paper-plane"></i>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>`;
@@ -700,6 +757,7 @@
       const reply = {
         authorName: user.displayName || "User",
         text: replyInput.value,
+        parentId: "reply",  // simple marker, in a more advanced version you might link to a specific comment id
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
       db.collection("posts").doc(postId).collection("comments").add(reply)
