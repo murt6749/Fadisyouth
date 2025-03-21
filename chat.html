@@ -16,8 +16,13 @@
   />
   <style>
     /* Reset and base styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html,
+    body {
       width: 100%;
       height: 100%;
       font-family: Arial, sans-serif;
@@ -190,6 +195,15 @@
       position: absolute;
       bottom: 4px;
       left: 6px;
+      font-size: 0.8rem;
+      color: #0088cc;
+      cursor: pointer;
+    }
+    /* Edit button for the sender */
+    .edit-btn {
+      position: absolute;
+      bottom: 4px;
+      right: 28px;
       font-size: 0.8rem;
       color: #0088cc;
       cursor: pointer;
@@ -372,7 +386,7 @@
   <script>
     // Your Firebase config
     var firebaseConfig = {
-      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      apiKey: "YOUR_API_KEY",
       authDomain: "fadis-youth.firebaseapp.com",
       databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
       projectId: "fadis-youth",
@@ -413,7 +427,6 @@
     function loadContacts() {
       const contactList = document.getElementById("contactList");
       // Remove any existing user items except the built-in groups
-      // (We can remove them by selecting everything after the groups)
       const builtInGroupCount = 4; // Fadis, Quran, HalalJokes, IslamicChat
       while (contactList.children.length > builtInGroupCount) {
         contactList.removeChild(contactList.lastChild);
@@ -483,47 +496,48 @@
     }
 
     // Open a group chat
-    function openGroup(groupId, groupName) {
+    async function openGroup(groupId, groupName) {
       currentChatId = groupId;
       currentChatIsGroup = true;
-      document.getElementById("chatHeader").innerText = groupName;
+      document.getElementById("sidebar").classList.remove("active");
       document.getElementById("chatInputContainer").style.display = "flex";
       document.getElementById("messageList").innerHTML = "";
       document.getElementById("replyInfo").style.display = "none";
       replyTarget = null;
 
-      // Hide sidebar
-      document.getElementById("sidebar").classList.remove("active");
+      let groupHeaderText = groupName;
 
       if (currentUser) {
-        // Ask if user wants to join this group if they are not in it
         const groupDoc = db.collection("chats").doc(groupId);
-        groupDoc.get().then((docSnapshot) => {
-          if (!docSnapshot.exists) {
-            // Create group if doesn't exist
-            groupDoc.set({
-              participants: [],
-              isGroup: true,
-              chatName: groupName,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            });
-          }
-          // Check if user is in participants
-          groupDoc.get().then((snap) => {
-            const data = snap.data();
-            if (data && data.participants && !data.participants.includes(currentUser.uid)) {
-              // ask user to join
-              if (confirm(`Do you want to join ${groupName}?`)) {
-                groupDoc.update({
-                  participants: firebase.firestore.FieldValue.arrayUnion(
-                    currentUser.uid
-                  ),
-                });
-              }
-            }
+        const snap = await groupDoc.get();
+        if (!snap.exists) {
+          await groupDoc.set({
+            participants: [],
+            isGroup: true,
+            chatName: groupName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
           });
-        });
+        }
+        // Re-fetch the doc after possible creation
+        const newSnap = await groupDoc.get();
+        const data = newSnap.data() || {};
+        const participants = data.participants || [];
+        // Ask user to join if not in participants
+        if (!participants.includes(currentUser.uid)) {
+          if (confirm(`Do you want to join ${groupName}?`)) {
+            await groupDoc.update({
+              participants: firebase.firestore.FieldValue.arrayUnion(
+                currentUser.uid
+              ),
+            });
+            participants.push(currentUser.uid);
+          }
+        }
+        // Show how many members
+        groupHeaderText = `${groupName} (${participants.length} members)`;
       }
+
+      document.getElementById("chatHeader").innerText = groupHeaderText;
       subscribeToMessages(groupId);
     }
 
@@ -563,6 +577,18 @@
               </span>
             `;
 
+            // Edit/Delete icon if sent by current user
+            let editIcon = "";
+            if (sentByMe) {
+              editIcon = `
+                <span class="edit-btn" onclick="openEditMenu(event, '${doc.id}', '${escapeQuotes(
+                  message.text
+                )}')">
+                  <i class="fas fa-edit"></i>
+                </span>
+              `;
+            }
+
             // If message has replyTo, show a small reference
             let repliedHtml = "";
             if (message.replyTo) {
@@ -578,20 +604,21 @@
               `;
             }
 
-            // If there's an imageUrl, show it
+            // If there's an imageUrl
             let imageHtml = "";
             if (message.imageUrl) {
               imageHtml = `<img src="${message.imageUrl}" class="message-image" />`;
             }
 
-            // If there's a fileUrl (PDF, doc, etc.), show a link
+            // If there's a fileUrl (non-image)
             let fileLinkHtml = "";
             if (message.fileUrl && !message.imageUrl) {
-              fileLinkHtml = `<div style="margin-top:5px;">
-                <a href="${message.fileUrl}" target="_blank" style="color:blue; text-decoration:underline;">
-                  View File
-                </a>
-              </div>`;
+              fileLinkHtml = `
+                <div style="margin-top:5px;">
+                  <a href="${message.fileUrl}" target="_blank" style="color:blue; text-decoration:underline;">
+                    View File
+                  </a>
+                </div>`;
             }
 
             msgDiv.innerHTML = `
@@ -602,6 +629,7 @@
               ${fileLinkHtml}
               ${tickHtml}
               ${replyIcon}
+              ${editIcon}
             `;
             addMessageEventListeners(msgDiv, doc.id, message);
 
@@ -633,22 +661,11 @@
 
     // Jump to a specific message in the chat by doc.id
     function scrollToMessage(msgId) {
-      const messageList = document.getElementById("messageList");
-      const allMessages = messageList.querySelectorAll(".message");
-      // Not a perfect approach, but we'll try matching the stored doc.id with a data attribute
-      // For a more robust approach, you might store the doc.id as an attribute on the msgDiv
-      // This code is for demonstration only.
-      // We'll do that here:
-      // ...
-      // Actually, let's store it in addMessageEventListeners:
-      // But for now, we won't store it. We'll just show how you might do it.
-
       alert("Scroll to message " + msgId + " (implement if storing data attributes).");
     }
 
     // Add event listeners for reaction panel toggling on message click
     function addMessageEventListeners(msgDiv, msgId, messageData) {
-      // We'll store the docId on the element so we can find it later
       msgDiv.dataset.docId = msgId;
 
       // Single click to show reaction panel (only for messages sent by me)
@@ -746,13 +763,46 @@
           const isImage = file.type.startsWith("image/");
           pendingUploadUrl = url;
           pendingUploadIsImage = isImage;
-          // Optionally auto-send or just wait for user to press Send
-          // For now, we can either auto-send or do nothing until user presses Send
           alert("File uploaded. Press Send to include it in your message.");
         })
         .catch((err) => {
           console.error("Error uploading file:", err);
         });
+    }
+
+    // Editing or deleting a message
+    function openEditMenu(e, msgId, oldText) {
+      e.stopPropagation();
+      // Simple approach: prompt user for action
+      const action = prompt(
+        "Type 'edit' to edit this message, or 'delete' to delete it.\n(Current text: " + oldText + ")"
+      );
+      if (!action) return;
+      if (action.toLowerCase() === "edit") {
+        const newText = prompt("Enter new text", oldText);
+        if (newText !== null) {
+          // Update doc
+          db.collection("chats")
+            .doc(currentChatId)
+            .collection("messages")
+            .doc(msgId)
+            .update({ text: newText })
+            .catch((err) => {
+              console.error("Error editing message:", err);
+            });
+        }
+      } else if (action.toLowerCase() === "delete") {
+        if (confirm("Are you sure you want to delete this message?")) {
+          db.collection("chats")
+            .doc(currentChatId)
+            .collection("messages")
+            .doc(msgId)
+            .delete()
+            .catch((err) => {
+              console.error("Error deleting message:", err);
+            });
+        }
+      }
     }
 
     // Helper to escape quotes in message text
