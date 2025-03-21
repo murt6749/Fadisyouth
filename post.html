@@ -11,14 +11,14 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Reset & Typography */
+    /* Reset and Typography */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
     
-    /* Top Navigation with Account Icon */
+    /* Top Navigation */
     .top-nav {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
       background: linear-gradient(45deg, #7f7fd5, #86a8e7);
@@ -37,6 +37,47 @@
       cursor: pointer;
       box-shadow: 0 0 8px rgba(0,0,0,0.3);
     }
+    .search-container {
+      position: relative;
+    }
+    .search-icon {
+      font-size: 1.5rem;
+      color: white;
+      cursor: pointer;
+    }
+    .search-box {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      width: 250px;
+      padding: 8px;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .search-results {
+      position: absolute;
+      top: 70px;
+      right: 0;
+      width: 250px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+    .search-result-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: #f0f2f5; }
     
     /* Main Container */
     .container {
@@ -106,9 +147,17 @@
     .action-btn:hover { color: #1877f2; }
     .like-btn.active { color: #1877f2; }
     
-    /* Comment Section */
-    .comments-section { margin-top: 15px; }
-    .comment { display: flex; margin-bottom: 15px; }
+    /* Comments Section */
+    .comments-section {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .comment {
+      display: flex;
+      margin-bottom: 10px;
+    }
     .comment-avatar {
       width: 35px;
       height: 35px;
@@ -128,9 +177,17 @@
       border-radius: 10px;
       flex-grow: 1;
     }
-    .comment-actions { display: flex; gap: 10px; margin-top: 5px; font-size: 0.8em; color: #65676b; }
-    .reply-form { margin-left: 45px; margin-top: 10px; }
-    .comment-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; resize: none; }
+    .comment-input-section {
+      margin-top: 10px;
+      display: none;
+    }
+    .comment-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      resize: none;
+    }
     
     /* New Post Form */
     .new-post {
@@ -175,10 +232,13 @@
   </style>
 </head>
 <body>
-  <!-- Top Navigation with Account Icon -->
+  <!-- Top Navigation -->
   <div class="top-nav">
-    <div class="account-icon" onclick="window.location.href='post_account.html'">
-      A
+    <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
+    <div class="search-container">
+      <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search users...">
+      <div class="search-results" id="searchResults"></div>
     </div>
   </div>
   
@@ -196,44 +256,68 @@
     </div>
   </div>
   
-  <!-- Navigation Modal (only opens when the avatar is clicked) -->
-  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeNavModal()">X</button>
-      <h2>Fadis Youth Portal</h2>
-      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
-      <div class="nav-buttons">
-        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
-        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
-        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
-      </div>
-      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
-    </div>
-  </div>
-  
   <script>
-    // Initialize Firebase (replace with your config)
+    // Firebase configuration – replace with your own config details
     var firebaseConfig = {
-      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
-      authDomain: "fadis-youth.firebaseapp.com",
-      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
-      projectId: "fadis-youth",
-      storageBucket: "fadis-youth.firebasestorage.app",
-      messagingSenderId: "1067077305340",
-      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
-      measurementId: "G-Z02SPW9ZKW"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    // Check login status
+    
+    // --- Search Functionality ---
+    function toggleSearch() {
+      const searchBox = document.getElementById("searchBox");
+      const resultsDiv = document.getElementById("searchResults");
+      if(searchBox.style.display === "block") {
+        searchBox.style.display = "none";
+        resultsDiv.style.display = "none";
+      } else {
+        searchBox.style.display = "block";
+        searchBox.focus();
+      }
+    }
+    document.getElementById("searchBox").addEventListener("input", function() {
+      const query = this.value.trim();
+      const resultsDiv = document.getElementById("searchResults");
+      if(query === "") {
+        resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none";
+        return;
+      }
+      // Search in the "users" collection by displayName (assuming it's indexed)
+      db.collection("users").where("displayName", ">=", query)
+        .where("displayName", "<=", query + "\uf8ff")
+        .limit(10)
+        .get().then(snapshot => {
+          let html = "";
+          snapshot.forEach(doc => {
+            const user = doc.data();
+            html += `<div class="search-result-item" onclick="goToUserProfile('${doc.id}')">${user.displayName}</div>`;
+          });
+          resultsDiv.innerHTML = html;
+          resultsDiv.style.display = "block";
+        });
+    });
+    function goToUserProfile(userId) {
+      // Redirect to a user profile page (adjust URL as needed)
+      window.location.href = "profile.html?uid=" + userId;
+    }
+    
+    // --- Auth Check ---
     auth.onAuthStateChanged(function(user) {
       if (user) {
         document.getElementById("loading").style.display = "none";
         document.getElementById("postsSection").style.display = "block";
         document.getElementById("newPostForm").style.display = "block";
-        // Update account icon with first letter of user's display name
+        // Set account icon letter
         const displayName = user.displayName || "A";
         document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
         loadPosts();
@@ -244,39 +328,38 @@
         }, 1500);
       }
     });
-
-    // Load posts from Firestore (public posts)
+    
+    // --- Load Posts ---
     function loadPosts() {
-      db.collection("posts").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-        const postsSection = document.getElementById("postsSection");
-        postsSection.innerHTML = "";
-        if (snapshot.empty) {
-          document.getElementById("noPostsMessage").style.display = "block";
-        } else {
-          document.getElementById("noPostsMessage").style.display = "none";
-          snapshot.forEach(doc => {
-            const post = doc.data();
-            postsSection.innerHTML += renderPost(doc.id, post);
-          });
-        }
-      });
+      db.collection("posts").orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+          const postsSection = document.getElementById("postsSection");
+          postsSection.innerHTML = "";
+          if (snapshot.empty) {
+            document.getElementById("noPostsMessage").style.display = "block";
+          } else {
+            document.getElementById("noPostsMessage").style.display = "none";
+            snapshot.forEach(doc => {
+              const post = doc.data();
+              postsSection.innerHTML += renderPost(doc.id, post);
+            });
+          }
+        });
     }
-
-    // Render a post card
+    
+    // --- Render a Post Card ---
     function renderPost(id, post) {
-      // Format timestamp
       let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
-      // Author avatar: if exists, use image; else, show first letter in a colored circle
+      // Render author avatar (if exists, use image; else, a colored circle with first letter)
       let avatarHTML = "";
       if (post.authorAvatar) {
         avatarHTML = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
       } else {
         const name = post.authorName || "A";
-        // Generate a random pastel background color
         const hue = Math.floor(Math.random() * 360);
         avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
       }
-      // Follow button – only show if current user is not the author
+      // Follow button appears if current user is not the post's author
       let followBtn = "";
       if (auth.currentUser && auth.currentUser.uid !== post.authorUID) {
         followBtn = `<button class="btn-post" id="follow-${id}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
@@ -307,25 +390,21 @@
             <i class="fas fa-share"></i> Share
           </div>
         </div>
-        <div class="comments-section" id="comments-${id}" style="display:none;"></div>
+        <div class="comments-section" id="comments-${id}"></div>
       </div>`;
     }
-
-    // Like functionality – update Firestore document with likes array
+    
+    // --- Like Functionality ---
     function toggleLike(e, postId) {
       e.stopPropagation();
       const user = auth.currentUser;
-      if (!user) {
-        alert("Please log in to like posts.");
-        return;
-      }
+      if (!user) { alert("Please log in to like posts."); return; }
       const postRef = db.collection("posts").doc(postId);
       postRef.get().then(doc => {
         if (doc.exists) {
           let data = doc.data();
           let likes = data.likes || [];
           if (likes.includes(user.uid)) {
-            // Remove like
             likes = likes.filter(uid => uid !== user.uid);
           } else {
             likes.push(user.uid);
@@ -334,25 +413,20 @@
         }
       });
     }
-
-    // Follow functionality: use "follows" collection with doc id = currentUser.uid_authorUID
+    
+    // --- Follow Functionality ---
     function toggleFollow(e, authorUID, postId) {
       e.stopPropagation();
       const user = auth.currentUser;
-      if (!user) {
-        alert("Please log in to follow users.");
-        return;
-      }
+      if (!user) { alert("Please log in to follow users."); return; }
       const followDocId = user.uid + "_" + authorUID;
       const followRef = db.collection("follows").doc(followDocId);
       followRef.get().then(doc => {
         if (doc.exists) {
-          // Unfollow
           followRef.delete().then(() => {
             document.getElementById("follow-" + postId).innerText = "+";
           });
         } else {
-          // Follow
           followRef.set({
             follower: user.uid,
             following: authorUID,
@@ -363,34 +437,35 @@
         }
       });
     }
-
-    // Comments: Toggle comment section
+    
+    // --- Comments Functionality ---
     function toggleComments(e, postId) {
       e.stopPropagation();
       const commentsSection = document.getElementById("comments-" + postId);
-      if (commentsSection.style.display === "none") {
+      if (commentsSection.style.display === "block") {
+        commentsSection.style.display = "none";
+      } else {
         commentsSection.style.display = "block";
         loadComments(postId);
-      } else {
-        commentsSection.style.display = "none";
       }
     }
-
-    // Load comments for a post from a subcollection "comments" under the post document
+    
     function loadComments(postId) {
       const commentsSection = document.getElementById("comments-" + postId);
-      db.collection("posts").doc(postId).collection("comments").orderBy("timestamp", "asc")
+      db.collection("posts").doc(postId).collection("comments")
+        .orderBy("timestamp", "asc")
         .onSnapshot(snapshot => {
           let html = "";
           snapshot.forEach(doc => {
             const comment = doc.data();
+            let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
             html += `<div class="comment">
                       <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
                       <div class="comment-content">
                         <div class="comment-author">${comment.authorName || "Anonymous"}</div>
                         <p>${comment.text}</p>
                         <div class="comment-actions">
-                          <span>${comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now"}</span>
+                          <span>${commentTime}</span>
                           <span onclick="toggleLikeComment(this)">Like</span>
                           <span onclick="toggleReplyForm(this)">Reply</span>
                         </div>
@@ -404,24 +479,23 @@
           commentsSection.innerHTML = html;
         });
     }
-
-    // Post a new comment in the "comments" subcollection
+    
+    // Post a comment in the comments subcollection
     function postComment(e, postId) {
       e.stopPropagation();
       const postCard = document.getElementById("post-" + postId);
       const commentInput = postCard.querySelector(".comment-input");
-      if(!commentInput || commentInput.value.trim() === "") return;
+      if (!commentInput || commentInput.value.trim() === "") return;
       const user = auth.currentUser;
       const comment = {
         authorName: user.displayName || "User",
         text: commentInput.value,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
-      db.collection("posts").doc(postId).collection("comments").add(comment).then(() => {
-        commentInput.value = "";
-      });
+      db.collection("posts").doc(postId).collection("comments").add(comment)
+        .then(() => { commentInput.value = ""; });
     }
-
+    
     // Post reply from reply form
     function postReply(e, postId, btn) {
       e.stopPropagation();
@@ -434,42 +508,40 @@
         text: replyInput.value,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
-      db.collection("posts").doc(postId).collection("comments").add(reply).then(() => {
-        replyInput.value = "";
-        replyForm.style.display = "none";
-      });
+      db.collection("posts").doc(postId).collection("comments").add(reply)
+        .then(() => { replyInput.value = ""; replyForm.style.display = "none"; });
     }
-
-    // Dummy like toggle for comments (you can extend as needed)
+    
+    // Dummy toggle for comment like
     function toggleLikeComment(el) {
       el.classList.toggle("active");
     }
-
-    // Share functionality: use navigator.share if available; else copy URL to clipboard.
+    
+    // Toggle reply form display
+    function toggleReplyForm(el) {
+      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
+      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
+    }
+    
+    // --- Share Functionality ---
     function sharePost(e, postId) {
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
-      if (navigator.share) {
+      if(navigator.share) {
         navigator.share({
           title: "Check out this post",
           url: postURL
         }).catch(err => console.error("Error sharing:", err));
       } else {
-        // Fallback: copy URL to clipboard
-        navigator.clipboard.writeText(postURL).then(() => {
-          alert("Post URL copied to clipboard.");
-        });
+        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
       }
     }
-
-    // New Post functionality – user can create a post with topic and body
+    
+    // --- New Post Functionality ---
     function postNewPost() {
       const topic = document.getElementById("postTopic").value.trim();
       const body = document.getElementById("postBody").value.trim();
-      if (topic === "" || body === "") {
-        alert("Please fill in both a topic and body.");
-        return;
-      }
+      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
       const user = auth.currentUser;
       const post = {
         authorName: user.displayName || "Anonymous",
@@ -481,15 +553,15 @@
         likes: [],
         likesCount: 0
       };
-      db.collection("posts").add(post).then(() => {
-        document.getElementById("postTopic").value = "";
-        document.getElementById("postBody").value = "";
-      }).catch(error => {
-        console.error("Error posting new post:", error);
-      });
+      db.collection("posts").add(post)
+        .then(() => {
+          document.getElementById("postTopic").value = "";
+          document.getElementById("postBody").value = "";
+        })
+        .catch(error => { console.error("Error posting new post:", error); });
     }
-
-    // Firebase Auth Check – if not logged in, redirect to login.html after a short delay.
+    
+    // --- Firebase Auth Check ---
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) {
         setTimeout(() => {
@@ -498,22 +570,22 @@
         }, 1500);
       }
     });
-
-    // Navigation Modal – opens only when the avatar-container is clicked.
+    
+    // --- Navigation Modal (only opens when avatar is clicked) ---
     function openNavModal(sheikhName) {
       document.getElementById("navModal").classList.add("active");
     }
     function closeNavModal() {
       document.getElementById("navModal").classList.remove("active");
     }
-
-    // Add sparkle animation to each card
+    
+    // --- Sparkle Animation ---
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.card').forEach(card => {
         let sparkleContainer = document.createElement('div');
         sparkleContainer.className = 'sparkles';
         card.appendChild(sparkleContainer);
-        for(let i = 0; i < 15; i++){
+        for (let i = 0; i < 15; i++) {
           const sparkle = document.createElement('div');
           sparkle.className = 'sparkle';
           sparkle.style.left = Math.random() * 100 + '%';
@@ -524,7 +596,7 @@
       });
     });
   </script>
-  <!-- Load Firebase Auth script after main code -->
+  <!-- Load Firebase Auth script last -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </body>
 </html>
