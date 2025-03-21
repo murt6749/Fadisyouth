@@ -2,405 +2,297 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Post Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Posts</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #1877f2;
-      --danger-color: #dc3545;
-      --success-color: #28a745;
-      --background-color: #f8f9fa;
-    }
+    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
     }
     body {
-      background: var(--background-color);
+      background: #f8fafc;
+      color: #1e293b;
     }
-    /* Mobile First Layout */
-    .management-container {
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .header {
       display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .mobile-menu-btn {
-      display: block;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 50%;
-      font-size: 1.2rem;
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #0f172a;
     }
-    .sidebar {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 250px;
-      background: white;
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      z-index: 999;
+    /* Post List and Card Styles */
+    .post-list {
+      display: grid;
+      gap: 1.5rem;
     }
-    .sidebar.active {
-      display: block;
-    }
-    .main-content {
-      padding: 1rem;
-      margin-top: 60px;
-    }
-    /* Post Card Styles */
     .post-card {
       background: white;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    /* Responsive Tables */
-    @media (max-width: 768px) {
-      .post-meta {
-        flex-direction: column;
-      }
-      .search-bar {
-        width: 100% !important;
-      }
-    }
-    /* Tablet and Desktop Styles */
-    @media (min-width: 768px) {
-      .management-container {
-        flex-direction: row;
-      }
-      .mobile-menu-btn {
-        display: none;
-      }
-      .sidebar {
-        display: block;
-        position: relative;
-        height: auto;
-        box-shadow: none;
-      }
-      .main-content {
-        flex: 1;
-        padding: 2rem;
-        margin-top: 0;
-      }
-      .post-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-      }
-    }
-    /* Common Styles */
-    .sidebar-menu {
-      list-style: none;
-      margin-top: 2rem;
-    }
-    .sidebar-item {
-      padding: 12px;
       border-radius: 8px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      transition: transform 0.2s ease;
     }
-    .sidebar-item.active {
-      background: var(--primary-color);
-      color: white;
+    .post-card:hover {
+      transform: translateY(-2px);
     }
-    .management-header {
+    .post-header {
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
     }
-    .search-bar {
-      padding: 10px 15px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      width: 100%;
-    }
-    .post-filters {
+    .post-meta {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      align-items: center;
+      gap: 0.75rem;
     }
-    .filter-btn {
-      padding: 8px 15px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      cursor: pointer;
-      background: white;
-    }
-    .filter-btn.active {
-      background: var(--primary-color);
-      color: white;
-    }
-    .post-status {
-      font-size: 0.8em;
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      display: inline-block;
-    }
-    .published { background: var(--success-color); color: white; }
-    .draft { background: #6c757d; color: white; }
-    .scheduled { background: #ffc107; color: black; }
     .post-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 15px;
+      position: relative;
     }
-    .action-btn {
-      padding: 6px 12px;
-      border-radius: 4px;
+    .menu-btn {
+      padding: 0.5rem;
+      border-radius: 6px;
       cursor: pointer;
-      border: 1px solid #ddd;
+      transition: background 0.2s ease;
+    }
+    .menu-btn:hover {
+      background: #f1f5f9;
+    }
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
       background: white;
-      transition: all 0.3s;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 0.5rem;
+      min-width: 150px;
+      display: none;
+      z-index: 10;
     }
-    .action-btn:hover {
-      background: var(--primary-color);
-      color: white;
+    .dropdown-menu.show {
+      display: block;
     }
-    .post-controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-    .btn-control {
-      padding: 6px 12px;
+    .dropdown-item {
+      padding: 0.5rem 1rem;
       border-radius: 4px;
-      border: none;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: background 0.3s;
-      color: white;
+      transition: background 0.2s ease;
     }
-    .btn-control.edit { background: var(--primary-color); }
-    .btn-control.delete { background: var(--danger-color); }
-    .btn-control.restore { background: var(--success-color); }
-    .btn-control:hover { opacity: 0.9; }
-    .post-grid {
+    .dropdown-item:hover {
+      background: #f8fafc;
+    }
+    .delete-btn {
+      color: #dc2626;
+    }
+    .edit-btn {
+      color: #2563eb;
+    }
+    .post-content h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+      color: #0f172a;
+    }
+    .post-content p {
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+    /* Stats Section */
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
     }
-    /* Section Headings */
-    .section-heading {
-      margin: 20px 0;
-      font-size: 1.3rem;
-      color: #2B5A46;
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
       text-align: center;
     }
-    /* Navigation Modal (for Top Navigation) */
-    .modal {
-      display: none;
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 0.5rem 0;
+    }
+    .stat-label {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    .stat-icon {
+      font-size: 1.5rem;
+      color: #2563eb;
+    }
+    /* Edit Modal Styles */
+    .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
       background: rgba(0,0,0,0.5);
+      display: none;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 100;
     }
-    .modal-content {
+    .modal {
       background: white;
-      padding: 1.5rem;
-      border-radius: 10px;
-      width: 95%;
-      max-width: 500px;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
     }
     .close-btn {
-      float: right;
-      font-size: 1.2rem;
       cursor: pointer;
-      margin-left: 1rem;
-    }
-    /* Checking animation */
-    .loading {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 50px;
-      position: relative;
-    }
-    .spinner {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(0,0,0,0.3);
+      padding: 0.5rem;
       border-radius: 50%;
-      border-top-color: #1877f2;
-      animation: spin 1s ease-in-out infinite;
-      margin-left: 10px;
+      transition: background 0.2s ease;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .close-btn:hover {
+      background: #f1f5f9;
+    }
+    .modal-form {
+      display: grid;
+      gap: 1rem;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #0f172a;
     }
   </style>
 </head>
 <body>
-  <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-  
-  <div class="management-container">
-    <nav class="sidebar">
-      <h2>Dashboard</h2>
-      <ul class="sidebar-menu">
-        <li class="sidebar-item active">Posts</li>
-        <li class="sidebar-item">Analytics</li>
-        <li class="sidebar-item">Scheduled</li>
-        <li class="sidebar-item">Drafts</li>
-        <li class="sidebar-item">Settings</li>
-      </ul>
-    </nav>
-
-    <main class="main-content">
-      <div class="management-header">
-        <h1>Post Management</h1>
-        <input type="text" class="search-bar" placeholder="Search posts...">
+  <div class="dashboard-container">
+    <div class="header">
+      <h1>Manage Your Posts</h1>
+    </div>
+    <!-- Stats Section -->
+    <div class="stats-grid" id="statsSection">
+      <div class="stat-card">
+        <i class="fas fa-file-alt stat-icon"></i>
+        <div class="stat-value" id="totalPosts">0</div>
+        <div class="stat-label">Total Posts</div>
       </div>
-
-      <div class="post-filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="published">Published</button>
-        <button class="filter-btn" data-filter="draft">Drafts</button>
-        <button class="filter-btn" data-filter="scheduled">Scheduled</button>
+      <div class="stat-card">
+        <i class="fas fa-heart stat-icon"></i>
+        <div class="stat-value" id="totalLikes">0</div>
+        <div class="stat-label">Total Likes</div>
       </div>
-
-      <!-- Post Grid: we will load the user's posts here -->
-      <div class="post-grid" id="postGrid"></div>
-    </main>
+      <div class="stat-card">
+        <i class="fas fa-comment stat-icon"></i>
+        <div class="stat-value" id="totalComments">0</div>
+        <div class="stat-label">Total Comments</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clock stat-icon"></i>
+        <div class="stat-value" id="lastActivity">-</div>
+        <div class="stat-label">Last Activity</div>
+      </div>
+    </div>
+    <div class="post-list" id="postList">
+      <div class="loading">Loading your posts...</div>
+    </div>
   </div>
 
   <!-- Edit Post Modal -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
       <div class="modal-header">
-        <h3 style="display:inline;">Edit Post</h3>
+        <h3 class="modal-title">Edit Post</h3>
         <span class="close-btn" onclick="closeModal()">&times;</span>
       </div>
-      <form id="editForm">
-        <label>Title</label>
-        <input type="text" id="editTitle" class="search-bar" placeholder="Post title">
-        <label>Content</label>
-        <textarea id="editContent" class="search-bar" rows="4" placeholder="Post content"></textarea>
-        <label>Status</label>
-        <select id="editStatus">
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="scheduled">Scheduled</option>
-        </select>
-        <div id="editScheduleContainer" style="display:none; margin-top:10px;">
-          <label>Scheduled At</label>
-          <input type="datetime-local" id="editScheduledAt">
+      <form class="modal-form" id="editForm">
+        <div class="form-group">
+          <input type="text" id="editTitle" required placeholder="Post Title">
         </div>
-        <div class="post-actions" style="margin-top: 1rem;">
-          <button type="button" class="action-btn" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="action-btn" style="background: var(--primary-color); color: white;">Save</button>
+        <div class="form-group">
+          <textarea id="editContent" rows="6" required placeholder="Post Content"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Stats Modal -->
-  <div class="modal" id="statsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="display:inline;">Post Analytics</h3>
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-      </div>
-      <div class="post-meta">
-        <div><strong>1,234</strong> Views</div>
-        <div><strong>256</strong> Likes</div>
-        <div><strong>89</strong> Comments</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fadis Youth Portal Modal -->
-  <div class="modal" id="navModalTop">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeNavModalTop()">&times;</span>
-      <h3>Fadis Youth Portal</h3>
-      <p>Welcome to Fadis Youth – a vibrant community for learning and growth.</p>
-      <div class="nav-buttons">
-        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
-        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
-        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
-      </div>
-      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModalTop()">Close</button>
-    </div>
-  </div>
-
-  <!-- Checking login status with spinner -->
-  <div class="loading" id="loading">Checking login status...<span class="spinner"></span></div>
-
   <script>
-    /* ========== Basic UI from your design ========== */
-    function toggleSidebar() {
-      document.querySelector('.sidebar').classList.toggle('active');
-    }
-    function openModal(modalId) {
-      document.getElementById(modalId).style.display = 'flex';
-    }
-    function closeModal() {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-      });
-    }
-    function openNavModalTop() {
-      document.getElementById("navModalTop").style.display = 'flex';
-    }
-    function closeNavModalTop() {
-      document.getElementById("navModalTop").style.display = 'none';
-    }
-
-    // Filter button logic
-    let currentFilter = "all";
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = btn.getAttribute("data-filter");
-        loadPosts();
-      });
-    });
-
-    // Searching posts by title
-    document.querySelector('.search-bar').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.post-card').forEach(card => {
-        const titleEl = card.querySelector('h2');
-        const title = titleEl ? titleEl.textContent.toLowerCase() : "";
-        card.style.display = title.includes(term) ? 'block' : 'none';
-      });
-    });
-
-    // Close modal if user clicks outside it
-    window.onclick = function(e) {
-      if (e.target.classList.contains('modal')) closeModal();
-    };
-
-    /* ========== Firebase Integration ========== */
-    var firebaseConfig = {
+    // Firebase Initialization
+    const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
       databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
@@ -415,142 +307,173 @@
     const db = firebase.firestore();
 
     let currentUser = null;
-    let currentEditPostId = null;
+    let currentPostId = null;
 
-    // Wait for Firebase Auth
-    auth.onAuthStateChanged(function(user) {
-      document.getElementById("loading").style.display = "none"; // hide checking spinner
+    // Auth State Listener
+    auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = user;
-        // Optionally, show user's initial in some top nav icon
-        // e.g. document.querySelector('.account-icon').innerText = user.displayName ? user.displayName[0] : "A";
-        loadPosts();
+        loadUserPosts();
       } else {
-        if (confirm("You are not logged in. Do you want to log in?")) {
-          window.location.href = "login.html";
-        }
+        window.location.href = 'login.html';
       }
     });
 
-    // Load posts from Firestore for the current user
-    function loadPosts() {
-      if (!currentUser) {
-        document.getElementById("postGrid").innerHTML = "<p style='text-align:center;'>Please log in to manage your posts.</p>";
-        return;
-      }
-      let query = db.collection("posts")
-                    .where("authorUID", "==", currentUser.uid)
-                    .where("trashed", "==", false);
-      if (currentFilter !== "all") {
-        query = query.where("status", "==", currentFilter);
-      }
-      query.orderBy("timestamp", "desc").onSnapshot(snapshot => {
-        const postGrid = document.getElementById("postGrid");
-        if (snapshot.empty) {
-          postGrid.innerHTML = "<p style='text-align:center;'>No posts found.</p>";
-          return;
-        }
-        let html = "";
-        snapshot.forEach(doc => {
-          const post = doc.data();
-          html += renderPost(doc.id, post);
-        });
-        postGrid.innerHTML = html;
-      });
-    }
+    // Load User Posts with Stats
+    function loadUserPosts() {
+      const postList = document.getElementById('postList');
+      let totalPosts = 0;
+      let totalLikes = 0;
+      let totalComments = 0;
+      let lastActivity = null;
 
-    // Render a single post card
-    function renderPost(id, post) {
-      let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
-      let statusClass = post.status || "draft"; // e.g. published, draft, scheduled
-      let statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
-      // build status pill
-      let statusPill = `<span class="post-status ${statusClass}">${statusLabel}</span>`;
+      db.collection('posts')
+        .where('authorUID', '==', currentUser.uid)
+        .orderBy('timestamp', 'desc')
+        .onSnapshot(snapshot => {
+          postList.innerHTML = '';
+          totalPosts = 0;
+          totalLikes = 0;
+          totalComments = 0;
+          lastActivity = null;
 
-      return `
-      <div class="post-card" id="post-${id}">
-        ${statusPill}
-        <h2>${post.topic || "Untitled"}</h2>
-        <div class="post-meta">
-          <span>Last updated: ${timeString}</span>
-          <span>Views: ${post.viewsCount || 0}</span>
-        </div>
-        <div class="post-actions">
-          <button class="action-btn" onclick="openEditModal('${id}')">Edit</button>
-          <button class="action-btn" onclick="openModal('statsModal')">Stats</button>
-          <button class="action-btn" onclick="moreOptions('${id}')">⋮</button>
-        </div>
-      </div>`;
-    }
-
-    // Example function for "⋮" button
-    function moreOptions(postId) {
-      alert("More options for post " + postId);
-    }
-
-    // Edit Modal
-    document.getElementById("editForm").addEventListener("submit", e => {
-      e.preventDefault();
-      saveEdit();
-    });
-    function openEditModal(postId) {
-      currentEditPostId = postId;
-      db.collection("posts").doc(postId).get().then(doc => {
-        if (doc.exists) {
-          const post = doc.data();
-          document.getElementById("editTitle").value = post.topic || "";
-          document.getElementById("editContent").value = post.body || "";
-          document.getElementById("editStatus").value = post.status || "published";
-          if (post.status === "scheduled" && post.scheduledAt) {
-            document.getElementById("editScheduleContainer").style.display = "block";
-            document.getElementById("editScheduledAt").value = new Date(post.scheduledAt.toDate()).toISOString().slice(0,16);
-          } else {
-            document.getElementById("editScheduleContainer").style.display = "none";
-            document.getElementById("editScheduledAt").value = "";
+          if (snapshot.empty) {
+            postList.innerHTML = '<div class="loading">No posts found. Create your first post!</div>';
+            updateStats(totalPosts, totalLikes, totalComments, lastActivity);
+            return;
           }
-          openModal("editModal");
-        }
-      });
+
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            totalPosts++;
+            totalLikes += post.likesCount || 0;
+            totalComments += post.commentsCount || 0;
+            const postDate = post.timestamp?.toDate();
+            if (!lastActivity || (postDate && postDate > lastActivity)) {
+              lastActivity = postDate;
+            }
+            postList.innerHTML += createPostCard(doc.id, post);
+          });
+
+          updateStats(totalPosts, totalLikes, totalComments, lastActivity);
+
+          // Add event listeners for dropdowns
+          document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', toggleDropdown);
+          });
+        });
     }
-    document.getElementById("editStatus").addEventListener("change", e => {
-      if (e.target.value === "scheduled") {
-        document.getElementById("editScheduleContainer").style.display = "block";
-      } else {
-        document.getElementById("editScheduleContainer").style.display = "none";
-        document.getElementById("editScheduledAt").value = "";
+
+    // Function to update statistics in the stats section
+    function updateStats(posts, likes, comments, lastDate) {
+      document.getElementById('totalPosts').textContent = posts;
+      document.getElementById('totalLikes').textContent = likes;
+      document.getElementById('totalComments').textContent = comments;
+      document.getElementById('lastActivity').textContent = lastDate 
+        ? lastDate.toLocaleDateString() 
+        : '-';
+    }
+
+    // Create Post Card HTML
+    function createPostCard(id, post) {
+      return `
+        <div class="post-card" data-postid="${id}">
+          <div class="post-header">
+            <div class="post-meta">
+              <div>
+                <h3>${post.topic}</h3>
+                <small>${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleDateString() : ''}</small>
+              </div>
+            </div>
+            <div class="post-actions">
+              <div class="menu-btn">⋮</div>
+              <div class="dropdown-menu">
+                <div class="dropdown-item edit-btn" onclick="openEditModal('${id}')">Edit</div>
+                <div class="dropdown-item delete-btn" onclick="deletePost('${id}')">Delete</div>
+              </div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>${post.body}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Toggle Dropdown Menu
+    function toggleDropdown(e) {
+      const dropdown = e.target.closest('.post-actions').querySelector('.dropdown-menu');
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu !== dropdown) menu.classList.remove('show');
+      });
+      dropdown.classList.toggle('show');
+      e.stopPropagation();
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.post-actions')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+          menu.classList.remove('show');
+        });
       }
     });
-    function saveEdit() {
-      if (!currentEditPostId) return;
-      let newTitle = document.getElementById("editTitle").value.trim();
-      let newContent = document.getElementById("editContent").value.trim();
-      let newStatus = document.getElementById("editStatus").value;
-      let updateData = {
-        topic: newTitle,
-        body: newContent,
-        status: newStatus,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if (newStatus === "scheduled") {
-        let scheduledVal = document.getElementById("editScheduledAt").value;
-        if (!scheduledVal) {
-          alert("Please select a scheduled date/time.");
+
+    // Enhanced Edit Modal with Ownership Check
+    function openEditModal(postId) {
+      const postRef = db.collection('posts').doc(postId);
+      postRef.get().then(doc => {
+        if (!doc.exists) return;
+        if (doc.data().authorUID !== currentUser.uid) {
+          alert('You can only edit your own posts!');
           return;
         }
-        updateData.scheduledAt = firebase.firestore.Timestamp.fromDate(new Date(scheduledVal));
-      } else {
-        updateData.scheduledAt = null;
-      }
-      if (!newTitle || !newContent) {
-        alert("Title and content cannot be empty.");
-        return;
-      }
-      db.collection("posts").doc(currentEditPostId).update(updateData)
-        .then(() => {
-          alert("Post updated.");
+        currentPostId = postId;
+        const post = doc.data();
+        document.getElementById('editTitle').value = post.topic;
+        document.getElementById('editContent').value = post.body;
+        document.getElementById('editModal').style.display = 'flex';
+      });
+    }
+
+    // Close Modal Function
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+      currentPostId = null;
+    }
+
+    // Handle Edit Form Submission
+    document.getElementById('editForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const title = document.getElementById('editTitle').value.trim();
+      const content = document.getElementById('editContent').value.trim();
+
+      if (title && content) {
+        db.collection('posts').doc(currentPostId).update({
+          topic: title,
+          body: content,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
           closeModal();
-        })
-        .catch(err => console.error("Error updating post:", err));
+        });
+      }
+    });
+
+    // Enhanced Delete Function with Ownership Check
+    function deletePost(postId) {
+      const postRef = db.collection('posts').doc(postId);
+      postRef.get().then(doc => {
+        if (!doc.exists) return;
+        if (doc.data().authorUID !== currentUser.uid) {
+          alert('You can only delete your own posts!');
+          return;
+        }
+        if (confirm('Are you sure you want to delete this post?')) {
+          postRef.delete().catch(error => {
+            alert('Error deleting post: ' + error.message);
+          });
+        }
+      });
     }
   </script>
 </body>
