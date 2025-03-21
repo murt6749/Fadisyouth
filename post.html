@@ -8,13 +8,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Reset & Typography */
+    /* Basic Reset & Typography */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #f0f2f5; color: #1c1e21; }
     
-    /* Top Navigation (Account Icon) */
+    /* Top Navigation */
     .top-nav {
       display: flex;
       justify-content: flex-end;
@@ -24,13 +25,14 @@
     .account-icon {
       width: 45px;
       height: 45px;
-      background: #ffbb00;
       border-radius: 50%;
+      background: #ff6f61;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-weight: 600;
       cursor: pointer;
       box-shadow: 0 0 8px rgba(0,0,0,0.3);
     }
@@ -48,9 +50,9 @@
     
     /* Post Card Styles */
     .post-card {
-      background: linear-gradient(135deg, #ffffff, #fefefe);
+      background: linear-gradient(135deg, #ffffff, #fffefc);
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       margin-bottom: 20px;
       padding: 20px;
       transition: transform 0.3s ease;
@@ -76,26 +78,36 @@
     .post-time { color: #65676b; font-size: 0.85em; }
     
     .post-content { margin-bottom: 20px; }
-    .post-actions { display: flex; gap: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
-    .action-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .post-content h2 { margin-bottom: 10px; color: #2c3e50; }
+    .post-content p { line-height: 1.6; }
+    
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      align-items: center;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
     .action-btn:hover { color: #1877f2; }
-    
-    /* Reaction Buttons */
-    .like-btn, .share-btn, .comment-btn { font-size: 1.1rem; }
     .like-btn.active { color: #1877f2; }
-    
-    /* Hide comments by default */
-    .comments-section { display: none; margin-top: 10px; }
     
     /* New Post Form */
     .new-post {
       background: linear-gradient(135deg, #86a8e7, #7f7fd5);
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       padding: 20px;
       margin-top: 30px;
       color: white;
     }
+    .new-post h2 { margin-bottom: 15px; }
     .new-post input[type="text"],
     .new-post textarea {
       width: 100%;
@@ -119,234 +131,40 @@
     }
     .new-post .btn-post:hover { background: #e65b50; }
     
-    /* No posts message */
-    .no-posts { text-align: center; font-size: 1.1rem; color: #65676b; margin: 40px 0; }
-    
-    /* Navigation Modal */
-    .nav-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-    }
-    .nav-modal.active { display: flex; }
-    .nav-modal .modal-content {
-      background: #fff;
-      border-radius: 15px;
-      padding: 20px;
-      width: 90%;
-      max-width: 500px;
+    /* No Posts Message */
+    .no-posts {
       text-align: center;
-      position: relative;
+      font-size: 1.1rem;
+      color: #65676b;
+      margin: 40px 0;
     }
-    .nav-modal h2 { margin-bottom: 10px; color: #2B5A46; }
-    .nav-modal p { margin-bottom: 20px; color: #555; }
-    .nav-modal .nav-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .nav-modal .nav-buttons a {
-      text-decoration: none;
-      background: #ff6f61;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
-    }
-    .nav-modal .nav-buttons a:hover { transform: translateY(-3px); }
-    .nav-modal .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: red;
-      color: white;
-      border: none;
-      font-size: 1.2rem;
-      padding: 5px 10px;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-      animation: glow 1.5s infinite alternate;
-    }
-    @keyframes glow {
-      from { box-shadow: 0 0 5px rgba(255, 0, 0, 0.8); }
-      to { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
-    }
-    
-    /* Sparkle Animation */
-    .sparkles { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-    .sparkle { position: absolute; background: rgba(255,255,255,0.8); border-radius: 50%; animation: sparkle 1.5s infinite; }
-    @keyframes sparkle { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
   </style>
 </head>
 <body>
   <!-- Top Navigation with default account icon -->
   <div class="top-nav">
     <div class="account-icon" onclick="window.location.href='post_account.html'">
-      <!-- Will be replaced with first letter of logged-in user (for demo, using "A") -->
+      <!-- This will display the first letter of the logged-in user's display name (or default "A") -->
       A
     </div>
   </div>
-
+  
   <div class="container">
-    <!-- Card 1: Sheik Aliyyi -->
-    <div class="card">
-      <div class="download-container" onclick="event.stopPropagation()">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <!-- Only clicking the avatar opens the nav modal -->
-      <div class="avatar-container" onclick="openNavModal('Sheik Aliyyi')">
-        <img src="1shekaliyyii.png" alt="Sheik Aliyyi">
-      </div>
-      <h3>Sheik Aliyyi</h3>
-      <div class="button-group" onclick="event.stopPropagation()">
-        <button class="btn btn-login" onclick="checkPassword('Sheik Aliyyi')">Login</button>
-        <button class="btn btn-problem" onclick="toggleProblem(this)">Problem</button>
-      </div>
-      <div class="problem-box">
-        <textarea placeholder="Describe your problem..." rows="3"></textarea>
-        <div style="margin-top:10px; display:flex; gap:10px; justify-content: flex-end;">
-          <button class="check-btn" onclick="checkAdminResponse(this)">Check</button>
-          <button class="send-btn" onclick="sendProblem(this)">Send ✨</button>
-        </div>
-        <div class="admin-response" style="margin-top:10px; display:none; background:#eee; padding:10px; border-radius:10px;"></div>
-      </div>
-      <div class="sparkles"></div>
-    </div>
-
-    <!-- Card 2: Sheik Abdurahmaan -->
-    <div class="card">
-      <div class="download-container" onclick="event.stopPropagation()">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="avatar-container" onclick="openNavModal('Sheik Abdurahmaan')">
-        <img src="2.shekabdurahmaan.png" alt="Sheik Abdurahmaan">
-      </div>
-      <h3>Sheik Abdurahmaan</h3>
-      <div class="button-group" onclick="event.stopPropagation()">
-        <button class="btn btn-login" onclick="checkPassword('Sheik Abdurahmaan')">Login</button>
-        <button class="btn btn-problem" onclick="toggleProblem(this)">Problem</button>
-      </div>
-      <div class="problem-box">
-        <textarea placeholder="Describe your problem..." rows="3"></textarea>
-        <div style="margin-top:10px; display:flex; gap:10px; justify-content: flex-end;">
-          <button class="check-btn" onclick="checkAdminResponse(this)">Check</button>
-          <button class="send-btn" onclick="sendProblem(this)">Send ✨</button>
-        </div>
-        <div class="admin-response" style="margin-top:10px; display:none; background:#eee; padding:10px; border-radius:10px;"></div>
-      </div>
-      <div class="sparkles"></div>
-    </div>
-
-    <!-- Card 3: Sheik Abdusalaam -->
-    <div class="card">
-      <div class="download-container" onclick="event.stopPropagation()">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="avatar-container" onclick="openNavModal('Sheik Abdusalaam')">
-        <img src="3.sheik_abdusalaam.png" alt="Sheik Abdusalaam">
-      </div>
-      <h3>Sheik Abdusalaam</h3>
-      <div class="button-group" onclick="event.stopPropagation()">
-        <button class="btn btn-login" onclick="checkPassword('Sheik Abdusalaam')">Login</button>
-        <button class="btn btn-problem" onclick="toggleProblem(this)">Problem</button>
-      </div>
-      <div class="problem-box">
-        <textarea placeholder="Describe your problem..." rows="3"></textarea>
-        <div style="margin-top:10px; display:flex; gap:10px; justify-content: flex-end;">
-          <button class="check-btn" onclick="checkAdminResponse(this)">Check</button>
-          <button class="send-btn" onclick="sendProblem(this)">Send ✨</button>
-        </div>
-        <div class="admin-response" style="margin-top:10px; display:none; background:#eee; padding:10px; border-radius:10px;"></div>
-      </div>
-      <div class="sparkles"></div>
-    </div>
-
-    <!-- Card 4: Sheik Nasraddiin -->
-    <div class="card">
-      <div class="download-container" onclick="event.stopPropagation()">
-        <button class="download-btn"><i class="fas fa-download"></i></button>
-        <div class="download-menu">
-          <form>
-            <label><input type="checkbox" name="fields" value="userName" checked> User Name</label>
-            <label><input type="checkbox" name="fields" value="questionText" checked> Question</label>
-            <label><input type="checkbox" name="fields" value="dynamicData" checked> Dynamic Data</label>
-            <label><input type="checkbox" name="fields" value="submissionDate" checked> Submission Date</label>
-            <button type="button" class="download-submit-btn">Download</button>
-          </form>
-        </div>
-      </div>
-      <div class="avatar-container" onclick="openNavModal('Sheik Nasraddiin')">
-        <img src="4.sheiknasraddiin.png" alt="Sheik Nasraddiin">
-      </div>
-      <h3>Sheik Nasraddiin</h3>
-      <div class="button-group" onclick="event.stopPropagation()">
-        <button class="btn btn-login" onclick="checkPassword('Sheik Nasraddiin')">Login</button>
-        <button class="btn btn-problem" onclick="toggleProblem(this)">Problem</button>
-      </div>
-      <div class="problem-box">
-        <textarea placeholder="Describe your problem..." rows="3"></textarea>
-        <div style="margin-top:10px; display:flex; gap:10px; justify-content: flex-end;">
-          <button class="check-btn" onclick="checkAdminResponse(this)">Check</button>
-          <button class="send-btn" onclick="sendProblem(this)">Send ✨</button>
-        </div>
-        <div class="admin-response" style="margin-top:10px; display:none; background:#eee; padding:10px; border-radius:10px;"></div>
-      </div>
-      <div class="sparkles"></div>
+    <div id="loading" class="loading">Checking login status...</div>
+    <div id="postsSection" style="display:none;"></div>
+    <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
+    
+    <!-- New Post Form -->
+    <div class="new-post" id="newPostForm" style="display:none;">
+      <h2>Create a New Post</h2>
+      <input type="text" id="postTopic" placeholder="Topic">
+      <textarea id="postBody" placeholder="What's on your mind?"></textarea>
+      <button class="btn-post" onclick="postNewPost()">Post</button>
     </div>
   </div>
-
-  <!-- Navigation Modal -->
-  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeNavModal()">X</button>
-      <h2>Fadis Youth Portal</h2>
-      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
-      <div class="nav-buttons">
-        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
-        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
-        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
-      </div>
-      <button class="send-btn" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
-    </div>
-  </div>
-
+  
   <script>
-    // Firebase initialization – replace with your config
+    // Initialize Firebase (replace with your actual config)
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -358,149 +176,193 @@
       measurementId: "G-Z02SPW9ZKW"
     };
     firebase.initializeApp(firebaseConfig);
-    var db = firebase.firestore();
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // --- Login and Password Checking ---
-    function checkPassword(name) {
-      let btn = event.target;
-      btn.innerText = "Checking...";
-      btn.disabled = true;
-      const mapping = {
-        "Sheik Aliyyi": "aliyyii",
-        "Sheik Abdurahmaan": "abdurahman",
-        "Sheik Abdusalaam": "abdusalaam",
-        "Sheik Nasraddiin": "nasraddiin"
-      };
-      let fileName = mapping[name] || name.toLowerCase().replace(/\s+/g, '-');
-      db.collection("adminPasswords").doc(fileName).get().then(function(doc) {
-        setTimeout(() => {
-          if(doc.exists && doc.data().password) {
-            let userPass = prompt(`Enter password for ${name}:`);
-            if(userPass === doc.data().password) {
-              window.location.href = fileName + ".html";
-            } else {
-              alert("Incorrect password! 🙅♂️");
-            }
-          } else {
-            let newPass = prompt(`No password set for ${name}. Please create a new password:`);
-            if(newPass && newPass.trim() !== "") {
-              db.collection("adminPasswords").doc(fileName).set({ password: newPass.trim() })
-                .then(() => { alert("Password created. Please try logging in again."); });
-            } else {
-              alert("Password not created.");
-            }
-          }
-          btn.innerText = "Login";
-          btn.disabled = false;
-        }, 1500);
-      }).catch(function(error) {
-        console.error("Error checking password:", error);
-        alert("Error checking password.");
-        btn.innerText = "Login";
-        btn.disabled = false;
-      });
-    }
-
-    // --- Problem Reporting and Admin Response Checking ---
-    function toggleProblem(button) {
-      const card = button.closest('.card');
-      const problemBox = card.querySelector('.problem-box');
-      problemBox.classList.toggle('active');
-    }
-    function sendProblem(button) {
-      const card = button.closest('.card');
-      const textarea = card.querySelector('textarea');
-      const problemText = textarea.value.trim();
-      if(problemText === '') {
-        alert("Please describe your problem before sending! 💌");
-        return;
-      }
-      button.innerHTML = 'Sending... 🌟';
-      button.disabled = true;
-      const sheikhName = card.querySelector('h3').innerText;
-      db.collection("adminProblems").add({
-        sheikhName: sheikhName,
-        problem: problemText,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        button.innerHTML = 'Sent! ✅';
-        setTimeout(() => {
-          button.innerHTML = 'Send ✨';
-          button.disabled = false;
-          textarea.value = '';
-          card.querySelector('.problem-box').classList.remove('active');
-        }, 1500);
-      }).catch((error) => {
-        console.error("Error sending problem:", error);
-        alert("Error sending problem.");
-        button.innerHTML = 'Send ✨';
-        button.disabled = false;
-      });
-    }
-    function checkAdminResponse(button) {
-      const card = button.closest('.card');
-      const sheikhName = card.querySelector('h3').innerText;
-      const responseDiv = card.querySelector('.admin-response');
-      responseDiv.style.display = 'none';
-      responseDiv.innerHTML = 'Checking for response...';
-      db.collection("adminresponse").where("sheikhName", "==", sheikhName)
-        .orderBy("timestamp", "desc").limit(1)
-        .get().then(function(querySnapshot) {
-          if(querySnapshot.empty) {
-            responseDiv.innerHTML = "No response from admin yet.";
-          } else {
-            querySnapshot.forEach(function(doc) {
-              const data = doc.data();
-              responseDiv.innerHTML = `<strong>Admin:</strong> ${data.response || "No response text"}. <button class="send-btn" onclick="replyToAdmin(this)">Reply</button>`;
-            });
-          }
-          responseDiv.style.display = 'block';
-        }).catch(function(error) {
-          console.error("Error retrieving admin response:", error);
-          responseDiv.innerHTML = "Error retrieving response.";
-          responseDiv.style.display = 'block';
-        });
-    }
-    function replyToAdmin(button) {
-      const responseDiv = button.parentElement;
-      let replyBox = responseDiv.querySelector('.reply-box');
-      if(!replyBox) {
-        replyBox = document.createElement('div');
-        replyBox.className = 'reply-box';
-        replyBox.style.marginTop = '10px';
-        replyBox.innerHTML = `<textarea placeholder="Your reply..." rows="2" style="width:100%; padding:5px; border-radius:5px; border:1px solid #ccc;"></textarea>
-                              <button class="send-btn" style="margin-top:5px;" onclick="sendAdminReply(this)">Send Reply</button>`;
-        responseDiv.appendChild(replyBox);
+    // Check login state and show posts or redirect to login.html
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("postsSection").style.display = "block";
+        document.getElementById("newPostForm").style.display = "block";
+        // Update account icon letter
+        const displayName = user.displayName || "A";
+        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        loadPosts();
       } else {
-        replyBox.style.display = (replyBox.style.display === 'none' || replyBox.style.display === '') ? 'block' : 'none';
+        setTimeout(() => {
+          alert("You are not logged in. Redirecting to login page.");
+          window.location.href = "login.html";
+        }, 1500);
       }
-    }
-    function sendAdminReply(button) {
-      const replyBox = button.closest('.reply-box');
-      const replyText = replyBox.querySelector('textarea').value.trim();
-      if(replyText === '') {
-        alert("Please enter a reply.");
-        return;
-      }
-      const card = button.closest('.card');
-      const sheikhName = card.querySelector('h3').innerText;
-      button.innerText = "Sending...";
-      db.collection("adminProblemsReply").add({
-        sheikhName: sheikhName,
-        reply: replyText,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert("Reply sent to admin.");
-        button.innerText = "Send Reply";
-        replyBox.style.display = 'none';
-      }).catch((error) => {
-        console.error("Error sending reply:", error);
-        alert("Error sending reply.");
-        button.innerText = "Send Reply";
+    });
+
+    // Load posts from "posts" collection ordered by timestamp descending
+    function loadPosts() {
+      db.collection("posts").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        const postsSection = document.getElementById("postsSection");
+        postsSection.innerHTML = "";
+        if (snapshot.empty) {
+          document.getElementById("noPostsMessage").style.display = "block";
+        } else {
+          document.getElementById("noPostsMessage").style.display = "none";
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            postsSection.innerHTML += renderPost(doc.id, post);
+          });
+        }
       });
     }
 
-    // --- Navigation Modal (opens only when the avatar is clicked) ---
+    // Render a single post
+    function renderPost(id, post) {
+      // Format timestamp
+      let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
+      // Determine author's avatar: if authorAvatar exists, use it; otherwise, show a colorful circle with first letter.
+      let authorDisplay = "";
+      if(post.authorAvatar) {
+        authorDisplay = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
+      } else {
+        const name = post.authorName || "A";
+        authorDisplay = `<div class="author-avatar" style="background: #${Math.floor(Math.random()*16777215).toString(16)};">${name.charAt(0).toUpperCase()}</div>`;
+      }
+      // Follow button: if current user is not the author, display a Follow button; if already following, show "Following"
+      let followButton = "";
+      if(auth.currentUser && auth.currentUser.uid !== post.authorUID) {
+        followButton = `<button class="btn-post" id="follow-${id}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">Follow</button>`;
+      }
+      return `
+      <div class="post-card" id="post-${id}">
+        <div class="post-header">
+          ${authorDisplay}
+          <div class="author-info">
+            <div class="author-name">${post.authorName || "Anonymous"}</div>
+            <div class="post-time">${timeString}</div>
+          </div>
+          ${followButton}
+        </div>
+        <div class="post-content">
+          <h2>${post.topic || "Untitled"}</h2>
+          <p>${post.body || ""}</p>
+        </div>
+        <div class="post-actions">
+          <div class="action-btn like-btn" onclick="toggleLike(event, '${id}')">
+            <i class="far fa-heart"></i>
+            <span class="like-count">${post.likesCount || 0}</span>
+          </div>
+          <div class="action-btn" onclick="focusComment(event, '${id}')">
+            <i class="far fa-comment"></i> Comment
+          </div>
+          <div class="action-btn" onclick="toggleShare(event)">
+            <i class="fas fa-share"></i> Share
+          </div>
+        </div>
+        <!-- Comments Section (hidden by default) -->
+        <div class="comments-section" id="comments-${id}" style="display:none;"></div>
+      </div>`;
+    }
+
+    // Like functionality – update Firestore document with likes array
+    function toggleLike(e, postId) {
+      e.stopPropagation();
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please log in to like posts.");
+        return;
+      }
+      const postRef = db.collection("posts").doc(postId);
+      postRef.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          let likes = data.likes || [];
+          if (likes.includes(user.uid)) {
+            // Already liked, so remove
+            likes = likes.filter(uid => uid !== user.uid);
+          } else {
+            likes.push(user.uid);
+          }
+          postRef.update({ likes: likes, likesCount: likes.length });
+        }
+      });
+    }
+
+    // Follow functionality: Use a "follows" collection where each document id is "currentUserUID_authorUID"
+    function toggleFollow(e, authorUID, postId) {
+      e.stopPropagation();
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please log in to follow users.");
+        return;
+      }
+      const followDocId = user.uid + "_" + authorUID;
+      const followRef = db.collection("follows").doc(followDocId);
+      followRef.get().then(doc => {
+        if (doc.exists) {
+          // Already following – unfollow
+          followRef.delete().then(() => {
+            document.getElementById("follow-" + postId).innerText = "Follow";
+          });
+        } else {
+          // Follow the author
+          followRef.set({ follower: user.uid, following: authorUID, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+          .then(() => {
+            document.getElementById("follow-" + postId).innerText = "Following";
+          });
+        }
+      });
+    }
+
+    // Dummy functions for comment and share – you can extend these as needed
+    function focusComment(e, postId) {
+      e.stopPropagation();
+      // For simplicity, toggling visibility of a comment section could be implemented
+      const commentsSection = document.getElementById("comments-" + postId);
+      commentsSection.style.display = commentsSection.style.display === "none" ? "block" : "none";
+    }
+    function toggleShare(e) {
+      e.stopPropagation();
+      alert("Share functionality (stub).");
+    }
+
+    // New Post Functionality – user can create a post with a topic and body
+    function postNewPost() {
+      const topic = document.getElementById("postTopic").value.trim();
+      const body = document.getElementById("postBody").value.trim();
+      if (topic === "" || body === "") {
+        alert("Please fill in both a topic and body.");
+        return;
+      }
+      const user = auth.currentUser;
+      const post = {
+        authorName: user.displayName || "Anonymous",
+        authorUID: user.uid,
+        // For avatar, you might use user.photoURL; if not, leave it null and render a circle with first letter.
+        authorAvatar: user.photoURL || null,
+        topic: topic,
+        body: body,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0
+      };
+      db.collection("posts").add(post).then(() => {
+        document.getElementById("postTopic").value = "";
+        document.getElementById("postBody").value = "";
+      }).catch(error => {
+        console.error("Error posting:", error);
+      });
+    }
+
+    // Firebase Auth Check: If not logged in, redirect to login.html after animation.
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        setTimeout(() => {
+          alert("You are not logged in. Redirecting to login page.");
+          window.location.href = "login.html";
+        }, 1500);
+      }
+    });
+
+    // Navigation Modal – only opens when the avatar-container is clicked.
     function openNavModal(sheikhName) {
       document.getElementById("navModal").classList.add("active");
     }
@@ -508,13 +370,13 @@
       document.getElementById("navModal").classList.remove("active");
     }
 
-    // Add sparkles to each card
+    // Add sparkle animation to each card
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.card').forEach(card => {
         let sparkleContainer = document.createElement('div');
         sparkleContainer.className = 'sparkles';
         card.appendChild(sparkleContainer);
-        for(let i = 0; i < 15; i++){
+        for (let i = 0; i < 15; i++) {
           const sparkle = document.createElement('div');
           sparkle.className = 'sparkle';
           sparkle.style.left = Math.random() * 100 + '%';
@@ -525,6 +387,6 @@
       });
     });
   </script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 </body>
 </html>
