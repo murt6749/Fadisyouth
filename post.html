@@ -14,7 +14,7 @@
     /* Reset and Base Styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
-    
+
     /* Top Navigation */
     .top-nav {
       display: flex;
@@ -37,14 +37,8 @@
       cursor: pointer;
       box-shadow: 0 0 8px rgba(0,0,0,0.3);
     }
-    .search-container {
-      position: relative;
-    }
-    .search-icon {
-      font-size: 1.5rem;
-      color: white;
-      cursor: pointer;
-    }
+    .search-container { position: relative; }
+    .search-icon { font-size: 1.5rem; color: white; cursor: pointer; }
     .search-box {
       position: absolute;
       top: 40px;
@@ -78,7 +72,7 @@
     }
     .search-result-item:last-child { border-bottom: none; }
     .search-result-item:hover { background: #f0f2f5; }
-    
+
     /* Main Container */
     .container {
       max-width: 800px;
@@ -90,7 +84,7 @@
       font-size: 1.2rem;
       margin-top: 50px;
     }
-    
+
     /* Post Card Styles */
     .post-card {
       background: linear-gradient(135deg, #ffffff, #fffefc);
@@ -99,9 +93,10 @@
       margin-bottom: 20px;
       padding: 20px;
       transition: transform 0.3s ease;
+      position: relative;
     }
     .post-card:hover { transform: translateY(-3px); }
-    
+
     .post-header {
       display: flex;
       align-items: center;
@@ -125,11 +120,11 @@
     .author-info { flex-grow: 1; }
     .author-name { font-weight: 600; }
     .post-time { color: #65676b; font-size: 0.85em; }
-    
+
     .post-content { margin-bottom: 20px; }
     .post-content h2 { margin-bottom: 10px; color: #2c3e50; }
     .post-content p { line-height: 1.6; }
-    
+
     .post-actions {
       display: flex;
       gap: 15px;
@@ -146,7 +141,7 @@
     }
     .action-btn:hover { color: #1877f2; }
     .like-btn.active { color: #1877f2; }
-    
+
     /* Comments Section */
     .comments-section {
       display: none;
@@ -177,10 +172,7 @@
       border-radius: 10px;
       flex-grow: 1;
     }
-    .comment-input-section {
-      margin-top: 10px;
-      display: none;
-    }
+    .comment-input-section { margin-top: 10px; display: none; }
     .comment-input {
       width: 100%;
       padding: 10px;
@@ -188,7 +180,7 @@
       border-radius: 20px;
       resize: none;
     }
-    
+
     /* New Post Form */
     .new-post {
       background: linear-gradient(135deg, #86a8e7, #7f7fd5);
@@ -221,7 +213,7 @@
       transition: background 0.3s ease;
     }
     .new-post .btn-post:hover { background: #e65b50; }
-    
+
     /* No Posts Message */
     .no-posts {
       text-align: center;
@@ -229,8 +221,8 @@
       color: #65676b;
       margin: 40px 0;
     }
-    
-    /* Navigation Modal (opens when account icon is clicked) */
+
+    /* Navigation Modal */
     .nav-modal {
       display: none;
       position: fixed;
@@ -319,11 +311,11 @@
   </div>
   
   <div class="container">
-    <div id="loading" class="loading">Checking login status…</div>
+    <div id="loading" class="loading">Checking login status...</div>
     <div id="postsSection" style="display:none;"></div>
     <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
     
-    <!-- New Post Form (only visible if logged in) -->
+    <!-- New Post Form (visible only if logged in) -->
     <div class="new-post" id="newPostForm" style="display:none;">
       <h2>Create a New Post</h2>
       <input type="text" id="postTopic" placeholder="Topic">
@@ -348,16 +340,16 @@
   </div>
   
   <script>
-    // Initialize Firebase – REPLACE the following config with your project config.
+    // Firebase configuration (using your Firebase project)
     var firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID"
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -366,10 +358,9 @@
     let isLoggedIn = false;
     let authResolved = false;
     
-    // --- Auth Check: Wait until Firebase responds (up to 10 seconds) ---
+    // --- Auth Check: Wait until Firebase responds or 10 seconds pass ---
     const authTimeout = setTimeout(() => {
       if (!authResolved) {
-        // If after 10 seconds no auth state is determined, ask the visitor.
         if (confirm("We couldn't verify your login status. Do you want to log in?")) {
           window.location.href = "login.html";
         } else {
@@ -399,7 +390,6 @@
         } else {
           isLoggedIn = false;
           document.getElementById("postsSection").style.display = "block";
-          // New Post form remains hidden.
           loadPosts();
         }
       }
@@ -409,7 +399,7 @@
     function toggleSearch() {
       const searchBox = document.getElementById("searchBox");
       const resultsDiv = document.getElementById("searchResults");
-      if (searchBox.style.display === "block") {
+      if(searchBox.style.display === "block") {
         searchBox.style.display = "none";
         resultsDiv.style.display = "none";
       } else {
@@ -420,7 +410,7 @@
     document.getElementById("searchBox").addEventListener("input", function() {
       const query = this.value.trim();
       const resultsDiv = document.getElementById("searchResults");
-      if (query === "") {
+      if(query === "") {
         resultsDiv.innerHTML = "";
         resultsDiv.style.display = "none";
         return;
@@ -613,13 +603,11 @@
     function sharePost(e, postId) {
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
-      if (navigator.share) {
+      if(navigator.share) {
         navigator.share({ title: "Check out this post", url: postURL })
           .catch(err => console.error("Error sharing:", err));
       } else {
-        navigator.clipboard.writeText(postURL).then(() => {
-          alert("Post URL copied to clipboard.");
-        });
+        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
       }
     }
     
@@ -627,10 +615,7 @@
     function postNewPost() {
       const topic = document.getElementById("postTopic").value.trim();
       const body = document.getElementById("postBody").value.trim();
-      if (topic === "" || body === "") {
-        alert("Please fill in both a topic and body.");
-        return;
-      }
+      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
       if (!isLoggedIn) { alert("Please log in to create posts."); return; }
       const user = auth.currentUser;
       const post = {
