@@ -229,6 +229,82 @@
       color: #65676b;
       margin: 40px 0;
     }
+    
+    /* Navigation Modal (opens when avatar is clicked) */
+    .nav-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .nav-modal.active { display: flex; }
+    .nav-modal .modal-content {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+    .nav-modal h2 { margin-bottom: 10px; color: #2B5A46; }
+    .nav-modal p { margin-bottom: 20px; color: #555; }
+    .nav-modal .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .nav-modal .nav-buttons a {
+      text-decoration: none;
+      background: #86a8e7;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .nav-modal .nav-buttons a:hover { transform: translateY(-3px); }
+    .nav-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 5px rgba(255, 0, 0, 0.8); }
+      to { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+    }
+    
+    /* Sparkle Animation */
+    .sparkles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .sparkle {
+      position: absolute;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      animation: sparkle 1.5s infinite;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -247,7 +323,7 @@
     <div id="postsSection" style="display:none;"></div>
     <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
     
-    <!-- New Post Form -->
+    <!-- New Post Form (only visible if logged in) -->
     <div class="new-post" id="newPostForm" style="display:none;">
       <h2>Create a New Post</h2>
       <input type="text" id="postTopic" placeholder="Topic">
@@ -256,7 +332,7 @@
     </div>
   </div>
   
-  <!-- Navigation Modal (only opens when avatar is clicked) -->
+  <!-- Navigation Modal (opens only when avatar is clicked) -->
   <div class="nav-modal" id="navModal" onclick="closeNavModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="close-btn" onclick="closeNavModal()">X</button>
@@ -286,7 +362,10 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    
+    // Global flag to track login state
+    let isLoggedIn = false;
+    
     // --- Search Functionality ---
     function toggleSearch() {
       const searchBox = document.getElementById("searchBox");
@@ -307,7 +386,7 @@
         resultsDiv.style.display = "none";
         return;
       }
-      // Search in "users" collection by displayName (ensure it's indexed)
+      // Query the "users" collection by displayName
       db.collection("users").where("displayName", ">=", query)
         .where("displayName", "<=", query + "\uf8ff")
         .limit(10)
@@ -327,16 +406,25 @@
     
     // --- Auth Check ---
     auth.onAuthStateChanged(function(user) {
+      // Remove the loading message as soon as Firebase responds
+      document.getElementById("loading").style.display = "none";
       if (user) {
-        document.getElementById("loading").style.display = "none";
+        isLoggedIn = true;
         document.getElementById("postsSection").style.display = "block";
         document.getElementById("newPostForm").style.display = "block";
         const displayName = user.displayName || "A";
         document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
         loadPosts();
       } else {
-        alert("You are not logged in. Redirecting to login page.");
-        window.location.href = "login.html";
+        // Ask the visitor if they want to log in
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          document.getElementById("postsSection").style.display = "block";
+          // New post form remains hidden
+          loadPosts();
+        }
       }
     });
     
@@ -370,7 +458,7 @@
         avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
       }
       let followBtn = "";
-      if (auth.currentUser && auth.currentUser.uid !== post.authorUID) {
+      if (isLoggedIn && auth.currentUser && auth.currentUser.uid !== post.authorUID) {
         followBtn = `<button class="btn-post" id="follow-${id}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
       }
       return `
@@ -406,8 +494,8 @@
     // --- Like Functionality ---
     function toggleLike(e, postId) {
       e.stopPropagation();
+      if (!isLoggedIn) { alert("Please log in to like posts."); return; }
       const user = auth.currentUser;
-      if (!user) { alert("Please log in to like posts."); return; }
       const postRef = db.collection("posts").doc(postId);
       postRef.get().then(doc => {
         if (doc.exists) {
@@ -426,8 +514,8 @@
     // --- Follow Functionality ---
     function toggleFollow(e, authorUID, postId) {
       e.stopPropagation();
+      if (!isLoggedIn) { alert("Please log in to follow users."); return; }
       const user = auth.currentUser;
-      if (!user) { alert("Please log in to follow users."); return; }
       const followDocId = user.uid + "_" + authorUID;
       const followRef = db.collection("follows").doc(followDocId);
       followRef.get().then(doc => {
@@ -512,14 +600,10 @@
       e.stopPropagation();
       const postURL = window.location.href + "#post-" + postId;
       if (navigator.share) {
-        navigator.share({
-          title: "Check out this post",
-          url: postURL
-        }).catch(err => console.error("Error sharing:", err));
+        navigator.share({ title: "Check out this post", url: postURL })
+          .catch(err => console.error("Error sharing:", err));
       } else {
-        navigator.clipboard.writeText(postURL).then(() => {
-          alert("Post URL copied to clipboard.");
-        });
+        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
       }
     }
     
@@ -531,6 +615,7 @@
         alert("Please fill in both a topic and body.");
         return;
       }
+      if (!isLoggedIn) { alert("Please log in to create posts."); return; }
       const user = auth.currentUser;
       const post = {
         authorName: user.displayName || "Anonymous",
@@ -552,21 +637,30 @@
     
     // --- Firebase Auth Check ---
     firebase.auth().onAuthStateChanged(function(user) {
+      // The onAuthStateChanged callback is now used to show or disable functionality immediately.
+      document.getElementById("loading").style.display = "none";
       if (user) {
-        document.getElementById("loading").style.display = "none";
+        isLoggedIn = true;
         document.getElementById("postsSection").style.display = "block";
         document.getElementById("newPostForm").style.display = "block";
         const displayName = user.displayName || "A";
         document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
         loadPosts();
       } else {
-        alert("You are not logged in. Redirecting to login page.");
-        window.location.href = "login.html";
+        // Show a confirm dialog to let the visitor decide whether to log in.
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          document.getElementById("postsSection").style.display = "block";
+          // New Post form remains hidden.
+          loadPosts();
+        }
       }
     });
     
-    // --- Navigation Modal (opens only when avatar is clicked) ---
-    function openNavModal(sheikhName) {
+    // --- Navigation Modal (opens only when the avatar is clicked) ---
+    function openNavModal() {
       document.getElementById("navModal").classList.add("active");
     }
     function closeNavModal() {
@@ -575,7 +669,7 @@
     
     // --- Sparkle Animation ---
     document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.card').forEach(card => {
+      document.querySelectorAll('.post-card').forEach(card => {
         let sparkleContainer = document.createElement('div');
         sparkleContainer.className = 'sparkles';
         card.appendChild(sparkleContainer);
@@ -590,7 +684,6 @@
       });
     });
   </script>
-  <!-- Ensure firebase-auth loads last -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </body>
 </html>
