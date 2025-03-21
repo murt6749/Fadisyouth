@@ -343,17 +343,9 @@
     <!-- Chat Window -->
     <div class="chat-window" id="chatWindow">
       <div class="chat-header" id="chatHeader">Select a Chat</div>
-      <div
-        id="replyInfo"
-        class="reply-info"
-        style="display:none;"
-      ></div>
+      <div id="replyInfo" class="reply-info" style="display:none;"></div>
       <div class="message-list" id="messageList"></div>
-      <div
-        class="chat-input-container"
-        id="chatInputContainer"
-        style="display:none;"
-      >
+      <div class="chat-input-container" id="chatInputContainer" style="display:none;">
         <!-- Hidden file input for uploading images/files -->
         <input
           type="file"
@@ -363,10 +355,7 @@
           onchange="uploadFile(this.files)"
         />
         <!-- Upload button -->
-        <button
-          class="upload-button"
-          onclick="document.getElementById('fileInput').click();"
-        >
+        <button class="upload-button" onclick="document.getElementById('fileInput').click();">
           <i class="fas fa-paperclip"></i>
         </button>
         <input
@@ -382,9 +371,10 @@
     </div>
   </div>
 
-  <!-- Firebase logic -->
   <script>
-    // Your Firebase config
+    // -----------------------------------------------------------------------
+    //  Firebase Configuration & Initialization
+    // -----------------------------------------------------------------------
     var firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -400,30 +390,66 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
+    // -----------------------------------------------------------------------
+    //  Auth & Login Check with Timeout
+    // -----------------------------------------------------------------------
+    let isLoggedIn = false;
+    let authResolved = false;
+
+    // If we don't hear back from Firebase within 10 seconds, ask user to log in
+    const authTimeout = setTimeout(() => {
+      if (!authResolved) {
+        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
+          window.location.href = "login.html"; // adjust to your login page
+        } else {
+          isLoggedIn = false;
+          authResolved = true;
+          // We can still allow them to see the UI but not send messages
+          loadContacts();
+        }
+      }
+    }, 10000);
+
+    auth.onAuthStateChanged((user) => {
+      authResolved = true;
+      clearTimeout(authTimeout);
+      if (user) {
+        isLoggedIn = true;
+        currentUser = user;
+        loadContacts();
+      } else {
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html"; // adjust to your login page
+        } else {
+          isLoggedIn = false;
+          currentUser = null;
+          loadContacts();
+        }
+      }
+    });
+
+    // -----------------------------------------------------------------------
+    //  Global Variables
+    // -----------------------------------------------------------------------
     let currentUser = null;
     let currentChatId = null;
     let currentChatIsGroup = false;
     let messageUnsubscribe = null;
-    // Holds the message being replied to (if any)
     let replyTarget = null;
 
-    // Toggle sidebar
+    let pendingUploadUrl = null;
+    let pendingUploadIsImage = false;
+
+    // -----------------------------------------------------------------------
+    //  Sidebar Toggle
+    // -----------------------------------------------------------------------
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("active");
     }
 
-    // On auth state changed
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        loadContacts();
-      } else {
-        currentUser = null;
-        loadContacts();
-      }
-    });
-
-    // Load contacts from Firestore "users" collection
+    // -----------------------------------------------------------------------
+    //  Load Contacts from Firestore
+    // -----------------------------------------------------------------------
     function loadContacts() {
       const contactList = document.getElementById("contactList");
       // Remove any existing user items except the built-in groups
@@ -431,6 +457,9 @@
       while (contactList.children.length > builtInGroupCount) {
         contactList.removeChild(contactList.lastChild);
       }
+
+      // If not logged in, we won't load or show personal direct contacts
+      if (!isLoggedIn) return;
 
       db.collection("users")
         .orderBy("displayName")
@@ -446,9 +475,8 @@
             div.className = "contact-item";
             div.onclick = () => openDirectChat(doc.id, displayName);
             div.innerHTML = `
-              <div class="contact-avatar">${displayName
-                .charAt(0)
-                .toUpperCase()}
+              <div class="contact-avatar">
+                ${displayName.charAt(0).toUpperCase()}
                 <div class="${onlineClass}"></div>
               </div>
               <div class="contact-name">${displayName}</div>
@@ -458,8 +486,14 @@
         });
     }
 
-    // Open a direct chat
+    // -----------------------------------------------------------------------
+    //  Open Direct Chat
+    // -----------------------------------------------------------------------
     function openDirectChat(otherUserId, displayName) {
+      if (!isLoggedIn) {
+        alert("You must be logged in to start a direct chat.");
+        return;
+      }
       const chatId = getChatId(otherUserId);
       currentChatId = chatId;
       currentChatIsGroup = false;
@@ -472,79 +506,88 @@
       document.getElementById("sidebar").classList.remove("active");
 
       // Ensure chat doc
-      if (currentUser) {
-        const chatDoc = db.collection("chats").doc(chatId);
-        chatDoc.get().then((docSnapshot) => {
-          if (!docSnapshot.exists) {
-            chatDoc.set({
-              participants: [currentUser.uid, otherUserId],
-              isGroup: false,
-              chatName: displayName,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            });
-          }
-        });
-      }
+      const chatDoc = db.collection("chats").doc(chatId);
+      chatDoc.get().then((docSnapshot) => {
+        if (!docSnapshot.exists) {
+          chatDoc.set({
+            participants: [currentUser.uid, otherUserId],
+            isGroup: false,
+            chatName: displayName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      });
 
       subscribeToMessages(chatId);
     }
 
     // Return a unique ID for direct chat by sorting user IDs
     function getChatId(otherUserId) {
-      if (!currentUser) return "guest_" + otherUserId;
       return [currentUser.uid, otherUserId].sort().join("_");
     }
 
-    // Open a group chat
+    // -----------------------------------------------------------------------
+    //  Open Group Chat
+    // -----------------------------------------------------------------------
     async function openGroup(groupId, groupName) {
-      currentChatId = groupId;
-      currentChatIsGroup = true;
       document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("chatInputContainer").style.display = "flex";
       document.getElementById("messageList").innerHTML = "";
       document.getElementById("replyInfo").style.display = "none";
       replyTarget = null;
 
-      let groupHeaderText = groupName;
+      currentChatId = groupId;
+      currentChatIsGroup = true;
 
-      if (currentUser) {
-        const groupDoc = db.collection("chats").doc(groupId);
-        const snap = await groupDoc.get();
-        if (!snap.exists) {
-          await groupDoc.set({
-            participants: [],
-            isGroup: true,
-            chatName: groupName,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-        }
-        // Re-fetch the doc after possible creation
-        const newSnap = await groupDoc.get();
-        const data = newSnap.data() || {};
-        const participants = data.participants || [];
-        // Ask user to join if not in participants
-        if (!participants.includes(currentUser.uid)) {
-          if (confirm(`Do you want to join ${groupName}?`)) {
-            await groupDoc.update({
-              participants: firebase.firestore.FieldValue.arrayUnion(
-                currentUser.uid
-              ),
-            });
-            participants.push(currentUser.uid);
-          }
-        }
-        // Show how many members
-        groupHeaderText = `${groupName} (${participants.length} members)`;
+      // If not logged in, just show messages (no join prompt)
+      // But user can't send messages
+      if (!isLoggedIn) {
+        document.getElementById("chatHeader").innerText = groupName + " (Login required)";
+        document.getElementById("chatInputContainer").style.display = "none";
+        subscribeToMessages(groupId);
+        return;
       }
 
+      // If logged in, ensure group doc, ask user to join if needed
+      const groupDoc = db.collection("chats").doc(groupId);
+      let snap = await groupDoc.get();
+      if (!snap.exists) {
+        await groupDoc.set({
+          participants: [],
+          isGroup: true,
+          chatName: groupName,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        snap = await groupDoc.get(); // re-fetch
+      }
+
+      const data = snap.data() || {};
+      const participants = data.participants || [];
+
+      // If user not in participants, ask them to join
+      if (!participants.includes(currentUser.uid)) {
+        if (confirm(`Do you want to join ${groupName}?`)) {
+          await groupDoc.update({
+            participants: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+          });
+          participants.push(currentUser.uid);
+        }
+      }
+
+      // Show how many members
+      const groupHeaderText = `${groupName} (${participants.length} members)`;
       document.getElementById("chatHeader").innerText = groupHeaderText;
+      document.getElementById("chatInputContainer").style.display = "flex";
+
       subscribeToMessages(groupId);
     }
 
-    // Subscribe to messages for a given chat
+    // -----------------------------------------------------------------------
+    //  Subscribe to Messages
+    // -----------------------------------------------------------------------
     function subscribeToMessages(chatId) {
-      if (messageUnsubscribe) messageUnsubscribe();
-
+      if (messageUnsubscribe) {
+        messageUnsubscribe();
+      }
       messageUnsubscribe = db
         .collection("chats")
         .doc(chatId)
@@ -556,15 +599,14 @@
           snapshot.forEach((doc) => {
             const message = doc.data();
             const msgDiv = document.createElement("div");
-            const sentByMe = currentUser && message.senderId === currentUser.uid;
+
+            const sentByMe = isLoggedIn && currentUser && (message.senderId === currentUser.uid);
             msgDiv.className = "message " + (sentByMe ? "sent" : "received");
 
             // Single or double tick
             let tickHtml = "";
             if (sentByMe) {
-              tickHtml = `<span class="tick-status">${
-                message.seen ? "✔✔" : "✔"
-              }</span>`;
+              tickHtml = `<span class="tick-status">${message.seen ? "✔✔" : "✔"}</span>`;
             }
 
             // A small reply button for every message
@@ -581,9 +623,10 @@
             let editIcon = "";
             if (sentByMe) {
               editIcon = `
-                <span class="edit-btn" onclick="openEditMenu(event, '${doc.id}', '${escapeQuotes(
-                  message.text
-                )}')">
+                <span class="edit-btn"
+                  onclick="openEditMenu(event, '${doc.id}', '${escapeQuotes(
+                    message.text
+                  )}')">
                   <i class="fas fa-edit"></i>
                 </span>
               `;
@@ -632,16 +675,21 @@
               ${editIcon}
             `;
             addMessageEventListeners(msgDiv, doc.id, message);
-
             messageList.appendChild(msgDiv);
           });
           messageList.scrollTop = messageList.scrollHeight;
         });
     }
 
-    // Prepare reply: store the reply target and show a small info
+    // -----------------------------------------------------------------------
+    //  Reply Logic
+    // -----------------------------------------------------------------------
     function prepareReply(e, msgId, msgText, senderName) {
       e.stopPropagation();
+      if (!isLoggedIn) {
+        alert("You must be logged in to reply.");
+        return;
+      }
       replyTarget = { msgId, msgText, senderName };
       const replyInfo = document.getElementById("replyInfo");
       replyInfo.innerHTML = `
@@ -659,24 +707,23 @@
       document.getElementById("replyInfo").style.display = "none";
     }
 
-    // Jump to a specific message in the chat by doc.id
     function scrollToMessage(msgId) {
       alert("Scroll to message " + msgId + " (implement if storing data attributes).");
     }
 
-    // Add event listeners for reaction panel toggling on message click
+    // -----------------------------------------------------------------------
+    //  Reaction Panel
+    // -----------------------------------------------------------------------
     function addMessageEventListeners(msgDiv, msgId, messageData) {
       msgDiv.dataset.docId = msgId;
-
       // Single click to show reaction panel (only for messages sent by me)
-      if (currentUser && messageData.senderId === currentUser.uid) {
+      if (isLoggedIn && currentUser && messageData.senderId === currentUser.uid) {
         msgDiv.addEventListener("click", () => {
           toggleReactionPanel(msgDiv, msgId);
         });
       }
     }
 
-    // Toggle reaction panel
     function toggleReactionPanel(msgDiv, msgId) {
       let panel = msgDiv.querySelector(".reaction-panel");
       if (panel) {
@@ -694,21 +741,26 @@
       panel.style.display = "flex";
     }
 
-    // Example reaction
     function reactToMessage(msgId, reaction) {
       alert("Reacted with " + reaction + " to message " + msgId);
       // In a real app, you'd update the message doc with a 'reaction' field
     }
 
-    // Send a message; if replyTarget is set, include that info
+    // -----------------------------------------------------------------------
+    //  Send Message
+    // -----------------------------------------------------------------------
     function sendMessage() {
+      if (!isLoggedIn) {
+        alert("You must be logged in to send messages.");
+        return;
+      }
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
       if (text === "" && !pendingUploadUrl) return;
 
       let message = {
-        senderId: currentUser ? currentUser.uid : "guest",
-        senderName: currentUser ? currentUser.displayName || "Anonymous" : "Guest",
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName || "Anonymous",
         text: text,
         seen: false,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -721,7 +773,6 @@
 
       // If an upload just finished, attach it
       if (pendingUploadUrl) {
-        // If it's an image
         if (pendingUploadIsImage) {
           message.imageUrl = pendingUploadUrl;
         } else {
@@ -744,11 +795,14 @@
         });
     }
 
-    // File uploading logic
-    let pendingUploadUrl = null;
-    let pendingUploadIsImage = false;
-
+    // -----------------------------------------------------------------------
+    //  File Upload Logic
+    // -----------------------------------------------------------------------
     function uploadFile(files) {
+      if (!isLoggedIn) {
+        alert("You must be logged in to upload files.");
+        return;
+      }
       if (!files || files.length === 0) return;
       const file = files[0];
       if (!file) return;
@@ -759,7 +813,6 @@
         .put(file)
         .then((snapshot) => snapshot.ref.getDownloadURL())
         .then((url) => {
-          // Check if image
           const isImage = file.type.startsWith("image/");
           pendingUploadUrl = url;
           pendingUploadIsImage = isImage;
@@ -770,7 +823,9 @@
         });
     }
 
-    // Editing or deleting a message
+    // -----------------------------------------------------------------------
+    //  Edit / Delete Messages
+    // -----------------------------------------------------------------------
     function openEditMenu(e, msgId, oldText) {
       e.stopPropagation();
       // Simple approach: prompt user for action
@@ -781,7 +836,6 @@
       if (action.toLowerCase() === "edit") {
         const newText = prompt("Enter new text", oldText);
         if (newText !== null) {
-          // Update doc
           db.collection("chats")
             .doc(currentChatId)
             .collection("messages")
@@ -805,7 +859,9 @@
       }
     }
 
-    // Helper to escape quotes in message text
+    // -----------------------------------------------------------------------
+    //  Helper to Escape Quotes
+    // -----------------------------------------------------------------------
     function escapeQuotes(str) {
       if (!str) return "";
       return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
