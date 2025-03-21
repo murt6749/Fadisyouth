@@ -1,392 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fadis Youth Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post Page</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <!-- Font Awesome for icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Reset and base styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      color: #333;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
+    /* Reset and Base Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
 
-    /* Main container fills full height */
-    .chat-container {
+    /* Top Navigation */
+    .top-nav {
       display: flex;
-      flex: 1; /* so it fills remaining vertical space */
-      overflow: hidden;
-      position: relative;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #7f7fd5, #86a8e7);
     }
-
-    /* Hamburger menu */
-    .hamburger {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    /* Sidebar (hidden by default) */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100%;
-      background: #fff;
-      border-right: 1px solid #ddd;
-      transition: left 0.3s ease;
-      z-index: 9;
-      display: flex;
-      flex-direction: column;
-    }
-    .sidebar.active {
-      left: 0;
-    }
-    .sidebar-header {
-      background: #0088cc;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    .contact-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-    .contact-item {
-      padding: 12px 15px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
+    .nav-left {
       display: flex;
       align-items: center;
-      transition: background 0.2s ease;
+      gap: 10px;
     }
-    .contact-item:hover {
-      background: #f7f7f7;
-    }
-    .contact-avatar {
-      width: 40px;
-      height: 40px;
+    .account-icon {
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
-      background: #0088cc;
-      color: #fff;
+      background: #ff6f61;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      margin-right: 10px;
-      position: relative;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
     }
-    /* Active status indicator */
-    .status-dot {
+    .chat-btn {
+      background: #fff;
+      color: #1877f2;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
+    .search-container { position: relative; }
+    .search-icon { font-size: 1.5rem; color: white; cursor: pointer; }
+    .search-box {
       position: absolute;
-      bottom: 0;
+      top: 40px;
       right: 0;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #4caf50;
-      border: 2px solid #fff;
+      width: 250px;
+      padding: 8px;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    .inactive-dot {
-      background: #aaa;
+    .search-results {
+      position: absolute;
+      top: 70px;
+      right: 0;
+      width: 250px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 100;
     }
-    .contact-name {
-      font-size: 1rem;
+    .search-result-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
     }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: #f0f2f5; }
 
-    /* Chat Window */
-    .chat-window {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #e5ddd5;
-      margin-left: 0;
-      position: relative;
+    /* Main Container */
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 20px;
     }
-    .chat-header {
-      background: #ededed;
-      padding: 15px;
-      border-bottom: 1px solid #ccc;
+    .loading {
       text-align: center;
       font-size: 1.2rem;
+      margin-top: 50px;
+    }
+
+    /* Post Card Styles */
+    .post-card {
+      background: linear-gradient(135deg, #ffffff, #fffefc);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+      padding: 20px;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .post-card:hover { transform: translateY(-3px); }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .author-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #1877f2;
+      color: white;
+      font-size: 1.2rem;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      overflow: hidden;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-info { flex-grow: 1; }
+    .author-name { font-weight: 600; }
+    .post-time { color: #65676b; font-size: 0.85em; }
+
+    .post-content { margin-bottom: 20px; }
+    .post-content h2 { margin-bottom: 10px; color: #2c3e50; }
+    .post-content p { line-height: 1.6; }
+
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      align-items: center;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .action-btn:hover { color: #1877f2; }
+    .like-btn { color: #555; }
+    .like-btn.active { color: red; }
+
+    /* Comments Section */
+    .comments-section {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .comment {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .comment-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #1877f2;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
       flex-shrink: 0;
     }
-    .message-list {
-      flex: 1; /* fill available space */
-      padding: 15px;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-    .message {
-      margin-bottom: 15px;
-      max-width: 70%;
+    .comment-content {
+      background: #f0f2f5;
       padding: 10px;
-      border-radius: 8px;
-      position: relative;
-      clear: both;
-      word-wrap: break-word;
-      background: #fff;
+      border-radius: 10px;
+      flex-grow: 1;
+      font-size: 0.95rem;
     }
-    .message.sent {
-      background: #dcf8c6;
-      margin-left: auto;
-    }
-    .message.received {
-      background: #fff;
-      margin-right: auto;
-    }
-    .message .sender-name {
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .message .message-text {
-      font-size: 1rem;
-      white-space: pre-wrap;
-    }
-    /* Show image in message if imageUrl is present */
-    .message .message-image {
-      max-width: 200px;
-      max-height: 200px;
-      display: block;
+    /* Replies hidden by default */
+    .replies-container { display: none; margin-left: 40px; margin-top: 5px; }
+    .view-replies {
+      color: blue;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-left: 40px;
       margin-top: 5px;
-      border-radius: 6px;
     }
-    /* Tick status for sent messages */
-    .message .tick-status {
-      position: absolute;
-      bottom: 4px;
-      right: 6px;
-      font-size: 0.8rem;
-      color: #999;
+    .sub-comment {
+      background: #e9ecef;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 5px;
+      font-size: 0.85rem;
     }
-    /* Small reply button */
-    .reply-btn {
-      position: absolute;
-      bottom: 4px;
-      left: 6px;
-      font-size: 0.8rem;
-      color: #0088cc;
-      cursor: pointer;
+    .comment-input-section {
+      display: none;
+      margin-top: 10px;
     }
-    /* Edit button for the sender */
-    .edit-btn {
-      position: absolute;
-      bottom: 4px;
-      right: 28px;
-      font-size: 0.8rem;
-      color: #0088cc;
-      cursor: pointer;
+    .comment-input-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    /* Reaction Panel */
-    .reaction-panel {
-      position: absolute;
-      bottom: 45px;
-      right: 10px;
-      background: #fff;
+    .comment-input {
+      flex-grow: 1;
+      padding: 10px;
       border: 1px solid #ddd;
       border-radius: 20px;
-      padding: 5px 10px;
-      display: none;
-      z-index: 5;
+      resize: none;
     }
-    .reaction-panel span {
-      cursor: pointer;
-      font-size: 1.2rem;
-      margin: 0 5px;
-    }
-
-    /* Chat Input pinned at the bottom */
-    .chat-input-container {
+    .send-btn {
+      background: #ff6f61;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
-      padding: 10px 15px;
-      background: #f0f0f0;
-      border-top: 1px solid #ddd;
-      flex-shrink: 0;
+      justify-content: center;
+      cursor: pointer;
     }
-    .chat-input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
+
+    /* New Post Form */
+    .new-post {
+      background: linear-gradient(135deg, #86a8e7, #7f7fd5);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 20px;
+      margin-top: 30px;
+      color: white;
+    }
+    .new-post h2 { margin-bottom: 15px; }
+    .new-post input[type="text"],
+    .new-post textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
       font-size: 1rem;
-      margin-right: 10px;
     }
-    .send-button {
-      background: #0088cc;
+    .new-post input[type="text"] { font-weight: 600; }
+    .new-post textarea { resize: vertical; min-height: 100px; }
+    .new-post .btn-post {
+      background: #ff6f61;
+      color: white;
       border: none;
-      color: #fff;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+      padding: 10px 20px;
+      border-radius: 8px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      margin-right: 10px;
+      font-size: 1rem;
+      transition: background 0.3s ease;
     }
-    .upload-button {
-      background: #0088cc;
-      border: none;
-      color: #fff;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
+    .new-post .btn-post:hover { background: #e65b50; }
+
+    /* No Posts Message */
+    .no-posts {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #65676b;
+      margin: 40px 0;
     }
 
-    /* Display reply info above input if replying */
-    .reply-info {
+    /* Navigation Modal */
+    .nav-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .nav-modal.active { display: flex; }
+    .nav-modal .modal-content {
       background: #fff;
-      border-left: 4px solid #0088cc;
-      padding: 5px 10px;
-      font-size: 0.9rem;
-      color: #555;
-      margin: 0 15px 5px;
-      border-radius: 4px;
-      flex-shrink: 0;
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
     }
-    .reply-info span.reply-to-text {
-      font-weight: bold;
-      color: #333;
-      cursor: pointer; /* can click to jump to original message */
+    .nav-modal h2 { margin-bottom: 10px; color: #2B5A46; }
+    .nav-modal p { margin-bottom: 20px; color: #555; }
+    .nav-modal .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .nav-modal .nav-buttons a {
+      text-decoration: none;
+      background: #86a8e7;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .nav-modal .nav-buttons a:hover { transform: translateY(-3px); }
+    .nav-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,0,0,0.8);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 5px rgba(255,0,0,0.8); }
+      to { box-shadow: 0 0 20px rgba(255,0,0,1); }
     }
 
-    /* Additional responsive adjustments */
-    @media (max-width: 768px) {
-      .chat-container {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        height: 40vh;
-        left: -100%;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-      .chat-window {
-        height: 60vh;
-      }
+    /* Edit Post Modal */
+    .edit-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 20000;
+    }
+    .edit-modal .edit-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      min-height: 400px; /* Increased height to prevent overlap */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .edit-modal .close-edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+    }
+    .edit-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .edit-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .edit-tab.active {
+      background: #7f7fd5;
+      color: white;
+    }
+    .edit-section { display: none; }
+    .edit-section.active { display: block; }
+    /* Separate the update area from the delete button */
+    .edit-post-content, .edit-reaction-content {
+      margin-bottom: 30px;
+    }
+    .edit-section input[type="text"],
+    .edit-section textarea,
+    .edit-section select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .btn-action {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-action:hover { background: #e65b50; }
+    .edit-delete-section {
+      margin-top: auto;
+      text-align: center;
+    }
+    .edit-delete-section hr {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <!-- Main container -->
-  <div class="chat-container">
-    <!-- Hamburger Icon to open sidebar -->
-    <div class="hamburger" onclick="toggleSidebar()">
-      <i class="fas fa-bars"></i>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
+      <button class="chat-btn" onclick="window.location.href='chat.html'">Chat</button>
     </div>
-
-    <!-- Sidebar with contacts -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">Contacts</div>
-      <div class="contact-list" id="contactList">
-        <!-- Built-in groups first -->
-        <div class="contact-item" onclick="openGroup('FadisYouth','Fadis Youth Group')">
-          <div class="contact-avatar" style="background:#0088cc;">F</div>
-          <div class="contact-name">Fadis Youth Group</div>
-        </div>
-        <div class="contact-item" onclick="openGroup('QuranGroup','Quran Group')">
-          <div class="contact-avatar" style="background:#0088cc;">Q</div>
-          <div class="contact-name">Quran Group</div>
-        </div>
-        <div class="contact-item" onclick="openGroup('HalalJokes','Halal Jokes')">
-          <div class="contact-avatar" style="background:#0088cc;">H</div>
-          <div class="contact-name">Halal Jokes</div>
-        </div>
-        <div class="contact-item" onclick="openGroup('IslamicChat','Islamic Chat')">
-          <div class="contact-avatar" style="background:#0088cc;">I</div>
-          <div class="contact-name">Islamic Chat</div>
-        </div>
-        <!-- Firestore users appended here -->
-      </div>
-    </div>
-
-    <!-- Chat Window -->
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-header" id="chatHeader">Select a Chat</div>
-      <div
-        id="replyInfo"
-        class="reply-info"
-        style="display:none;"
-      ></div>
-      <div class="message-list" id="messageList"></div>
-      <div
-        class="chat-input-container"
-        id="chatInputContainer"
-        style="display:none;"
-      >
-        <!-- Hidden file input for uploading images/files -->
-        <input
-          type="file"
-          id="fileInput"
-          style="display:none;"
-          accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
-          onchange="uploadFile(this.files)"
-        />
-        <!-- Upload button -->
-        <button
-          class="upload-button"
-          onclick="document.getElementById('fileInput').click();"
-        >
-          <i class="fas fa-paperclip"></i>
-        </button>
-        <input
-          type="text"
-          class="chat-input"
-          id="chatInput"
-          placeholder="Type your message..."
-        />
-        <button class="send-button" onclick="sendMessage()">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
+    <div class="search-container">
+      <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search users...">
+      <div class="search-results" id="searchResults"></div>
     </div>
   </div>
-
-  <!-- Firebase logic -->
+  
+  <div class="container">
+    <div id="loading" class="loading">Checking login status...</div>
+    <div id="postsSection" style="display:none;"></div>
+    <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
+    
+    <!-- New Post Form (visible only if logged in) -->
+    <div class="new-post" id="newPostForm" style="display:none;">
+      <h2>Create a New Post</h2>
+      <input type="text" id="postTopic" placeholder="Topic">
+      <textarea id="postBody" placeholder="What's on your mind?"></textarea>
+      <button class="btn-post" onclick="postNewPost()">Post</button>
+    </div>
+  </div>
+  
+  <!-- Navigation Modal -->
+  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeNavModal()">X</button>
+      <h2>Fadis Youth Portal</h2>
+      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
+      <div class="nav-buttons">
+        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
+        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
+        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
+      </div>
+      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
+    </div>
+  </div>
+  
+  <!-- Edit Post Modal (Injected Dynamically) -->
+  
   <script>
-    // Your Firebase config
+    // Initialize Firebase using your configuration
     var firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
       databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
       projectId: "fadis-youth",
@@ -398,418 +481,528 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    let currentUser = null;
-    let currentChatId = null;
-    let currentChatIsGroup = false;
-    let messageUnsubscribe = null;
-    // Holds the message being replied to (if any)
-    let replyTarget = null;
-
-    // Toggle sidebar
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
-
-    // On auth state changed
-    auth.onAuthStateChanged((user) => {
+    
+    let isLoggedIn = false;
+    let authResolved = false;
+    
+    // --- Auth Check: Wait until Firebase responds or 10 seconds pass ---
+    const authTimeout = setTimeout(() => {
+      if (!authResolved) {
+        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          authResolved = true;
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("postsSection").style.display = "block";
+          loadPosts();
+        }
+      }
+    }, 10000);
+    
+    auth.onAuthStateChanged(function(user) {
+      authResolved = true;
+      clearTimeout(authTimeout);
+      document.getElementById("loading").style.display = "none";
       if (user) {
-        currentUser = user;
-        loadContacts();
+        isLoggedIn = true;
+        document.getElementById("postsSection").style.display = "block";
+        document.getElementById("newPostForm").style.display = "block";
+        const displayName = user.displayName || "A";
+        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        loadPosts();
       } else {
-        currentUser = null;
-        loadContacts();
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          document.getElementById("postsSection").style.display = "block";
+          loadPosts();
+        }
       }
     });
-
-    // Load contacts from Firestore "users" collection
-    function loadContacts() {
-      const contactList = document.getElementById("contactList");
-      // Remove any existing user items except the built-in groups
-      const builtInGroupCount = 4; // Fadis, Quran, HalalJokes, IslamicChat
-      while (contactList.children.length > builtInGroupCount) {
-        contactList.removeChild(contactList.lastChild);
-      }
-
-      db.collection("users")
-        .orderBy("displayName")
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            const userData = doc.data();
-            const displayName = userData.displayName || "Unknown";
-            const onlineClass = userData.online
-              ? "status-dot"
-              : "status-dot inactive-dot";
-            const div = document.createElement("div");
-            div.className = "contact-item";
-            div.onclick = () => openDirectChat(doc.id, displayName);
-            div.innerHTML = `
-              <div class="contact-avatar">${displayName
-                .charAt(0)
-                .toUpperCase()}
-                <div class="${onlineClass}"></div>
-              </div>
-              <div class="contact-name">${displayName}</div>
-            `;
-            contactList.appendChild(div);
-          });
-        });
-    }
-
-    // Open a direct chat
-    function openDirectChat(otherUserId, displayName) {
-      const chatId = getChatId(otherUserId);
-      currentChatId = chatId;
-      currentChatIsGroup = false;
-      document.getElementById("chatHeader").innerText = displayName;
-      document.getElementById("chatInputContainer").style.display = "flex";
-      document.getElementById("messageList").innerHTML = "";
-      document.getElementById("replyInfo").style.display = "none";
-      replyTarget = null;
-
-      document.getElementById("sidebar").classList.remove("active");
-
-      // Ensure chat doc
-      if (currentUser) {
-        const chatDoc = db.collection("chats").doc(chatId);
-        chatDoc.get().then((docSnapshot) => {
-          if (!docSnapshot.exists) {
-            chatDoc.set({
-              participants: [currentUser.uid, otherUserId],
-              isGroup: false,
-              chatName: displayName,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            });
-          }
-        });
-      }
-
-      subscribeToMessages(chatId);
-    }
-
-    // Return a unique ID for direct chat by sorting user IDs
-    function getChatId(otherUserId) {
-      if (!currentUser) return "guest_" + otherUserId;
-      return [currentUser.uid, otherUserId].sort().join("_");
-    }
-
-    // Open a group chat
-    async function openGroup(groupId, groupName) {
-      currentChatId = groupId;
-      currentChatIsGroup = true;
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("chatInputContainer").style.display = "flex";
-      document.getElementById("messageList").innerHTML = "";
-      document.getElementById("replyInfo").style.display = "none";
-      replyTarget = null;
-
-      let groupHeaderText = groupName;
-
-      if (currentUser) {
-        const groupDoc = db.collection("chats").doc(groupId);
-        const snap = await groupDoc.get();
-        if (!snap.exists) {
-          await groupDoc.set({
-            participants: [],
-            isGroup: true,
-            chatName: groupName,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-        }
-        // Re-fetch the doc after possible creation
-        const newSnap = await groupDoc.get();
-        const data = newSnap.data() || {};
-        const participants = data.participants || [];
-        // Ask user to join if not in participants
-        if (!participants.includes(currentUser.uid)) {
-          if (confirm(`Do you want to join ${groupName}?`)) {
-            await groupDoc.update({
-              participants: firebase.firestore.FieldValue.arrayUnion(
-                currentUser.uid
-              ),
-            });
-            participants.push(currentUser.uid);
-          }
-        }
-        // Show how many members
-        groupHeaderText = `${groupName} (${participants.length} members)`;
-      }
-
-      document.getElementById("chatHeader").innerText = groupHeaderText;
-      subscribeToMessages(groupId);
-    }
-
-    // Subscribe to messages for a given chat
-    function subscribeToMessages(chatId) {
-      if (messageUnsubscribe) messageUnsubscribe();
-
-      messageUnsubscribe = db
-        .collection("chats")
-        .doc(chatId)
-        .collection("messages")
-        .orderBy("timestamp")
-        .onSnapshot((snapshot) => {
-          const messageList = document.getElementById("messageList");
-          messageList.innerHTML = "";
-          snapshot.forEach((doc) => {
-            const message = doc.data();
-            const msgDiv = document.createElement("div");
-            const sentByMe = currentUser && message.senderId === currentUser.uid;
-            msgDiv.className = "message " + (sentByMe ? "sent" : "received");
-
-            // Single or double tick
-            let tickHtml = "";
-            if (sentByMe) {
-              tickHtml = `<span class="tick-status">${
-                message.seen ? "✔✔" : "✔"
-              }</span>`;
-            }
-
-            // A small reply button for every message
-            const replyIcon = `
-              <span class="reply-btn"
-                onclick="prepareReply(event, '${doc.id}', '${escapeQuotes(
-                  message.text
-                )}', '${escapeQuotes(message.senderName)}')">
-                <i class="fas fa-reply"></i>
-              </span>
-            `;
-
-            // Edit/Delete icon if sent by current user
-            let editIcon = "";
-            if (sentByMe) {
-              editIcon = `
-                <span class="edit-btn" onclick="openEditMenu(event, '${doc.id}', '${escapeQuotes(
-                  message.text
-                )}')">
-                  <i class="fas fa-edit"></i>
-                </span>
-              `;
-            }
-
-            // If message has replyTo, show a small reference
-            let repliedHtml = "";
-            if (message.replyTo) {
-              repliedHtml = `
-                <div style="font-size:0.8rem; color:#666; margin-bottom:4px; border-left:2px solid #ccc; padding-left:6px;">
-                  Reply to: <span style="font-weight:bold; cursor:pointer;"
-                    onclick="scrollToMessage('${message.replyTo.msgId}')">
-                    ${message.replyTo.senderName}
-                  </span>
-                  <br>
-                  <em>${message.replyTo.msgText}</em>
-                </div>
-              `;
-            }
-
-            // If there's an imageUrl
-            let imageHtml = "";
-            if (message.imageUrl) {
-              imageHtml = `<img src="${message.imageUrl}" class="message-image" />`;
-            }
-
-            // If there's a fileUrl (non-image)
-            let fileLinkHtml = "";
-            if (message.fileUrl && !message.imageUrl) {
-              fileLinkHtml = `
-                <div style="margin-top:5px;">
-                  <a href="${message.fileUrl}" target="_blank" style="color:blue; text-decoration:underline;">
-                    View File
-                  </a>
-                </div>`;
-            }
-
-            msgDiv.innerHTML = `
-              <div class="sender-name">${message.senderName || "Guest"}</div>
-              ${repliedHtml}
-              <div class="message-text">${message.text || ""}</div>
-              ${imageHtml}
-              ${fileLinkHtml}
-              ${tickHtml}
-              ${replyIcon}
-              ${editIcon}
-            `;
-            addMessageEventListeners(msgDiv, doc.id, message);
-
-            messageList.appendChild(msgDiv);
-          });
-          messageList.scrollTop = messageList.scrollHeight;
-        });
-    }
-
-    // Prepare reply: store the reply target and show a small info
-    function prepareReply(e, msgId, msgText, senderName) {
-      e.stopPropagation();
-      replyTarget = { msgId, msgText, senderName };
-      const replyInfo = document.getElementById("replyInfo");
-      replyInfo.innerHTML = `
-        Replying to <span class="reply-to-text" onclick="scrollToMessage('${msgId}')">
-          ${senderName}
-        </span>:
-        ${msgText}
-        <span style="cursor:pointer; color:#f00; float:right;" onclick="clearReply()">✖</span>
-      `;
-      replyInfo.style.display = "block";
-    }
-
-    function clearReply() {
-      replyTarget = null;
-      document.getElementById("replyInfo").style.display = "none";
-    }
-
-    // Jump to a specific message in the chat by doc.id
-    function scrollToMessage(msgId) {
-      alert("Scroll to message " + msgId + " (implement if storing data attributes).");
-    }
-
-    // Add event listeners for reaction panel toggling on message click
-    function addMessageEventListeners(msgDiv, msgId, messageData) {
-      msgDiv.dataset.docId = msgId;
-
-      // Single click to show reaction panel (only for messages sent by me)
-      if (currentUser && messageData.senderId === currentUser.uid) {
-        msgDiv.addEventListener("click", () => {
-          toggleReactionPanel(msgDiv, msgId);
-        });
+    
+    // --- Search Functionality ---
+    function toggleSearch() {
+      const searchBox = document.getElementById("searchBox");
+      const resultsDiv = document.getElementById("searchResults");
+      if (searchBox.style.display === "block") {
+        searchBox.style.display = "none";
+        resultsDiv.style.display = "none";
+      } else {
+        searchBox.style.display = "block";
+        searchBox.focus();
       }
     }
-
-    // Toggle reaction panel
-    function toggleReactionPanel(msgDiv, msgId) {
-      let panel = msgDiv.querySelector(".reaction-panel");
-      if (panel) {
-        panel.style.display = panel.style.display === "none" ? "flex" : "none";
+    document.getElementById("searchBox").addEventListener("input", function() {
+      const query = this.value.trim();
+      const resultsDiv = document.getElementById("searchResults");
+      if(query === "") {
+        resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none";
         return;
       }
-      panel = document.createElement("div");
-      panel.className = "reaction-panel";
-      panel.innerHTML = `
-        <span onclick="reactToMessage('${msgId}', '👍')">👍</span>
-        <span onclick="reactToMessage('${msgId}', '❤️')">❤️</span>
-        <span onclick="reactToMessage('${msgId}', '😂')">😂</span>
-      `;
-      msgDiv.appendChild(panel);
-      panel.style.display = "flex";
+      db.collection("users")
+        .orderBy("displayName")
+        .startAt(query)
+        .endAt(query + "\uf8ff")
+        .limit(10)
+        .get().then(snapshot => {
+          let html = "";
+          snapshot.forEach(doc => {
+            const user = doc.data();
+            html += `<div class="search-result-item" onclick="goToUserProfile('${doc.id}')">${user.displayName}</div>`;
+          });
+          resultsDiv.innerHTML = html;
+          resultsDiv.style.display = "block";
+        });
+    });
+    function goToUserProfile(userId) {
+      window.location.href = "profile.html?uid=" + userId;
     }
-
-    // Example reaction
-    function reactToMessage(msgId, reaction) {
-      alert("Reacted with " + reaction + " to message " + msgId);
-      // In a real app, you'd update the message doc with a 'reaction' field
-    }
-
-    // Send a message; if replyTarget is set, include that info
-    function sendMessage() {
-      const input = document.getElementById("chatInput");
-      const text = input.value.trim();
-      if (text === "" && !pendingUploadUrl) return;
-
-      let message = {
-        senderId: currentUser ? currentUser.uid : "guest",
-        senderName: currentUser ? currentUser.displayName || "Anonymous" : "Guest",
-        text: text,
-        seen: false,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      };
-
-      // If replying
-      if (replyTarget) {
-        message.replyTo = { ...replyTarget };
-      }
-
-      // If an upload just finished, attach it
-      if (pendingUploadUrl) {
-        // If it's an image
-        if (pendingUploadIsImage) {
-          message.imageUrl = pendingUploadUrl;
-        } else {
-          message.fileUrl = pendingUploadUrl;
-        }
-      }
-
-      db.collection("chats")
-        .doc(currentChatId)
-        .collection("messages")
-        .add(message)
-        .then(() => {
-          input.value = "";
-          clearReply();
-          pendingUploadUrl = null;
-          pendingUploadIsImage = false;
-        })
-        .catch((err) => {
-          console.error("Error sending message:", err);
+    
+    // --- Load Posts ---
+    function loadPosts() {
+      db.collection("posts").orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+          const postsSection = document.getElementById("postsSection");
+          postsSection.innerHTML = "";
+          if (snapshot.empty) {
+            document.getElementById("noPostsMessage").style.display = "block";
+          } else {
+            document.getElementById("noPostsMessage").style.display = "none";
+            snapshot.forEach(doc => {
+              const post = doc.data();
+              postsSection.innerHTML += renderPost(doc.id, post);
+            });
+            // After rendering all posts, update follow button states
+            updateFollowButtons();
+          }
         });
     }
-
-    // File uploading logic
-    let pendingUploadUrl = null;
-    let pendingUploadIsImage = false;
-
-    function uploadFile(files) {
-      if (!files || files.length === 0) return;
-      const file = files[0];
-      if (!file) return;
-
-      const storageRef = storage.ref();
-      const fileRef = storageRef.child("chat_uploads/" + Date.now() + "_" + file.name);
-      fileRef
-        .put(file)
-        .then((snapshot) => snapshot.ref.getDownloadURL())
-        .then((url) => {
-          // Check if image
-          const isImage = file.type.startsWith("image/");
-          pendingUploadUrl = url;
-          pendingUploadIsImage = isImage;
-          alert("File uploaded. Press Send to include it in your message.");
-        })
-        .catch((err) => {
-          console.error("Error uploading file:", err);
-        });
+    
+    // --- Render a Post Card with Comment Input Section ---
+    function renderPost(id, post) {
+      let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
+      let avatarHTML = "";
+      if (post.authorAvatar) {
+        avatarHTML = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
+      } else {
+        const name = post.authorName || "A";
+        const hue = Math.floor(Math.random() * 360);
+        avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
+      }
+      let followBtn = "";
+      if (isLoggedIn && auth.currentUser && auth.currentUser.uid !== post.authorUID) {
+        followBtn = `<button class="btn-post follow-btn" id="follow-${id}" data-author="${post.authorUID}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
+      }
+      // Add edit icon if the current user is the author
+      let editIcon = "";
+      if (isLoggedIn && auth.currentUser && auth.currentUser.uid === post.authorUID) {
+        editIcon = `<div class="action-btn" onclick="openEditMenu(event, '${id}')">
+                      <i class="fas fa-edit"></i> Edit
+                    </div>`;
+      }
+      return `
+      <div class="post-card" id="post-${id}">
+        <div class="post-header">
+          ${avatarHTML}
+          <div class="author-info">
+            <div class="author-name">${post.authorName || "Anonymous"}</div>
+            <div class="post-time">${timeString}</div>
+          </div>
+          ${followBtn}
+        </div>
+        <div class="post-content">
+          <h2>${post.topic || "Untitled"}</h2>
+          <p>${post.body || ""}</p>
+        </div>
+        <div class="post-actions">
+          <div class="action-btn like-btn" onclick="toggleLike(event, '${id}')">
+            <i class="far fa-heart"></i>
+            <span class="like-count">${post.likesCount || 0}</span>
+          </div>
+          <div class="action-btn" onclick="toggleComments(event, '${id}')">
+            <i class="far fa-comment"></i> Comment
+          </div>
+          <div class="action-btn" onclick="sharePost(event, '${id}')">
+            <i class="fas fa-share"></i> Share
+          </div>
+          ${editIcon}
+        </div>
+        <div class="comments-section" id="comments-${id}"></div>
+        <!-- Comment Input Section (initially hidden) -->
+        <div class="comment-input-section" id="commentInput-${id}" style="display:none;">
+          <div class="comment-input-container">
+            <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
+            <button class="send-btn" onclick="postComment(event, '${id}')">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>`;
     }
-
-    // Editing or deleting a message
-    function openEditMenu(e, msgId, oldText) {
+    
+    // --- Update Follow Buttons on Render ---
+    function updateFollowButtons() {
+      if (!isLoggedIn || !auth.currentUser) return;
+      document.querySelectorAll('.follow-btn').forEach(btn => {
+        let authorUID = btn.getAttribute('data-author');
+        let followDocId = auth.currentUser.uid + "_" + authorUID;
+        db.collection("follows").doc(followDocId).get().then(doc => {
+          btn.innerText = doc.exists ? "Following" : "+";
+        });
+      });
+    }
+    
+    // --- Like Functionality ---
+    function toggleLike(e, postId) {
       e.stopPropagation();
-      // Simple approach: prompt user for action
-      const action = prompt(
-        "Type 'edit' to edit this message, or 'delete' to delete it.\n(Current text: " + oldText + ")"
-      );
-      if (!action) return;
-      if (action.toLowerCase() === "edit") {
-        const newText = prompt("Enter new text", oldText);
-        if (newText !== null) {
-          // Update doc
-          db.collection("chats")
-            .doc(currentChatId)
-            .collection("messages")
-            .doc(msgId)
-            .update({ text: newText })
-            .catch((err) => {
-              console.error("Error editing message:", err);
-            });
+      if (!isLoggedIn) { alert("Please log in to like posts."); return; }
+      const user = auth.currentUser;
+      const postRef = db.collection("posts").doc(postId);
+      postRef.get().then(doc => {
+        if (doc.exists) {
+          let data = doc.data();
+          let likes = data.likes || [];
+          if (likes.includes(user.uid)) {
+            likes = likes.filter(uid => uid !== user.uid);
+          } else {
+            likes.push(user.uid);
+          }
+          postRef.update({ likes: likes, likesCount: likes.length });
         }
-      } else if (action.toLowerCase() === "delete") {
-        if (confirm("Are you sure you want to delete this message?")) {
-          db.collection("chats")
-            .doc(currentChatId)
-            .collection("messages")
-            .doc(msgId)
-            .delete()
-            .catch((err) => {
-              console.error("Error deleting message:", err);
-            });
+      });
+    }
+    
+    // --- Follow Functionality ---
+    function toggleFollow(e, authorUID, postId) {
+      e.stopPropagation();
+      if (!isLoggedIn) { alert("Please log in to follow users."); return; }
+      const user = auth.currentUser;
+      const followDocId = user.uid + "_" + authorUID;
+      const followRef = db.collection("follows").doc(followDocId);
+      followRef.get().then(doc => {
+        if (doc.exists) {
+          followRef.delete().then(() => {
+            document.getElementById("follow-" + postId).innerText = "+";
+          });
+        } else {
+          followRef.set({
+            follower: user.uid,
+            following: authorUID,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            document.getElementById("follow-" + postId).innerText = "Following";
+          });
         }
+      });
+    }
+    
+    // --- Comments Functionality ---
+    function toggleComments(e, postId) {
+      e.stopPropagation();
+      const commentsSection = document.getElementById("comments-" + postId);
+      const commentInputSection = document.getElementById("commentInput-" + postId);
+      if (commentsSection.style.display === "block") {
+        commentsSection.style.display = "none";
+        commentInputSection.style.display = "none";
+      } else {
+        commentsSection.style.display = "block";
+        commentInputSection.style.display = "block";
+        loadComments(postId);
       }
     }
-
-    // Helper to escape quotes in message text
-    function escapeQuotes(str) {
-      if (!str) return "";
-      return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    
+    // Updated loadComments to group replies and add a toggle link
+    function loadComments(postId) {
+      const commentsSection = document.getElementById("comments-" + postId);
+      db.collection("posts").doc(postId).collection("comments")
+        .orderBy("timestamp", "asc")
+        .get().then(snapshot => {
+          let mainComments = [];
+          let repliesMap = {};
+          snapshot.forEach(doc => {
+            let comment = doc.data();
+            comment.id = doc.id;
+            if(comment.parentId) {
+              if(!repliesMap[comment.parentId]) {
+                repliesMap[comment.parentId] = [];
+              }
+              repliesMap[comment.parentId].push(comment);
+            } else {
+              mainComments.push(comment);
+            }
+          });
+          let html = "";
+          mainComments.forEach(comment => {
+            html += renderMainComment(comment, repliesMap[comment.id] || []);
+          });
+          commentsSection.innerHTML = html;
+        });
     }
+    
+    function renderMainComment(comment, replies) {
+      let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
+      let html = `<div class="comment">
+                    <div style="display:flex; align-items:center;">
+                      <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
+                      <div class="comment-content">
+                        <div class="comment-author">${comment.authorName || "Anonymous"}</div>
+                        <p>${comment.text}</p>
+                        <div class="comment-actions">
+                          <span>${commentTime}</span>
+                          <span onclick="toggleLikeComment(this)">Like</span>
+                          <span onclick="toggleReplyForm(this)">Reply</span>
+                        </div>
+                      </div>
+                    </div>`;
+      // If there are replies, add a "View replies" toggle link
+      if(replies.length > 0) {
+        html += `<div class="view-replies" onclick="toggleReplies(this)">View replies (${replies.length})</div>`;
+        html += `<div class="replies-container">`;
+        replies.forEach(reply => {
+          let replyTime = reply.timestamp ? new Date(reply.timestamp.toDate()).toLocaleTimeString() : "Just now";
+          html += `<div class="comment sub-comment">
+                      <div style="display:flex; align-items:center;">
+                        <div class="comment-avatar">${(reply.authorName || "U").charAt(0).toUpperCase()}</div>
+                        <div class="comment-content">
+                          <div class="comment-author">${reply.authorName || "Anonymous"}</div>
+                          <p>${reply.text}</p>
+                          <div class="comment-actions">
+                            <span>${replyTime}</span>
+                            <span onclick="toggleLikeComment(this)">Like</span>
+                            <span onclick="toggleReplyForm(this)">Reply</span>
+                          </div>
+                          <div class="reply-form" style="display:none;">
+                            <div class="comment-input-container">
+                              <textarea class="comment-input" placeholder="Write a reply..."></textarea>
+                              <button class="send-btn" onclick="postReply(event, '${comment.id}', this)">
+                                <i class="fas fa-paper-plane"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>`;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+    
+    function toggleLikeComment(el) { el.classList.toggle("active"); }
+    function toggleReplyForm(el) {
+      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
+      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
+    }
+    function toggleReplies(el) {
+      const repliesContainer = el.nextElementSibling;
+      if(repliesContainer.style.display === "none" || repliesContainer.style.display === "") {
+        repliesContainer.style.display = "block";
+        el.innerText = "Hide replies";
+      } else {
+        repliesContainer.style.display = "none";
+        // Extract number from the parent's text if needed
+        const count = repliesContainer.children.length;
+        el.innerText = `View replies (${count})`;
+      }
+    }
+    function postReply(e, parentId, btn) {
+      e.stopPropagation();
+      const replyForm = btn.closest(".reply-form");
+      const replyInput = replyForm.querySelector("textarea");
+      if(replyInput.value.trim() === "") return;
+      const user = auth.currentUser;
+      const reply = {
+        authorName: user.displayName || "User",
+        text: replyInput.value,
+        parentId: parentId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      // Here we assume the reply is added under the same post's comments collection.
+      // You might need to adjust if you want to nest further.
+      const postId = btn.getAttribute("data-postid") || parentId; 
+      db.collection("posts").doc(postId).collection("comments").add(reply)
+        .then(() => { replyInput.value = ""; replyForm.style.display = "none"; loadComments(postId); });
+    }
+    
+    // Post Comment using the comment input section
+    function postComment(e, postId) {
+      e.stopPropagation();
+      const commentInput = document.getElementById("commentText-" + postId);
+      if (!commentInput || commentInput.value.trim() === "") return;
+      const user = auth.currentUser;
+      const comment = {
+        authorName: user.displayName || "User",
+        text: commentInput.value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("posts").doc(postId).collection("comments").add(comment)
+        .then(() => { commentInput.value = ""; loadComments(postId); });
+    }
+    
+    // --- Share Functionality ---
+    function sharePost(e, postId) {
+      e.stopPropagation();
+      const postURL = window.location.href + "#post-" + postId;
+      if (navigator.share) {
+        navigator.share({ title: "Check out this post", url: postURL })
+          .catch(err => console.error("Error sharing:", err));
+      } else {
+        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
+      }
+    }
+    
+    // --- New Post Functionality ---
+    function postNewPost() {
+      const topic = document.getElementById("postTopic").value.trim();
+      const body = document.getElementById("postBody").value.trim();
+      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
+      if (!isLoggedIn) { alert("Please log in to create posts."); return; }
+      const user = auth.currentUser;
+      const post = {
+        authorName: user.displayName || "Anonymous",
+        authorUID: user.uid,
+        authorAvatar: user.photoURL || null,
+        topic: topic,
+        body: body,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0,
+        // Default reaction permissions and visibility
+        allowLike: true,
+        allowShare: true,
+        allowComment: true,
+        visibility: "public"
+      };
+      db.collection("posts").add(post)
+        .then(() => {
+          document.getElementById("postTopic").value = "";
+          document.getElementById("postBody").value = "";
+        })
+        .catch(error => { console.error("Error posting new post:", error); });
+    }
+    
+    // --- Navigation Modal ---
+    function openNavModal() {
+      document.getElementById("navModal").classList.add("active");
+    }
+    function closeNavModal() {
+      document.getElementById("navModal").classList.remove("active");
+    }
+    
+    // --- Edit Post Modal Functionality ---
+    function openEditMenu(e, postId) {
+      e.stopPropagation();
+      // Fetch current post data
+      db.collection("posts").doc(postId).get().then(doc => {
+        if (!doc.exists) return;
+        const postData = doc.data();
+        // Create modal container with updated layout:
+        const modal = document.createElement("div");
+        modal.className = "edit-modal";
+        modal.innerHTML = `
+          <div class="edit-content">
+            <button class="close-edit" onclick="this.parentElement.parentElement.remove()">X</button>
+            <div class="edit-tabs">
+              <div class="edit-tab active" data-tab="postTab" onclick="switchEditTab(event)">Post</div>
+              <div class="edit-tab" data-tab="reactionTab" onclick="switchEditTab(event)">Reactions & Visibility</div>
+            </div>
+            <div id="postTab" class="edit-section active">
+              <div class="edit-post-content">
+                <input type="text" id="editTopic" placeholder="Topic" value="${postData.topic || ''}">
+                <textarea id="editBody" placeholder="Post body">${postData.body || ''}</textarea>
+                <button class="btn-action update-post-btn" onclick="updatePost('${postId}')">Update Post</button>
+              </div>
+            </div>
+            <div id="reactionTab" class="edit-section">
+              <div class="edit-reaction-content">
+                <label><input type="checkbox" id="editAllowLike" ${postData.allowLike ? 'checked' : ''}> Allow Likes</label><br>
+                <label><input type="checkbox" id="editAllowShare" ${postData.allowShare ? 'checked' : ''}> Allow Shares</label><br>
+                <label><input type="checkbox" id="editAllowComment" ${postData.allowComment ? 'checked' : ''}> Allow Comments</label><br>
+                <select id="editVisibility">
+                  <option value="public" ${postData.visibility==="public" ? "selected" : ""}>Public</option>
+                  <option value="private" ${postData.visibility==="private" ? "selected" : ""}>Private</option>
+                  <option value="friends" ${postData.visibility==="friends" ? "selected" : ""}>Friends</option>
+                </select>
+                <button class="btn-action update-reaction-btn" onclick="updatePost('${postId}')">Update Settings</button>
+              </div>
+            </div>
+            <div class="edit-delete-section">
+              <hr>
+              <button class="btn-action delete-post-btn" style="background:red;" onclick="deletePost('${postId}', this)">Delete Post</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+      });
+    }
+    
+    function switchEditTab(e) {
+      const tabs = e.target.parentElement.querySelectorAll(".edit-tab");
+      tabs.forEach(tab => tab.classList.remove("active"));
+      e.target.classList.add("active");
+      const sections = e.target.parentElement.parentElement.querySelectorAll(".edit-section");
+      sections.forEach(sec => sec.classList.remove("active"));
+      document.getElementById(e.target.getAttribute("data-tab")).classList.add("active");
+    }
+    
+    function updatePost(postId) {
+      // Retrieve updated values from the modal
+      const newTopic = document.getElementById("editTopic").value.trim();
+      const newBody = document.getElementById("editBody").value.trim();
+      const allowLike = document.getElementById("editAllowLike").checked;
+      const allowShare = document.getElementById("editAllowShare").checked;
+      const allowComment = document.getElementById("editAllowComment").checked;
+      const visibility = document.getElementById("editVisibility").value;
+      if(newTopic === "" || newBody === "") {
+        alert("Topic and body cannot be empty.");
+        return;
+      }
+      db.collection("posts").doc(postId).update({
+        topic: newTopic,
+        body: newBody,
+        allowLike: allowLike,
+        allowShare: allowShare,
+        allowComment: allowComment,
+        visibility: visibility
+      }).then(() => {
+        // Remove the modal after update
+        document.querySelector(".edit-modal").remove();
+      }).catch(err => {
+        console.error("Error updating post:", err);
+      });
+    }
+    
+    function deletePost(postId, btn) {
+      if(confirm("Are you sure you want to delete this post?")) {
+        db.collection("posts").doc(postId).delete().then(() => {
+          // Remove the modal
+          document.querySelector(".edit-modal").remove();
+        }).catch(err => {
+          console.error("Error deleting post:", err);
+        });
+      }
+    }
+    
+    // --- Sparkle Animation ---
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.post-card').forEach(card => {
+        let sparkleContainer = document.createElement('div');
+        sparkleContainer.className = 'sparkles';
+        card.appendChild(sparkleContainer);
+        for(let i = 0; i < 15; i++){
+          const sparkle = document.createElement('div');
+          sparkle.className = 'sparkle';
+          sparkle.style.left = Math.random() * 100 + '%';
+          sparkle.style.top = Math.random() * 100 + '%';
+          sparkle.style.animationDelay = Math.random() * 1.5 + 's';
+          sparkleContainer.appendChild(sparkle);
+        }
+      });
+    });
   </script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </body>
 </html>
