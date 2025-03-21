@@ -11,7 +11,7 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Reset & Typography */
+    /* Reset and Base Styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
     
@@ -230,7 +230,7 @@
       margin: 40px 0;
     }
     
-    /* Navigation Modal (opens when avatar is clicked) */
+    /* Navigation Modal (opens when account icon is clicked) */
     .nav-modal {
       display: none;
       position: fixed;
@@ -280,12 +280,12 @@
       padding: 5px 10px;
       border-radius: 50%;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+      box-shadow: 0 0 10px rgba(255,0,0,0.8);
       animation: glow 1.5s infinite alternate;
     }
     @keyframes glow {
-      from { box-shadow: 0 0 5px rgba(255, 0, 0, 0.8); }
-      to { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+      from { box-shadow: 0 0 5px rgba(255,0,0,0.8); }
+      to { box-shadow: 0 0 20px rgba(255,0,0,1); }
     }
     
     /* Sparkle Animation */
@@ -319,7 +319,7 @@
   </div>
   
   <div class="container">
-    <div id="loading" class="loading">Checking login status...</div>
+    <div id="loading" class="loading">Checking login status…</div>
     <div id="postsSection" style="display:none;"></div>
     <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
     
@@ -332,7 +332,7 @@
     </div>
   </div>
   
-  <!-- Navigation Modal (opens only when avatar is clicked) -->
+  <!-- Navigation Modal (opens when account icon is clicked) -->
   <div class="nav-modal" id="navModal" onclick="closeNavModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="close-btn" onclick="closeNavModal()">X</button>
@@ -348,7 +348,7 @@
   </div>
   
   <script>
-    // Initialize Firebase – replace with your own configuration
+    // Initialize Firebase – REPLACE the following config with your project config.
     var firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -363,14 +363,53 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    // Global flag to track login state
     let isLoggedIn = false;
+    let authResolved = false;
+    
+    // --- Auth Check: Wait until Firebase responds (up to 10 seconds) ---
+    const authTimeout = setTimeout(() => {
+      if (!authResolved) {
+        // If after 10 seconds no auth state is determined, ask the visitor.
+        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          authResolved = true;
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("postsSection").style.display = "block";
+          loadPosts();
+        }
+      }
+    }, 10000);
+    
+    auth.onAuthStateChanged(function(user) {
+      authResolved = true;
+      clearTimeout(authTimeout);
+      document.getElementById("loading").style.display = "none";
+      if (user) {
+        isLoggedIn = true;
+        document.getElementById("postsSection").style.display = "block";
+        document.getElementById("newPostForm").style.display = "block";
+        const displayName = user.displayName || "A";
+        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        loadPosts();
+      } else {
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          document.getElementById("postsSection").style.display = "block";
+          // New Post form remains hidden.
+          loadPosts();
+        }
+      }
+    });
     
     // --- Search Functionality ---
     function toggleSearch() {
       const searchBox = document.getElementById("searchBox");
       const resultsDiv = document.getElementById("searchResults");
-      if(searchBox.style.display === "block") {
+      if (searchBox.style.display === "block") {
         searchBox.style.display = "none";
         resultsDiv.style.display = "none";
       } else {
@@ -381,12 +420,11 @@
     document.getElementById("searchBox").addEventListener("input", function() {
       const query = this.value.trim();
       const resultsDiv = document.getElementById("searchResults");
-      if(query === "") {
+      if (query === "") {
         resultsDiv.innerHTML = "";
         resultsDiv.style.display = "none";
         return;
       }
-      // Query the "users" collection by displayName
       db.collection("users").where("displayName", ">=", query)
         .where("displayName", "<=", query + "\uf8ff")
         .limit(10)
@@ -403,30 +441,6 @@
     function goToUserProfile(userId) {
       window.location.href = "profile.html?uid=" + userId;
     }
-    
-    // --- Auth Check ---
-    auth.onAuthStateChanged(function(user) {
-      // Remove the loading message as soon as Firebase responds
-      document.getElementById("loading").style.display = "none";
-      if (user) {
-        isLoggedIn = true;
-        document.getElementById("postsSection").style.display = "block";
-        document.getElementById("newPostForm").style.display = "block";
-        const displayName = user.displayName || "A";
-        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
-        loadPosts();
-      } else {
-        // Ask the visitor if they want to log in
-        if (confirm("You are not logged in. Do you want to log in?")) {
-          window.location.href = "login.html";
-        } else {
-          isLoggedIn = false;
-          document.getElementById("postsSection").style.display = "block";
-          // New post form remains hidden
-          loadPosts();
-        }
-      }
-    });
     
     // --- Load Posts ---
     function loadPosts() {
@@ -556,21 +570,21 @@
             const comment = doc.data();
             let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
             html += `<div class="comment">
-                      <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
-                      <div class="comment-content">
-                        <div class="comment-author">${comment.authorName || "Anonymous"}</div>
-                        <p>${comment.text}</p>
-                        <div class="comment-actions">
-                          <span>${commentTime}</span>
-                          <span onclick="toggleLikeComment(this)">Like</span>
-                          <span onclick="toggleReplyForm(this)">Reply</span>
+                        <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
+                        <div class="comment-content">
+                          <div class="comment-author">${comment.authorName || "Anonymous"}</div>
+                          <p>${comment.text}</p>
+                          <div class="comment-actions">
+                            <span>${commentTime}</span>
+                            <span onclick="toggleLikeComment(this)">Like</span>
+                            <span onclick="toggleReplyForm(this)">Reply</span>
+                          </div>
+                          <div class="reply-form" style="display:none;">
+                            <textarea class="comment-input" placeholder="Write a reply..."></textarea>
+                            <button class="btn-post" onclick="postReply(event, '${postId}', this)">Post</button>
+                          </div>
                         </div>
-                        <div class="reply-form" style="display:none;">
-                          <textarea class="comment-input" placeholder="Write a reply..."></textarea>
-                          <button class="btn-post" onclick="postReply(event, '${postId}', this)">Post</button>
-                        </div>
-                      </div>
-                    </div>`;
+                      </div>`;
           });
           commentsSection.innerHTML = html;
         });
@@ -603,7 +617,9 @@
         navigator.share({ title: "Check out this post", url: postURL })
           .catch(err => console.error("Error sharing:", err));
       } else {
-        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
+        navigator.clipboard.writeText(postURL).then(() => {
+          alert("Post URL copied to clipboard.");
+        });
       }
     }
     
@@ -635,31 +651,7 @@
         .catch(error => { console.error("Error posting new post:", error); });
     }
     
-    // --- Firebase Auth Check ---
-    firebase.auth().onAuthStateChanged(function(user) {
-      // The onAuthStateChanged callback is now used to show or disable functionality immediately.
-      document.getElementById("loading").style.display = "none";
-      if (user) {
-        isLoggedIn = true;
-        document.getElementById("postsSection").style.display = "block";
-        document.getElementById("newPostForm").style.display = "block";
-        const displayName = user.displayName || "A";
-        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
-        loadPosts();
-      } else {
-        // Show a confirm dialog to let the visitor decide whether to log in.
-        if (confirm("You are not logged in. Do you want to log in?")) {
-          window.location.href = "login.html";
-        } else {
-          isLoggedIn = false;
-          document.getElementById("postsSection").style.display = "block";
-          // New Post form remains hidden.
-          loadPosts();
-        }
-      }
-    });
-    
-    // --- Navigation Modal (opens only when the avatar is clicked) ---
+    // --- Navigation Modal ---
     function openNavModal() {
       document.getElementById("navModal").classList.add("active");
     }
