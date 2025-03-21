@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Post Dashboard</title>
+  <!-- Firebase Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Reset and Base Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
+    
+    /* Top Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #7f7fd5, #86a8e7);
+    }
+    .account-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #ff6f61;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+    
+    /* Main Container */
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 20px;
+    }
+    .loading { text-align: center; font-size: 1.2rem; margin-top: 50px; }
+    
+    /* Dashboard Heading */
+    h1 { margin-bottom: 20px; text-align: center; color: #2B5A46; }
+    
+    /* New Post Form */
+    .new-post {
+      background: linear-gradient(135deg, #86a8e7, #7f7fd5);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 20px;
+      margin-bottom: 30px;
+      color: white;
+    }
+    .new-post h2 { margin-bottom: 15px; }
+    .new-post input[type="text"],
+    .new-post textarea,
+    .new-post select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .new-post input[type="text"] { font-weight: 600; }
+    .new-post textarea { resize: vertical; min-height: 100px; }
+    .new-post .btn-post {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+    .new-post .btn-post:hover { background: #e65b50; }
+    
+    /* Post Card Styles */
+    .post-card {
+      background: linear-gradient(135deg, #ffffff, #fffefc);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+      padding: 20px;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .post-card:hover { transform: translateY(-3px); }
+    
+    .post-header { display: flex; align-items: center; margin-bottom: 15px; }
+    .author-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #1877f2;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      overflow: hidden;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-info { flex-grow: 1; }
+    .author-name { font-weight: 600; }
+    .post-time { color: #65676b; font-size: 0.85em; }
+    
+    .post-content { margin-bottom: 20px; }
+    .post-content h2 { margin-bottom: 10px; color: #2c3e50; }
+    .post-content p { line-height: 1.6; }
+    
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      align-items: center;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .action-btn:hover { color: #1877f2; }
+    .like-btn.active { color: #1877f2; }
+    
+    /* Privacy Selector */
+    .privacy-selector {
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .privacy-selector select {
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+    
+    /* Edit & Delete Buttons on Each Post */
+    .post-controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .btn-control {
+      background: #1877f2;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s ease;
+    }
+    .btn-control.delete { background: #d9534f; }
+    .btn-control:hover { opacity: 0.9; }
+    
+    /* Comments Section */
+    .comments-section {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .comment {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .comment-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #1877f2;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    .comment-content {
+      background: #f0f2f5;
+      padding: 10px;
+      border-radius: 10px;
+      flex-grow: 1;
+    }
+    .comment-input-section { margin-top: 10px; display: none; }
+    .comment-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      resize: none;
+    }
+    
+    /* No Posts Message */
+    .no-posts {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #65676b;
+      margin: 40px 0;
+    }
+    
+    /* Navigation Modal */
+    .nav-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .nav-modal.active { display: flex; }
+    .nav-modal .modal-content {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+    .nav-modal h2 { margin-bottom: 10px; color: #2B5A46; }
+    .nav-modal p { margin-bottom: 20px; color: #555; }
+    .nav-modal .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .nav-modal .nav-buttons a {
+      text-decoration: none;
+      background: #86a8e7;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .nav-modal .nav-buttons a:hover { transform: translateY(-3px); }
+    .nav-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,0,0,0.8);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 5px rgba(255,0,0,0.8); }
+      to { box-shadow: 0 0 20px rgba(255,0,0,1); }
+    }
+    
+    /* Sparkle Animation */
+    .sparkles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .sparkle {
+      position: absolute;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      animation: sparkle 1.5s infinite;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
+    <div class="search-container">
+      <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search users...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <h1>My Post Dashboard</h1>
+    <div id="loading" class="loading">Checking login status...</div>
+    <div id="postsSection" style="display:none;"></div>
+    <div id="noPostsMessage" class="no-posts" style="display:none;">No posts yet. Be the first to post!</div>
+    
+    <!-- New Post Form (only visible if logged in) -->
+    <div class="new-post" id="newPostForm" style="display:none;">
+      <h2>Create a New Post</h2>
+      <input type="text" id="postTopic" placeholder="Topic">
+      <textarea id="postBody" placeholder="What's on your mind?"></textarea>
+      <!-- Privacy options: public, private, followers only -->
+      <div class="privacy-selector">
+        <select id="postPrivacy">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+          <option value="followers">Followers Only</option>
+        </select>
+      </div>
+      <button class="btn-post" onclick="postNewPost()">Post</button>
+    </div>
+    
+    <!-- Section for listing user's posts -->
+    <div id="userPostsSection"></div>
+  </div>
+  
+  <!-- Edit Post Modal -->
+  <div class="nav-modal" id="editModal" onclick="closeEditModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeEditModal()">X</button>
+      <h2>Edit Post</h2>
+      <input type="text" id="editTopic" placeholder="Topic">
+      <textarea id="editBody" placeholder="What's on your mind?"></textarea>
+      <div class="privacy-selector">
+        <select id="editPrivacy">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+          <option value="followers">Followers Only</option>
+        </select>
+      </div>
+      <button class="btn-post" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+  
+  <!-- Navigation Modal for Top Navigation (if needed) -->
+  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeNavModal()">X</button>
+      <h2>Fadis Youth Portal</h2>
+      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
+      <div class="nav-buttons">
+        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
+        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
+        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
+      </div>
+      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
+    </div>
+  </div>
+  
+  <script>
+    // Initialize Firebase using your configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+      measurementId: "G-Z02SPW9ZKW"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let isLoggedIn = false;
+    let authResolved = false;
+    
+    // --- Auth Check: Wait until Firebase responds or 10 seconds pass ---
+    const authTimeout = setTimeout(() => {
+      if (!authResolved) {
+        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          authResolved = true;
+          document.getElementById("loading").style.display = "none";
+          loadUserPosts();
+        }
+      }
+    }, 10000);
+    
+    auth.onAuthStateChanged(function(user) {
+      authResolved = true;
+      clearTimeout(authTimeout);
+      document.getElementById("loading").style.display = "none";
+      if (user) {
+        isLoggedIn = true;
+        document.getElementById("newPostForm").style.display = "block";
+        const displayName = user.displayName || "A";
+        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        loadUserPosts();
+      } else {
+        if (confirm("You are not logged in. Do you want to log in?")) {
+          window.location.href = "login.html";
+        } else {
+          isLoggedIn = false;
+          loadUserPosts();
+        }
+      }
+    });
+    
+    // --- Search Functionality (same as before) ---
+    function toggleSearch() {
+      const searchBox = document.getElementById("searchBox");
+      const resultsDiv = document.getElementById("searchResults");
+      if (searchBox.style.display === "block") {
+        searchBox.style.display = "none";
+        resultsDiv.style.display = "none";
+      } else {
+        searchBox.style.display = "block";
+        searchBox.focus();
+      }
+    }
+    document.getElementById("searchBox").addEventListener("input", function() {
+      const query = this.value.trim();
+      const resultsDiv = document.getElementById("searchResults");
+      if(query === "") {
+        resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none";
+        return;
+      }
+      db.collection("users").where("displayName", ">=", query)
+        .where("displayName", "<=", query + "\uf8ff")
+        .limit(10)
+        .get().then(snapshot => {
+          let html = "";
+          snapshot.forEach(doc => {
+            const user = doc.data();
+            html += `<div class="search-result-item" onclick="goToUserProfile('${doc.id}')">${user.displayName}</div>`;
+          });
+          resultsDiv.innerHTML = html;
+          resultsDiv.style.display = "block";
+        });
+    });
+    function goToUserProfile(userId) {
+      window.location.href = "profile.html?uid=" + userId;
+    }
+    
+    // --- Load User Posts (only posts by current user) ---
+    function loadUserPosts() {
+      let query;
+      if (isLoggedIn && auth.currentUser) {
+        query = db.collection("posts").where("authorUID", "==", auth.currentUser.uid)
+                  .orderBy("timestamp", "desc");
+      } else {
+        // If not logged in, load no posts or load public posts if you wish
+        query = db.collection("posts").orderBy("timestamp", "desc");
+      }
+      query.onSnapshot(snapshot => {
+        const postsSection = document.getElementById("userPostsSection");
+        postsSection.innerHTML = "";
+        if (snapshot.empty) {
+          document.getElementById("noPostsMessage").style.display = "block";
+        } else {
+          document.getElementById("noPostsMessage").style.display = "none";
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            postsSection.innerHTML += renderUserPost(doc.id, post);
+          });
+        }
+      });
+    }
+    
+    // --- Render a User Post Card with Controls ---
+    function renderUserPost(id, post) {
+      let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
+      let avatarHTML = "";
+      if (post.authorAvatar) {
+        avatarHTML = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
+      } else {
+        const name = post.authorName || "A";
+        const hue = Math.floor(Math.random() * 360);
+        avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
+      }
+      return `
+      <div class="post-card" id="post-${id}">
+        <div class="post-header">
+          ${avatarHTML}
+          <div class="author-info">
+            <div class="author-name">${post.authorName || "Anonymous"}</div>
+            <div class="post-time">${timeString}</div>
+          </div>
+        </div>
+        <div class="post-content">
+          <h2>${post.topic || "Untitled"}</h2>
+          <p>${post.body || ""}</p>
+          <div class="privacy-selector">
+            <label>Visibility:
+              <select onchange="updatePrivacy('${id}', this.value)">
+                <option value="public" ${post.privacy === "public" ? "selected" : ""}>Public</option>
+                <option value="private" ${post.privacy === "private" ? "selected" : ""}>Private</option>
+                <option value="followers" ${post.privacy === "followers" ? "selected" : ""}>Followers Only</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="post-actions">
+          <div class="action-btn like-btn" onclick="toggleLike(event, '${id}')">
+            <i class="far fa-heart"></i>
+            <span class="like-count">${post.likesCount || 0}</span>
+          </div>
+          <div class="action-btn" onclick="toggleComments(event, '${id}')">
+            <i class="far fa-comment"></i> Comment
+          </div>
+          <div class="action-btn" onclick="sharePost(event, '${id}')">
+            <i class="fas fa-share"></i> Share
+          </div>
+        </div>
+        <div class="post-controls">
+          <button class="btn-control" onclick="openEditModal('${id}')">Edit</button>
+          <button class="btn-control delete" onclick="deletePost('${id}')">Delete</button>
+        </div>
+        <div class="comments-section" id="comments-${id}"></div>
+        <div class="comment-input-section" id="commentInput-${id}" style="display:none;">
+          <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
+          <button class="btn-post" onclick="postComment(event, '${id}')">Post Comment</button>
+        </div>
+      </div>`;
+    }
+    
+    // --- Update Privacy for a Post ---
+    function updatePrivacy(postId, privacySetting) {
+      // privacySetting can be "public", "private", or "followers"
+      db.collection("posts").doc(postId).update({ privacy: privacySetting })
+        .then(() => { alert("Privacy updated."); })
+        .catch(err => console.error("Error updating privacy:", err));
+    }
+    
+    // --- Like Functionality ---
+    function toggleLike(e, postId) {
+      e.stopPropagation();
+      if (!isLoggedIn) { alert("Please log in to like posts."); return; }
+      const user = auth.currentUser;
+      const postRef = db.collection("posts").doc(postId);
+      postRef.get().then(doc => {
+        if (doc.exists) {
+          let data = doc.data();
+          let likes = data.likes || [];
+          if (likes.includes(user.uid)) {
+            likes = likes.filter(uid => uid !== user.uid);
+          } else {
+            likes.push(user.uid);
+          }
+          postRef.update({ likes: likes, likesCount: likes.length });
+        }
+      });
+    }
+    
+    // --- Delete Post ---
+    function deletePost(postId) {
+      if (confirm("Are you sure you want to delete this post?")) {
+        db.collection("posts").doc(postId).delete()
+          .then(() => { alert("Post deleted."); })
+          .catch(err => console.error("Error deleting post:", err));
+      }
+    }
+    
+    // --- Edit Post Modal ---
+    let currentEditPostId = null;
+    function openEditModal(postId) {
+      currentEditPostId = postId;
+      // Load the post data and populate the modal fields
+      db.collection("posts").doc(postId).get().then(doc => {
+        if (doc.exists) {
+          const post = doc.data();
+          document.getElementById("editTopic").value = post.topic || "";
+          document.getElementById("editBody").value = post.body || "";
+          document.getElementById("editPrivacy").value = post.privacy || "public";
+          document.getElementById("editModal").style.display = "flex";
+        }
+      });
+    }
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+      currentEditPostId = null;
+    }
+    function saveEdit() {
+      const newTopic = document.getElementById("editTopic").value.trim();
+      const newBody = document.getElementById("editBody").value.trim();
+      const newPrivacy = document.getElementById("editPrivacy").value;
+      if(newTopic === "" || newBody === "") {
+        alert("Topic and body cannot be empty.");
+        return;
+      }
+      db.collection("posts").doc(currentEditPostId).update({
+        topic: newTopic,
+        body: newBody,
+        privacy: newPrivacy,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() // update timestamp if desired
+      }).then(() => {
+        alert("Post updated.");
+        closeEditModal();
+      }).catch(err => console.error("Error updating post:", err));
+    }
+    
+    // --- Follow Functionality ---
+    function toggleFollow(e, authorUID, postId) {
+      e.stopPropagation();
+      if (!isLoggedIn) { alert("Please log in to follow users."); return; }
+      const user = auth.currentUser;
+      const followDocId = user.uid + "_" + authorUID;
+      const followRef = db.collection("follows").doc(followDocId);
+      followRef.get().then(doc => {
+        if (doc.exists) {
+          followRef.delete().then(() => {
+            alert("Unfollowed.");
+          });
+        } else {
+          followRef.set({
+            follower: user.uid,
+            following: authorUID,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            alert("Now following.");
+          });
+        }
+      });
+    }
+    
+    // --- Comments Functionality ---
+    function toggleComments(e, postId) {
+      e.stopPropagation();
+      const commentsSection = document.getElementById("comments-" + postId);
+      const commentInputSection = document.getElementById("commentInput-" + postId);
+      if (commentsSection.style.display === "block") {
+        commentsSection.style.display = "none";
+        commentInputSection.style.display = "none";
+      } else {
+        commentsSection.style.display = "block";
+        commentInputSection.style.display = "block";
+        loadComments(postId);
+      }
+    }
+    function loadComments(postId) {
+      const commentsSection = document.getElementById("comments-" + postId);
+      db.collection("posts").doc(postId).collection("comments")
+        .orderBy("timestamp", "asc")
+        .onSnapshot(snapshot => {
+          let html = "";
+          snapshot.forEach(doc => {
+            const comment = doc.data();
+            let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
+            html += `<div class="comment">
+                        <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
+                        <div class="comment-content">
+                          <div class="comment-author">${comment.authorName || "Anonymous"}</div>
+                          <p>${comment.text}</p>
+                          <div class="comment-actions">
+                            <span>${commentTime}</span>
+                            <span onclick="toggleLikeComment(this)">Like</span>
+                            <span onclick="toggleReplyForm(this)">Reply</span>
+                          </div>
+                          <div class="reply-form" style="display:none;">
+                            <textarea class="comment-input" placeholder="Write a reply..."></textarea>
+                            <button class="btn-post" onclick="postReply(event, '${postId}', this)">Post</button>
+                          </div>
+                        </div>
+                      </div>`;
+          });
+          commentsSection.innerHTML = html;
+        });
+    }
+    function toggleLikeComment(el) { el.classList.toggle("active"); }
+    function toggleReplyForm(el) {
+      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
+      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
+    }
+    function postReply(e, postId, btn) {
+      e.stopPropagation();
+      const replyForm = btn.closest(".reply-form");
+      const replyInput = replyForm.querySelector("textarea");
+      if(replyInput.value.trim() === "") return;
+      const user = auth.currentUser;
+      const reply = {
+        authorName: user.displayName || "User",
+        text: replyInput.value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("posts").doc(postId).collection("comments").add(reply)
+        .then(() => { replyInput.value = ""; replyForm.style.display = "none"; });
+    }
+    
+    // --- Post Comment using the comment input section ---
+    function postComment(e, postId) {
+      e.stopPropagation();
+      const commentInput = document.getElementById("commentText-" + postId);
+      if (!commentInput || commentInput.value.trim() === "") return;
+      const user = auth.currentUser;
+      const comment = {
+        authorName: user.displayName || "User",
+        text: commentInput.value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("posts").doc(postId).collection("comments").add(comment)
+        .then(() => { commentInput.value = ""; });
+    }
+    
+    // --- Share Functionality ---
+    function sharePost(e, postId) {
+      e.stopPropagation();
+      const postURL = window.location.href + "#post-" + postId;
+      if (navigator.share) {
+        navigator.share({ title: "Check out this post", url: postURL })
+          .catch(err => console.error("Error sharing:", err));
+      } else {
+        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
+      }
+    }
+    
+    // --- New Post Functionality ---
+    function postNewPost() {
+      const topic = document.getElementById("postTopic").value.trim();
+      const body = document.getElementById("postBody").value.trim();
+      const privacy = document.getElementById("postPrivacy").value;
+      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
+      if (!isLoggedIn) { alert("Please log in to create posts."); return; }
+      const user = auth.currentUser;
+      const post = {
+        authorName: user.displayName || "Anonymous",
+        authorUID: user.uid,
+        authorAvatar: user.photoURL || null,
+        topic: topic,
+        body: body,
+        privacy: privacy, // store privacy setting
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0
+      };
+      db.collection("posts").add(post)
+        .then(() => {
+          document.getElementById("postTopic").value = "";
+          document.getElementById("postBody").value = "";
+        })
+        .catch(error => { console.error("Error posting new post:", error); });
+    }
+    
+    // --- Navigation Modal (opens when account icon is clicked) ---
+    function openNavModal() {
+      document.getElementById("navModal").classList.add("active");
+    }
+    function closeNavModal() {
+      document.getElementById("navModal").classList.remove("active");
+    }
+    
+    // --- Sparkle Animation ---
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.post-card').forEach(card => {
+        let sparkleContainer = document.createElement('div');
+        sparkleContainer.className = 'sparkles';
+        card.appendChild(sparkleContainer);
+        for(let i = 0; i < 15; i++){
+          const sparkle = document.createElement('div');
+          sparkle.className = 'sparkle';
+          sparkle.style.left = Math.random() * 100 + '%';
+          sparkle.style.top = Math.random() * 100 + '%';
+          sparkle.style.animationDelay = Math.random() * 1.5 + 's';
+          sparkleContainer.appendChild(sparkle);
+        }
+      });
+    });
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</body>
+</html>
