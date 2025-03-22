@@ -376,15 +376,16 @@
     //  Firebase Configuration & Initialization
     // -----------------------------------------------------------------------
     var firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "fadis-youth.firebaseapp.com",
-      databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
-      projectId: "fadis-youth",
-      storageBucket: "fadis-youth.firebasestorage.app",
-      messagingSenderId: "1067077305340",
-      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
-      measurementId: "G-Z02SPW9ZKW"
-    };
+  apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+  authDomain: "fadis-youth.firebaseapp.com",
+  databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
+  projectId: "fadis-youth",
+  storageBucket: "fadis-youth.firebasestorage.app",
+  messagingSenderId: "1067077305340",
+  appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
+  measurementId: "G-Z02SPW9ZKW"
+};
+firebase.initializeApp(firebaseConfig);
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
