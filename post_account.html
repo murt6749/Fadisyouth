@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Stats</title>
+  <title>My Stats & Post</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -54,27 +54,58 @@
       max-height: 300px;
       overflow-y: auto;
     }
-    /* For listing names/comments */
     .detail-item {
       padding: 5px 0;
       border-bottom: 1px solid #eee;
       font-size: 0.95rem;
     }
     .detail-item:last-child { border-bottom: none; }
-    /* Last Activity */
     .last-activity { font-size: 1rem; color: #555; }
-    /* Loading Spinner */
     .loading { text-align: center; font-size: 1.2rem; margin-top: 50px; }
+
+    /* New Post Form */
+    .new-post {
+      max-width: 800px;
+      margin: 30px auto 50px auto;
+      background: linear-gradient(135deg, #86a8e7, #7f7fd5);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 20px;
+      color: white;
+    }
+    .new-post h2 { margin-bottom: 15px; }
+    .new-post input[type="text"],
+    .new-post textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .new-post input[type="text"] { font-weight: 600; }
+    .new-post textarea { resize: vertical; min-height: 100px; }
+    .new-post .btn-post {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+    .new-post .btn-post:hover { background: #e65b50; }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>My Stats</h1>
+    <h1>My Stats & Post</h1>
   </div>
 
   <div id="loading" class="loading">Loading your statistics...</div>
   <div id="statsContainer" class="stats-container" style="display:none;">
-    <!-- Stat Cards will be injected here -->
+    <!-- Stat Cards -->
     <div class="stat-card" id="totalPostsCard">
       <h2>Total Posts</h2>
       <div class="stat-value" id="totalPostsValue">0</div>
@@ -95,6 +126,14 @@
     </div>
   </div>
 
+  <!-- New Post Form -->
+  <div class="new-post" id="newPostForm" style="display:none;">
+    <h2>Create a New Post</h2>
+    <input type="text" id="postTopic" placeholder="Topic">
+    <textarea id="postBody" placeholder="What's on your mind?"></textarea>
+    <button class="btn-post" onclick="postNewPost()">Post</button>
+  </div>
+
   <script>
     // Firebase configuration
     var firebaseConfig = {
@@ -110,70 +149,63 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    
     let currentUser = null;
-
-    // When auth state changes, load the stats
+    
+    // Listen for authentication state
     auth.onAuthStateChanged(function(user) {
       if (user) {
         currentUser = user;
         loadStats();
+        document.getElementById("newPostForm").style.display = "block";
       } else {
-        alert("Please log in to view your stats.");
+        alert("Please log in to view your stats and post.");
         window.location.href = "login.html";
       }
     });
-
-    // Function to load stats
+    
+    // Function to load statistics
     async function loadStats() {
       const postsSnapshot = await db.collection("posts")
         .where("authorUID", "==", currentUser.uid)
         .get();
-
+      
       let totalPosts = postsSnapshot.size;
       let totalLikes = 0;
       let totalComments = 0;
       let lastActivityTimestamp = 0;
       let likeUserIDs = new Set();
       let allComments = [];
-
-      // Process each post document
+      
       const postPromises = postsSnapshot.docs.map(async (doc) => {
         let data = doc.data();
         totalLikes += data.likesCount || 0;
-        // Gather the likes (an array of user IDs) if available
         if (data.likes && Array.isArray(data.likes)) {
           data.likes.forEach(uid => likeUserIDs.add(uid));
         }
-        // Check for last activity (timestamp)
         if (data.timestamp && data.timestamp.toMillis() > lastActivityTimestamp) {
           lastActivityTimestamp = data.timestamp.toMillis();
         }
-        // Get comments count for each post by querying its subcollection "comments"
         const commentsSnapshot = await db.collection("posts").doc(doc.id).collection("comments").get();
         totalComments += commentsSnapshot.size;
-        // Also accumulate comment details (for drop down) 
         commentsSnapshot.forEach(commentDoc => {
           let commentData = commentDoc.data();
-          // Attach post topic to indicate which post the comment belongs to
           commentData.postTopic = data.topic || "Untitled";
           allComments.push(commentData);
         });
       });
       await Promise.all(postPromises);
-
-      // Update the card values
+      
+      // Update card values
       document.getElementById("totalPostsValue").innerText = totalPosts;
       document.getElementById("totalLikesValue").innerText = totalLikes;
       document.getElementById("totalCommentsValue").innerText = totalComments;
       document.getElementById("lastActivityValue").innerText = lastActivityTimestamp 
         ? new Date(lastActivityTimestamp).toLocaleString() 
         : "No activity yet";
-
-      // Set up toggling for the Like and Comment cards
+      
+      // Set up toggling for Like and Comment cards
       setupToggle("totalLikesCard", "likesDetails", async function() {
-        // When the like card is clicked, list the names of the users who liked his posts.
-        // Convert set to array and fetch user display names from "users" collection.
         let idsArray = Array.from(likeUserIDs);
         if (idsArray.length === 0) return "<div class='detail-item'>No likes yet</div>";
         let detailsHTML = "";
@@ -187,31 +219,27 @@
         return detailsHTML;
       });
       setupToggle("totalCommentsCard", "commentsDetails", async function() {
-        // When the comment card is clicked, list all comments (with post topic and comment text)
         if (allComments.length === 0) return "<div class='detail-item'>No comments yet</div>";
         let detailsHTML = allComments.map(c => {
           return `<div class="detail-item"><strong>${c.postTopic}:</strong> ${c.text} <em>by ${c.authorName || "Anonymous"}</em></div>`;
         }).join("");
         return detailsHTML;
       });
-
-      // Hide loading and show stats container
+      
       document.getElementById("loading").style.display = "none";
       document.getElementById("statsContainer").style.display = "grid";
     }
-
-    // Helper to set up toggle behavior for a card
+    
+    // Helper to set up toggle for stat details
     function setupToggle(cardId, detailsId, loadDetailsFunc) {
       const card = document.getElementById(cardId);
       const details = document.getElementById(detailsId);
       let detailsLoaded = false;
       card.addEventListener("click", async function(e) {
-        // Prevent event from bubbling if click is on already toggled details
         if (e.target.closest(".stat-details")) return;
         if (details.style.display === "block") {
           details.style.display = "none";
         } else {
-          // If not loaded yet, call the async function to fill details
           if (!detailsLoaded) {
             details.innerHTML = "<div class='loading'>Loading...</div>";
             details.innerHTML = await loadDetailsFunc();
@@ -220,6 +248,36 @@
           details.style.display = "block";
         }
       });
+    }
+    
+    // New Post Functionality
+    function postNewPost() {
+      const topic = document.getElementById("postTopic").value.trim();
+      const body = document.getElementById("postBody").value.trim();
+      if (topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
+      const user = currentUser;
+      const post = {
+        authorName: user.displayName || "Anonymous",
+        authorUID: user.uid,
+        authorAvatar: user.photoURL || null,
+        topic: topic,
+        body: body,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0,
+        allowLike: true,
+        allowShare: true,
+        allowComment: true,
+        visibility: "public"
+      };
+      db.collection("posts").add(post)
+        .then(() => {
+          document.getElementById("postTopic").value = "";
+          document.getElementById("postBody").value = "";
+          // Refresh stats after new post
+          loadStats();
+        })
+        .catch(error => { console.error("Error posting new post:", error); });
     }
   </script>
 </body>
