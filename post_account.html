@@ -120,6 +120,11 @@
       <div class="stat-value" id="totalCommentsValue">0</div>
       <div class="stat-details" id="commentsDetails"></div>
     </div>
+    <div class="stat-card" id="totalFollowersCard">
+      <h2>Total Followers</h2>
+      <div class="stat-value" id="totalFollowersValue">0</div>
+      <div class="stat-details" id="followersDetails"></div>
+    </div>
     <div class="stat-card" id="lastActivityCard">
       <h2>Last Activity</h2>
       <div class="last-activity" id="lastActivityValue">N/A</div>
@@ -166,6 +171,7 @@
     
     // Function to load statistics
     async function loadStats() {
+      // Query posts by current user
       const postsSnapshot = await db.collection("posts")
         .where("authorUID", "==", currentUser.uid)
         .get();
@@ -196,28 +202,42 @@
       });
       await Promise.all(postPromises);
       
+      // Query followers: those who follow current user (following == currentUser.uid)
+      const followersSnapshot = await db.collection("follows")
+        .where("following", "==", currentUser.uid)
+        .get();
+      let totalFollowers = followersSnapshot.size;
+      let followerIDs = [];
+      followersSnapshot.forEach(doc => {
+        let data = doc.data();
+        // Each document stores follower UID as "follower"
+        if (data.follower) {
+          followerIDs.push(data.follower);
+        }
+      });
+      
       // Update card values
       document.getElementById("totalPostsValue").innerText = totalPosts;
       document.getElementById("totalLikesValue").innerText = totalLikes;
       document.getElementById("totalCommentsValue").innerText = totalComments;
+      document.getElementById("totalFollowersValue").innerText = totalFollowers;
       document.getElementById("lastActivityValue").innerText = lastActivityTimestamp 
         ? new Date(lastActivityTimestamp).toLocaleString() 
         : "No activity yet";
       
-      // Set up toggling for Like and Comment cards
+      // Set up toggling for Like, Comment, and Follower cards
       setupToggle("totalLikesCard", "likesDetails", async function() {
         let idsArray = Array.from(likeUserIDs);
         if (idsArray.length === 0) return "<div class='detail-item'>No likes yet</div>";
-        let detailsHTML = "";
         const userPromises = idsArray.map(async uid => {
           const userDoc = await db.collection("users").doc(uid).get();
           let displayName = userDoc.exists ? userDoc.data().displayName : "Unknown";
           return `<div class="detail-item">${displayName}</div>`;
         });
         const userItems = await Promise.all(userPromises);
-        detailsHTML = userItems.join("");
-        return detailsHTML;
+        return userItems.join("");
       });
+      
       setupToggle("totalCommentsCard", "commentsDetails", async function() {
         if (allComments.length === 0) return "<div class='detail-item'>No comments yet</div>";
         let detailsHTML = allComments.map(c => {
@@ -226,16 +246,28 @@
         return detailsHTML;
       });
       
+      setupToggle("totalFollowersCard", "followersDetails", async function() {
+        if (followerIDs.length === 0) return "<div class='detail-item'>No followers yet</div>";
+        const followerPromises = followerIDs.map(async uid => {
+          const userDoc = await db.collection("users").doc(uid).get();
+          let displayName = userDoc.exists ? userDoc.data().displayName : "Unknown";
+          return `<div class="detail-item">${displayName}</div>`;
+        });
+        const followerItems = await Promise.all(followerPromises);
+        return followerItems.join("");
+      });
+      
       document.getElementById("loading").style.display = "none";
       document.getElementById("statsContainer").style.display = "grid";
     }
     
-    // Helper to set up toggle for stat details
+    // Helper to set up toggle behavior for a card
     function setupToggle(cardId, detailsId, loadDetailsFunc) {
       const card = document.getElementById(cardId);
       const details = document.getElementById(detailsId);
       let detailsLoaded = false;
       card.addEventListener("click", async function(e) {
+        // Prevent toggling if clicking inside details panel
         if (e.target.closest(".stat-details")) return;
         if (details.style.display === "block") {
           details.style.display = "none";
