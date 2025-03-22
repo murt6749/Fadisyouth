@@ -420,5 +420,70 @@
       });
     });
   </script>
+
+  <!-- New Script: Limit Audio Sources Based on Registration -->
+  <script>
+    // For demo purposes, these values are fetched from localStorage.
+    // In your real application, these should be set after a successful registration.
+    let userVerified = localStorage.getItem('userVerified') === 'true';
+    let userReciters = parseInt(localStorage.getItem('userReciters')) || 0;
+
+    // Function to simulate a checking animation before proceeding
+    function simulateCheckingAnimation(callback) {
+      // Create an overlay with a spinner
+      let overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = 0;
+      overlay.style.left = 0;
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '2000';
+      overlay.innerHTML = '<div style="width:50px;height:50px;border:5px solid #fff;border-top:5px solid var(--primary-color);border-radius:50%;animation:spin 1s linear infinite;"></div>';
+      document.body.appendChild(overlay);
+      setTimeout(function() {
+        document.body.removeChild(overlay);
+        callback();
+      }, 1000);
+    }
+
+    // Append spinner animation style
+    let style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Attach click events only for audio source links
+    document.querySelectorAll('.audio-dropdown .dropdown-menu li.dropdown-item a').forEach(function(link, index) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        simulateCheckingAnimation(function() {
+          // Check if user is verified
+          if (!userVerified) {
+            alert("You are not verified. Please register and verify your account.");
+            return;
+          }
+          // Allow access if the audio source is within the user’s allowed range (0-based index)
+          if (index < userReciters) {
+            window.location.href = link.getAttribute('href');
+          } else {
+            // If the clicked source is beyond the allowed count, prompt the user for an upgrade
+            if (confirm("You registered for " + userReciters + " reciter(s) only. Would you like to upgrade for more audio sources?")) {
+              window.location.href = "qupgrade.html";
+            } else {
+              // Otherwise, do nothing and allow the user to continue using the site.
+            }
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
