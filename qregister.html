@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quran Registration Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #ff6b6b;
+      --secondary: #4ecdc4;
+      --accent: #ffe66d;
+      --dark: #2d3436;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d);
+      background-size: 400% 400%;
+      min-height: 100vh;
+      padding: 40px;
+      animation: gradientBG 15s ease infinite;
+    }
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .floating-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.1;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="%23ffffff" stroke-width="2" fill="none"/></svg>');
+      animation: float 20s linear infinite;
+    }
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 50px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      animation: fadeInUp 1s ease;
+    }
+    .registration-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+    .registration-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+    .registration-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+    .registration-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+    }
+    .card-header {
+      text-align: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+    .card-header h2 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 1.8em;
+    }
+    .price {
+      font-size: 28px;
+      color: var(--primary);
+      font-weight: 700;
+      margin: 20px 0;
+      animation: pulse 2s infinite;
+    }
+    .form-group {
+      margin-bottom: 25px;
+    }
+    .phone-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    /* Country-code dropdown styled to show flags only */
+    .country-code {
+      flex: 0 0 60px;
+      position: relative;
+    }
+    .country-code select {
+      width: 100%;
+      padding: 12px 10px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 20px;
+      text-align: center;
+      appearance: none;
+      background: #fff url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE2IDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBvbHlnb24gcG9pbnRzPSIwLDAgOCw4IDE2LDAiIGZpbGw9IiM3Nzc3NzciLz48L3N2Zz4=') no-repeat right 10px center;
+      background-size: 12px;
+    }
+    .country-code select:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 15px rgba(78,205,196,0.2);
+    }
+    /* "Other" custom dial code input (hidden by default) */
+    .custom-dial {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 20px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+    input:focus, select:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 15px rgba(78,205,196,0.2);
+    }
+    .account-details, .verification-container {
+      background: rgba(78,205,196,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      display: none;
+      animation: slideDown 0.5s ease;
+    }
+    .account-details.show, .verification-container.show {
+      display: block;
+    }
+    .telegram-verify {
+      text-align: center;
+      margin-top: 25px;
+      animation: fadeIn 0.5s ease;
+    }
+    /* Telegram link styling */
+    .telegram-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 25px;
+      background: #0088cc;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .telegram-link.enabled {
+      pointer-events: auto;
+      opacity: 1;
+    }
+    .btn {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 15px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes shine {
+      0% { transform: rotate(45deg) translateX(-150%); }
+      100% { transform: rotate(45deg) translateX(150%); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 768px) {
+      body { padding: 20px; }
+      .container { padding: 0 10px; }
+    }
+    @media (max-width: 600px) {
+      .registration-section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Firebase Integration using Modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getDatabase, ref, push, set, get, child, update } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8p3n0-vqcPK28123Bbe6icsYLPNz9B4k",
+      authDomain: "quran-8b98a.firebaseapp.com",
+      projectId: "quran-8b98a",
+      storageBucket: "quran-8b98a.firebasestorage.app",
+      messagingSenderId: "59182289710",
+      appId: "1:59182289710:web:eae2d0a2923c1e71be60bf",
+      measurementId: "G-FTRM95K2XT"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const database = getDatabase(app);
+    window.db = database;
+
+    // Update price based on number of reciters
+    window.updatePrice = function(type, basePrice) {
+      const reciters = document.getElementById(`${type}Reciters`).value;
+      const total = basePrice + (reciters - 1) * (basePrice * 0.5);
+      document.getElementById(`${type}Price`).innerHTML = `${total} Birr`;
+    };
+
+    // When a valid phone number is entered, show payment details and enable Telegram link
+    window.autoShowAccount = function(type) {
+      const form = document.getElementById(type);
+      const phoneInput = form.querySelector('input[type="tel"]');
+      if (phoneInput.checkValidity()) {
+        const accountDetails = document.getElementById(`${type}Account`);
+        if (!accountDetails.classList.contains('show')) {
+          accountDetails.classList.add('show');
+          const telegramLink = document.getElementById(`${type}TelegramLink`);
+          telegramLink.classList.add('enabled');
+          if(document.getElementById(`${type}Ref`).textContent === "") {
+            document.getElementById(`${type}Ref`).textContent =
+              Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+          }
+        }
+      }
+    };
+
+    // Show custom dial input if "other" is selected
+    window.checkOtherCountry = function(type) {
+      const selectElem = document.querySelector(`#${type} .country-code select`);
+      const customDial = document.querySelector(`#${type} .custom-dial`);
+      if (selectElem.value === "other") {
+        customDial.style.display = "block";
+      } else {
+        customDial.style.display = "none";
+      }
+    };
+
+    // Handle registration and verification in one function
+    window.handleRegistration = async function(type) {
+      const form = document.getElementById(type);
+      const button = document.getElementById(`${type}RegisterButton`);
+      
+      // Registration step
+      if (button.textContent.trim() === "Register") {
+        const fullName = form.querySelector('input[name="fullName"]').value.trim();
+        const phoneInput = form.querySelector('input[type="tel"]');
+        if (!fullName) {
+          alert("Please enter your full name.");
+          return;
+        }
+        if (!phoneInput.checkValidity()) {
+          alert("Please enter a valid phone number.");
+          return;
+        }
+        let phone = phoneInput.value.trim();
+        // If phone number starts with '0', remove it
+        if (phone.startsWith("0")) {
+          phone = phone.slice(1);
+        }
+        const reciters = document.getElementById(`${type}Reciters`).value;
+        const price = document.getElementById(`${type}Price`).textContent;
+        // Generate a 4-digit verification code for reference
+        const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+        const registrationData = {
+          fullName: fullName,
+          phone: phone,
+          reciters: reciters,
+          price: price,
+          verificationCode: verificationCode,
+          timestamp: Date.now(),
+          verified: false,
+          type: type
+        };
+
+        try {
+          const regRef = push(ref(database, 'registrations'));
+          await set(regRef, registrationData);
+          alert("Registration successful. Please enter the verification code.");
+          // Show verification container above the button
+          const verificationContainer = document.getElementById(`${type}VerificationContainer`);
+          verificationContainer.classList.add('show');
+          // Store registration key for verification
+          verificationContainer.setAttribute('data-reg-id', regRef.key);
+          // Change button text to "Confirm"
+          button.textContent = "Confirm";
+        } catch (error) {
+          alert("Registration failed: " + error);
+        }
+      } else {
+        // Verification step
+        const verificationContainer = document.getElementById(`${type}VerificationContainer`);
+        const regId = verificationContainer.getAttribute('data-reg-id');
+        const enteredCode = document.getElementById(`${type}Code`).value.trim();
+        if (!regId) {
+          alert("Registration not initiated.");
+          return;
+        }
+        try {
+          const snapshot = await get(child(ref(database), 'registrations/' + regId));
+          const data = snapshot.val();
+          if (data && data.verificationCode === enteredCode) {
+            await update(ref(database, 'registrations/' + regId), { verified: true });
+            alert("Registration complete!");
+            window.location.href = "quran1.html";
+          } else {
+            alert("Verification code does not match.");
+          }
+        } catch (error) {
+          alert("Error during verification: " + error);
+        }
+      }
+    };
+  </script>
+
+  <div class="container">
+    <div class="floating-bg"></div>
+    <div class="header">
+      <h1>🕌 Quran Registration Portal</h1>
+      <p>Register Now & Connect with the Divine Words</p>
+    </div>
+    <div class="registration-section">
+      <!-- Half Juza Registration -->
+      <div class="registration-card">
+        <div class="card-header">
+          <h2>🌙 Half Juza Registration</h2>
+          <div class="price" id="halfJuzaPrice">100 Birr</div>
+        </div>
+        <form id="halfJuza">
+          <!-- Full Name Field -->
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="fullName" placeholder="Your Full Name" required />
+          </div>
+          <div class="form-group">
+            <label>Number of Reciters</label>
+            <select id="halfJuzaReciters" onchange="updatePrice('halfJuza', 100)" required>
+              <option value="1">1 Reciter</option>
+              <option value="2">2 Reciters</option>
+              <option value="3">3 Reciters</option>
+              <option value="4">4 Reciters</option>
+              <option value="5">5 Reciters</option>
+            </select>
+          </div>
+          <div class="form-group phone-group">
+            <!-- Country Code Dropdown (flags only) -->
+            <div class="country-code">
+              <select name="countryCode" required onchange="checkOtherCountry('halfJuza')">
+                <option value="+251">🇪🇹</option>
+                <option value="+1">🇺🇸</option>
+                <option value="+44">🇬🇧</option>
+                <option value="+966">🇸🇦</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" class="custom-dial" placeholder="Code" />
+            </div>
+            <input type="tel" placeholder="Phone Number" pattern="[0-9]{9}" required oninput="autoShowAccount('halfJuza')" />
+          </div>
+          <div class="account-details" id="halfJuzaAccount">
+            <h3>💳 Payment Details</h3>
+            <p><strong>Bank:</strong> Commercial Bank of Ethiopia</p>
+            <p><strong>Account Name:</strong> Fadis youth</p>
+            <p><strong>Account Number:</strong> Not implemented yet</p>
+            <p><strong>Reference:</strong> stay tuned-<span id="halfJuzaRef"></span></p>
+          </div>
+          <div class="telegram-verify" id="halfJuzaTelegram">
+            <a id="halfJuzaTelegramLink" class="telegram-link" target="_blank" href="https://t.me/maybe2117">
+              <i class="fab fa-telegram"></i> Verify Payment Here
+            </a>
+          </div>
+          <!-- Verification Container (hidden initially) -->
+          <div class="verification-container" id="halfJuzaVerificationContainer">
+            <label for="halfJuzaCode">Enter Verification Code</label>
+            <input type="text" id="halfJuzaCode" placeholder="Verification Code" />
+          </div>
+          <button type="button" id="halfJuzaRegisterButton" class="btn" onclick="handleRegistration('halfJuza')">Register</button>
+        </form>
+      </div>
+      
+      <!-- Complete Quran Registration -->
+      <div class="registration-card">
+        <div class="card-header">
+          <h2>🌕 Complete Quran Registration</h2>
+          <div class="price" id="completeQuranPrice">300 Birr</div>
+        </div>
+        <form id="completeQuran">
+          <!-- Full Name Field -->
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="fullName" placeholder="Your Full Name" required />
+          </div>
+          <div class="form-group">
+            <label>Number of Reciters</label>
+            <select id="completeQuranReciters" onchange="updatePrice('completeQuran', 300)" required>
+              <option value="1">1 Reciter</option>
+              <option value="2">2 Reciters</option>
+              <option value="3">3 Reciters</option>
+              <option value="4">4 Reciters</option>
+              <option value="5">5 Reciters</option>
+            </select>
+          </div>
+          <div class="form-group phone-group">
+            <div class="country-code">
+              <select name="countryCode" required onchange="checkOtherCountry('completeQuran')">
+                <option value="+251">🇪🇹</option>
+                <option value="+1">🇺🇸</option>
+                <option value="+44">🇬🇧</option>
+                <option value="+966">🇸🇦</option>
+                <option value="other">Other</option>
+              </select>
+              <input type="text" class="custom-dial" placeholder="Code" />
+            </div>
+            <input type="tel" placeholder="Phone Number" pattern="[0-9]{9}" required oninput="autoShowAccount('completeQuran')" />
+          </div>
+          <div class="account-details" id="completeQuranAccount">
+            <h3>💳 Payment Details</h3>
+            <p><strong>Bank:</strong> Commercial Bank of Ethiopia</p>
+            <p><strong>Account Name:</strong> Quran Foundation</p>
+            <p><strong>Account Number:</strong> 0987654321</p>
+            <p><strong>Reference:</strong> CQURAN-<span id="completeQuranRef"></span></p>
+          </div>
+          <div class="telegram-verify" id="completeQuranTelegram">
+            <a id="completeQuranTelegramLink" class="telegram-link" target="_blank" href="https://t.me/maybe2117">
+              <i class="fab fa-telegram"></i> Verify Payment Here
+            </a>
+          </div>
+          <div class="verification-container" id="completeQuranVerificationContainer">
+            <label for="completeQuranCode">Enter Verification Code</label>
+            <input type="text" id="completeQuranCode" placeholder="Verification Code" />
+          </div>
+          <button type="button" id="completeQuranRegisterButton" class="btn" onclick="handleRegistration('completeQuran')">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
