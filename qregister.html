@@ -117,7 +117,7 @@
       font-size: 20px;
       text-align: center;
       appearance: none;
-      background: #fff url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE2IDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBvbHlnb24gcG9pbnRzPSIwLDAgOCw4IDE2LDAiIGZpbGw9IiM3Nzc3NzciLz48L3N2Zz4=') no-repeat right 10px center;
+      background: #fff url('data:image/svg+xml;utf8,<svg viewBox="0 0 16 8" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 8,8 16,0" fill="#777777"/></svg>') no-repeat right 10px center;
       background-size: 12px;
     }
     .country-code select:focus {
@@ -242,7 +242,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
     import { getDatabase, ref, push, set, get, child, update } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
-
+    
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyC8p3n0-vqcPK28123Bbe6icsYLPNz9B4k",
@@ -253,20 +253,20 @@
       appId: "1:59182289710:web:eae2d0a2923c1e71be60bf",
       measurementId: "G-FTRM95K2XT"
     };
-
+    
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const database = getDatabase(app);
     window.db = database;
-
+    
     // Update price based on number of reciters
     window.updatePrice = function(type, basePrice) {
       const reciters = document.getElementById(`${type}Reciters`).value;
       const total = basePrice + (reciters - 1) * (basePrice * 0.5);
       document.getElementById(`${type}Price`).innerHTML = `${total} Birr`;
     };
-
+    
     // When a valid phone number is entered, show payment details and enable Telegram link
     window.autoShowAccount = function(type) {
       const form = document.getElementById(type);
@@ -284,7 +284,7 @@
         }
       }
     };
-
+    
     // Show custom dial input if "other" is selected
     window.checkOtherCountry = function(type) {
       const selectElem = document.querySelector(`#${type} .country-code select`);
@@ -295,7 +295,7 @@
         customDial.style.display = "none";
       }
     };
-
+    
     // Handle registration and verification in one function
     window.handleRegistration = async function(type) {
       const form = document.getElementById(type);
@@ -332,7 +332,7 @@
           verified: false,
           type: type
         };
-
+    
         try {
           const regRef = push(ref(database, 'registrations'));
           await set(regRef, registrationData);
@@ -361,6 +361,10 @@
           const data = snapshot.val();
           if (data && data.verificationCode === enteredCode) {
             await update(ref(database, 'registrations/' + regId), { verified: true });
+            // Save verified status and number of reciters in localStorage
+            localStorage.setItem('userVerified', 'true');
+            const reciters = document.getElementById(`${type}Reciters`).value;
+            localStorage.setItem('userReciters', reciters);
             alert("Registration complete!");
             window.location.href = "quran1.html";
           } else {
@@ -372,7 +376,6 @@
       }
     };
   </script>
-
   <div class="container">
     <div class="floating-bg"></div>
     <div class="header">
@@ -419,9 +422,9 @@
           <div class="account-details" id="halfJuzaAccount">
             <h3>💳 Payment Details</h3>
             <p><strong>Bank:</strong> Commercial Bank of Ethiopia</p>
-            <p><strong>Account Name:</strong> Fadis youth</p>
-            <p><strong>Account Number:</strong> Not implemented yet</p>
-            <p><strong>Reference:</strong> stay tuned-<span id="halfJuzaRef"></span></p>
+            <p><strong>Account Name:</strong> Quran Foundation</p>
+            <p><strong>Account Number:</strong> 1234567890</p>
+            <p><strong>Reference:</strong> HJUZA-<span id="halfJuzaRef"></span></p>
           </div>
           <div class="telegram-verify" id="halfJuzaTelegram">
             <a id="halfJuzaTelegramLink" class="telegram-link" target="_blank" href="https://t.me/maybe2117">
