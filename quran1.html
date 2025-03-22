@@ -10,9 +10,11 @@
   />
   <style>
     :root {
-      --primary-color: #2c5d2c;
-      --secondary-color: #4a7856;
-      --sidebar-width: 250px;
+      /* Vibrant color palette */
+      --primary-color: #ff6f61;
+      --secondary-color: #ffcc5c;
+      --accent-color: #88d8b0;
+      --sidebar-width: 260px;
     }
 
     * {
@@ -23,7 +25,7 @@
     }
 
     body {
-      background: #f5f5f5;
+      background: #fefefe;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -42,6 +44,7 @@
       align-items: center;
       justify-content: space-between;
       height: 60px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .menu-toggle {
@@ -52,14 +55,14 @@
 
     /* Sidebar Styles */
     .sidebar {
-      background: white;
+      background: #fff;
       width: var(--sidebar-width);
       position: fixed;
       left: 0;
       top: 60px;
       bottom: 0;
       padding: 1rem;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
       transform: translateX(-100%);
       transition: transform 0.3s ease;
       z-index: 999;
@@ -77,6 +80,7 @@
     .sidebar-item {
       margin: 0.5rem 0;
       position: relative;
+      transition: transform 0.2s ease;
     }
 
     .sidebar-link {
@@ -87,12 +91,12 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      transition: 0.3s;
+      transition: background 0.3s, transform 0.2s;
     }
 
     .sidebar-link:hover {
-      background: #f0f0f0;
-      color: var(--primary-color);
+      background: var(--accent-color);
+      color: white;
     }
 
     .sidebar-link i {
@@ -105,37 +109,51 @@
       cursor: pointer;
       width: 100%;
     }
+
+    /* Use max-height and opacity transitions for smooth dropdown animations */
     .sidebar-menu li.dropdown > .dropdown-menu {
-      display: none;
-      list-style: none;
-      padding-left: 1rem;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-10px);
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
+      margin-left: 1rem;
     }
     .sidebar-menu li.dropdown.active > .dropdown-menu {
-      display: block;
+      max-height: 500px; /* enough to show all items */
+      opacity: 1;
+      transform: translateY(0);
     }
     .dropdown-icon {
       margin-left: auto;
     }
 
-    /* Audio Dropdown Specific Styles */
-    .audio-dropdown .dropdown-menu {
-      background: #e6f7ff;
-      border: 1px solid #91d5ff;
+    /* Subtopic Dropdowns: Audio and Register */
+    .audio-dropdown .dropdown-menu,
+    .register-dropdown .dropdown-menu {
+      background: #ffe8d6;
+      border: 1px solid var(--secondary-color);
       padding: 0.5rem;
       border-radius: 5px;
+      margin-top: 0.5rem;
+      margin-left: 0;
     }
-    .audio-dropdown .dropdown-menu li.dropdown-item a {
+    .audio-dropdown .dropdown-menu li.dropdown-item a,
+    .register-dropdown .dropdown-menu li.dropdown-item a {
       background: transparent;
       color: #333;
       padding: 0.5rem 1rem;
       border-radius: 3px;
       display: block;
+      transition: background 0.3s;
     }
-    .audio-dropdown .dropdown-menu li.dropdown-item a:hover {
-      background: #91d5ff;
+    .audio-dropdown .dropdown-menu li.dropdown-item a:hover,
+    .register-dropdown .dropdown-menu li.dropdown-item a:hover {
+      background: var(--secondary-color);
       color: white;
     }
-    .audio-dropdown .dropdown-text {
+    .audio-dropdown .dropdown-text,
+    .register-dropdown .dropdown-text {
       padding: 0.5rem 1rem;
       font-weight: bold;
       color: #1d3a4d;
@@ -146,14 +164,14 @@
       margin-top: 60px;
       padding: 2rem;
       flex: 1;
-      transition: 0.3s;
+      transition: margin-left 0.3s;
     }
 
     .quran-section {
-      background: white;
+      background: #fff;
       border-radius: 10px;
       padding: 2rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     }
 
     .section-title {
@@ -182,7 +200,7 @@
       padding: 1rem;
       border-radius: 5px;
       border-left: 3px solid var(--primary-color);
-      transition: 0.3s;
+      transition: transform 0.3s;
     }
 
     .chapter-item:hover {
@@ -203,11 +221,22 @@
 
     /* Footer Styles */
     .footer {
-      background: linear-gradient(135deg, #2c5d2c, #1e401e);
+      background: linear-gradient(135deg, var(--primary-color), #e65c50);
       color: white;
       padding: 1.5rem;
       text-align: center;
       margin-top: auto;
+    }
+
+    .footer-links a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 0.5rem;
+      transition: text-decoration 0.2s;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 768px) {
@@ -244,35 +273,43 @@
           <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
         <ul class="dropdown-menu">
-          <!-- Audio Dropdown with a different design -->
+          <!-- Audio Dropdown with Icon -->
           <li class="dropdown dropdown-item audio-dropdown">
             <a href="#" class="sidebar-link dropdown-toggle">
+              <i class="fas fa-volume-up"></i>
               Audio
               <i class="fas fa-chevron-right dropdown-icon"></i>
             </a>
             <ul class="dropdown-menu">
               <li class="dropdown-text">Select Audio Source:</li>
               <li class="dropdown-item">
-                <a href="aq.ht" class="sidebar-link">a</a>
+                <a href="aq.ht" class="sidebar-link">Source A</a>
               </li>
               <li class="dropdown-item">
-                <a href="bq.htl" class="sidebar-link">b</a>
+                <a href="bq.htl" class="sidebar-link">Source B</a>
               </li>
               <li class="dropdown-item">
-                <a href="cq.html" class="sidebar-link">c</a>
+                <a href="cq.html" class="sidebar-link">Source C</a>
               </li>
               <li class="dropdown-item">
-                <a href="dq.html" class="sidebar-link">d</a>
+                <a href="dq.html" class="sidebar-link">Source D</a>
               </li>
             </ul>
           </li>
+          <!-- Register Dropdown Item -->
+          <li class="dropdown-item register-dropdown">
+            <a href="qregister.html" class="sidebar-link">
+              <i class="fas fa-user-plus"></i>
+              Register
+            </a>
+          </li>
         </ul>
       </li>
-      <!-- Prayer Menu Item -->
+      <!-- Quiz Menu Item (replacing Prayer) -->
       <li class="sidebar-item">
-        <a href="prayer.hyml" class="sidebar-link">
-          <i class="fas fa-pray"></i>
-          Prayer
+        <a href="quranquiz.html" class="sidebar-link">
+          <i class="fas fa-question-circle"></i>
+          Quiz
         </a>
       </li>
       <!-- Search Quran Menu Item -->
@@ -286,14 +323,7 @@
       <li class="sidebar-item">
         <a href="qhistory.html" class="sidebar-link">
           <i class="fas fa-history"></i>
-          seenaa
-        </a>
-      </li>
-      <!-- Register Menu Item -->
-      <li class="sidebar-item">
-        <a href="qregister.html" class="sidebar-link">
-          <i class="fas fa-user-plus"></i>
-          Register
+          Seenaa
         </a>
       </li>
     </ul>
@@ -304,10 +334,7 @@
     <div class="quran-section">
       <h2 class="section-title">Qur'aana Waa'ee</h2>
       <p class="quran-definition">
-        Qur'aanni kitaaba Rabbii qulqulluu Islaamaa ti. Kun kitaaba Rabbiin
-        Nabii Muhammad SAW irratti buusee jira. Qur'aanni keessatti amantii,
-        seera, jaalala, qajeelummaa fi haqaa tokko hundi ibsameera.
-        Qur'aanni suuraa 114 qaba, suuraaleen kun immoo aayotaan kan hammatamanidha.
+        Qur'aanni kitaaba Rabbii qulqulluu Islaamaa ti. Kun kitaaba Rabbiin Nabii Muhammad SAW irratti buusee jira. Qur'aanni keessatti amantii, seera, jaalala, qajeelummaa fi haqaa tokko hundi ibsameera. Qur'aanni suuraa 114 qaba, suuraaleen kun immoo aayotaan kan hammatamanidha.
       </p>
 
       <h3 class="section-title">Suuraalee Qur'aanaa</h3>
