@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fadis Youth – Member</title>
-  <!-- Link to the web app manifest -->
+  <title>Fadis Youth – Home</title>
   <link rel="manifest" href="manifest.json">
-  <!-- Firebase Scripts (compat version for simplicity) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  
   <script>
-    // Firebase configuration – replace with your actual values.
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -23,9 +25,11 @@
     };
     firebase.initializeApp(firebaseConfig);
   </script>
-  <!-- Google Fonts & FontAwesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
   <style>
     /* ========================================================
        Global Styles & Variables
@@ -35,149 +39,580 @@
       --secondary-color: #FFD700;
       --accent-color: #009688;
       --text-light: #f0f0f0;
+      --text-dark: #333;
       --bg-gradient: linear-gradient(135deg, #0a1931 0%, #020024 100%);
-      --card-bg: rgba(16,36,60,0.9);
-      --shadow: 0 4px 30px rgba(0,0,0,0.1);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --card-bg-solid: rgba(16, 36, 60, 0.95);
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Amiri', 'Segoe UI', sans-serif; }
-    body { min-height: 100vh; background: var(--bg-gradient); color: var(--text-light); overflow-x: hidden; position: relative; }
+    
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      font-family: 'Tajawal', 'Amiri', sans-serif; 
+    }
+    
+    body { 
+      min-height: 100vh; 
+      background: var(--bg-gradient); 
+      color: var(--text-light); 
+      overflow-x: hidden; 
+      position: relative; 
+    }
+    
     /* ========================================================
        Background Elements
     ========================================================== */
     .islamic-pattern { 
-      position: fixed; width: 100vw; height: 100vh; 
-      background-image: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
+      position: fixed; 
+      width: 100vw; 
+      height: 100vh; 
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 20%), 
+        repeating-linear-gradient(45deg, rgba(0,150,136,0.02) 0px, rgba(0,150,136,0.02) 20px, transparent 20px, transparent 40px); 
       z-index: -1; 
     }
+    
     .floating-ornament { 
-      position: fixed; width: 50px; height: 50px; 
+      position: fixed; 
+      width: 50px; 
+      height: 50px; 
       background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23009688" d="M50 0L100 50 50 100 0 50 50 0" opacity="0.1"/></svg>'); 
-      animation: float 20s linear infinite; pointer-events: none; 
+      animation: float 20s linear infinite; 
+      pointer-events: none; 
+      z-index: -1;
     }
-    @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
+    
+    @keyframes float { 
+      0% { transform: translateY(110vh) rotate(0deg); } 
+      100% { transform: translateY(-10vh) rotate(360deg); } 
+    }
+    
     /* ========================================================
        Header
     ========================================================== */
     header { 
-      position: fixed; top: 0; left: 0; width: 100%; height: 70px; 
-      background: rgba(10,25,49,0.95); backdrop-filter: blur(10px); 
-      display: flex; align-items: center; padding: 0 2rem; 
-      z-index: 1000; border-bottom: 2px solid var(--secondary-color); 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 70px; 
+      background: rgba(10, 25, 49, 0.95); 
+      backdrop-filter: blur(10px); 
+      display: flex; 
+      align-items: center; 
+      padding: 0 2rem; 
+      z-index: 1000; 
+      border-bottom: 2px solid var(--secondary-color);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
+    
     .logo { 
-      font-size: 1.8rem; color: var(--secondary-color); 
-      text-decoration: none; margin-right: auto; 
+      font-size: 1.8rem; 
+      color: var(--secondary-color); 
+      text-decoration: none; 
+      margin-right: auto;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    
+    .logo i {
+      font-size: 1.5rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 1.2rem;
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
     .hamburger { 
-      width: 35px; height: 25px; cursor: pointer; 
-      display: flex; flex-direction: column; justify-content: space-between; 
+      width: 35px; 
+      height: 25px; 
+      cursor: pointer; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
       margin-left: 1.5rem; 
     }
-    .hamburger span { height: 3px; background: var(--secondary-color); transition: all 0.3s ease; }
-    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px,8px); }
+    
+    .hamburger span { 
+      height: 3px; 
+      background: var(--secondary-color); 
+      transition: var(--transition); 
+      border-radius: 3px;
+    }
+    
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
-    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px,-8px); }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -8px); }
+    
     /* ========================================================
        Side Navigation
     ========================================================== */
     .side-nav { 
-      position: fixed; left: -300px; top: 0; width: 300px; height: 100vh; 
-      background: rgba(16,36,60,0.98); backdrop-filter: blur(15px); 
-      padding: 80px 1.5rem 2rem; transition: left 0.3s ease; 
-      z-index: 999; border-right: 2px solid var(--secondary-color); 
-      overflow-y: auto; 
+      position: fixed; 
+      left: -300px; 
+      top: 0; 
+      width: 300px; 
+      height: 100vh; 
+      background: rgba(16, 36, 60, 0.98); 
+      backdrop-filter: blur(15px); 
+      padding: 80px 1.5rem 2rem; 
+      transition: left 0.3s ease; 
+      z-index: 999; 
+      border-right: 2px solid var(--secondary-color);
+      overflow-y: auto;
     }
+    
     .side-nav.active { left: 0; }
+    
     .nav-link { 
-      display: flex; align-items: center; padding: 1rem; margin: 0.5rem 0; 
-      color: var(--text-light); text-decoration: none; border-radius: 8px; 
-      transition: all 0.3s ease; 
+      display: flex; 
+      align-items: center; 
+      padding: 1rem; 
+      margin: 0.5rem 0; 
+      color: var(--text-light); 
+      text-decoration: none; 
+      border-radius: var(--border-radius); 
+      transition: var(--transition);
     }
-    .nav-link:hover { background: rgba(255,215,0,0.1); transform: translateX(10px); }
-    .nav-link i { margin-right: 1rem; width: 25px; text-align: center; }
-    /* ========================================================
-       Settings Dropdown in Side Nav
-    ========================================================== */
-    .settings-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-bottom: 1rem; border-radius: 5px; }
-    .settings-section { margin-bottom: 1rem; }
-    .settings-header { display: flex; align-items: center; padding: 0.5rem; cursor: pointer; }
-    .settings-header i { margin-right: 0.5rem; }
-    .settings-submenu { display: none; flex-direction: column; margin-left: 1.5rem; }
-    .settings-submenu a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
-    /* ========================================================
-       Contact Dropdown – Simple Vertical List
-    ========================================================== */
-    .contact-dropdown { display: none; flex-direction: column; padding: 0.5rem; background: rgba(16,36,60,0.95); margin-top: 0.5rem; border-radius: 5px; }
-    .contact-dropdown a { padding: 0.5rem; text-decoration: none; color: var(--text-light); border-top: 1px solid rgba(255,215,0,0.2); }
-    /* ========================================================
-       Main Content Sections
-    ========================================================== */
-    main { margin-top: 90px; padding: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
-    .dashboard-section { background: var(--card-bg); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.2); box-shadow: var(--shadow); }
-    .section-header { display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--accent-color); }
-    .section-title { font-size: 1.8rem; color: var(--secondary-color); margin-left: 1rem; }
-    /* --------------------------------------------------------
-       Profile Card Section (New)
-    --------------------------------------------------------- */
-    #profileCardSection { display: none; margin-bottom: 2rem; }
-    .profile-card { text-align: center; padding: 1rem; border: 1px solid var(--secondary-color); border-radius: 10px; background: var(--card-bg); }
-    .profile-card #profileCircle { 
-      width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; 
-      background: #ccc; display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; overflow: hidden; 
+    
+    .nav-link:hover { 
+      background: rgba(255, 215, 0, 0.1); 
+      transform: translateX(5px);
     }
-    .profile-card #profileCircle i { font-size: 4rem; color: #fff; }
-    .profile-card #profileCircle img { display: none; width: 100%; height: 100%; object-fit: cover; }
-    .profile-card #profileBio { margin-top: 10px; }
-    /* --------------------------------------------------------
-       Auth Checking Animation (in Prayer Section)
-    --------------------------------------------------------- */
-    #authCheck { text-align: center; padding: 1rem; }
-    /* --------------------------------------------------------
-       Prayer Times Section
-    --------------------------------------------------------- */
-    #dateDisplay { text-align: center; font-size: 1.2rem; margin-bottom: 1rem; }
-    #upcomingPrayer { text-align: center; padding: 1.5rem; background: linear-gradient(145deg, rgba(16,36,60,0.9), rgba(8,18,32,0.9)); border-radius: 12px; }
-    /* --------------------------------------------------------
-       Donate Section (Replaces Fadis Sheik Section)
-    --------------------------------------------------------- */
-    #donateSection { text-align: center; }
-    /* --------------------------------------------------------
-       Featured Topic Flashcard Section
-    --------------------------------------------------------- */
-    #topicSection { margin-bottom: 2rem; }
-    #topicSection .topic-card { background: var(--card-bg); border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: transform 0.3s ease; }
-    #topicSection .topic-card:hover { transform: scale(1.02); }
-    #topicSection .topic-image { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; margin-bottom: 0.5rem; }
-    #topicSection .topic-title { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--secondary-color); }
-    #topicSection .topic-description { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1rem; }
-    /* --------------------------------------------------------
-       Buttons
-    --------------------------------------------------------- */
-    .submit-btn { padding: 0.5rem 1rem; background: var(--accent-color); border: none; border-radius: 5px; color: var(--text-light); cursor: pointer; transition: transform 0.3s ease; }
-    .submit-btn:hover { transform: scale(1.05); }
-    /* --------------------------------------------------------
-       Footer
-    --------------------------------------------------------- */
-    footer { background: rgba(10,25,49,0.95); padding: 2rem; margin-top: 4rem; border-top: 2px solid var(--secondary-color); text-align: center; }
+    
+    .nav-link.active {
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    .nav-link i { 
+      margin-right: 1rem; 
+      width: 25px; 
+      text-align: center; 
+      font-size: 1.1rem;
+    }
+    
+    .nav-section-title {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      padding-left: 1rem;
+    }
+    
+    /* Dropdown styles */
+    .nav-dropdown {
+      display: none;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: var(--border-radius);
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    
+    .nav-dropdown a {
+      padding: 0.8rem 1rem 0.8rem 2.5rem;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    
+    .nav-dropdown a:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* ========================================================
+       Main Content
+    ========================================================== */
+    main { 
+      margin-top: 90px; 
+      padding: 2rem; 
+      max-width: 1200px; 
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    
+    .hero-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .hero-title {
+      font-size: 2.5rem;
+      color: var(--secondary-color);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.2rem;
+      max-width: 800px;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .dashboard-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 215, 0, 0.1);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    .card-content {
+      margin-top: 1rem;
+    }
+    
+    /* Prayer Times Card */
+    .prayer-times {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .prayer-time {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .prayer-name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--secondary-color);
+    }
+    
+    .prayer-time-value {
+      font-size: 1.1rem;
+    }
+    
+    .current-prayer {
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    /* Announcements Section */
+    .announcements-container {
+      margin-top: 2rem;
+    }
+    
+    .announcement {
+      background: var(--card-bg-solid);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--accent-color);
+    }
+    
+    .announcement-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--secondary-color);
+    }
+    
+    .announcement-date {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+    
+    .announcement-content {
+      line-height: 1.6;
+    }
+    
+    /* Recent Activities */
+    .activity-list {
+      margin-top: 1rem;
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 150, 136, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      color: var(--accent-color);
+    }
+    
+    .activity-details {
+      flex: 1;
+    }
+    
+    .activity-title {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    
+    .activity-time {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    
     /* ========================================================
        Modals
     ========================================================== */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
-    .modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
-    .modal-content input { width: 100%; margin: 5px 0; padding: 8px; }
-    .prayer-modal, .idiot-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 3000; }
-    .prayer-modal-content, .idiot-modal-content { background: var(--card-bg); padding: 1rem; border-radius: 10px; text-align: center; width: 300px; }
-    .prayer-modal-content h3, .idiot-modal-content h3 { margin-bottom: 1rem; }
-    .prayer-modal-content p, .idiot-modal-content p { margin-bottom: 1rem; }
-    .prayer-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
-    /* Fatwa Modal */
-    .fatwa-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 4000; }
-    .fatwa-modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
-    .fatwa-modal-content button { margin: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; color: var(--text-light); background: var(--accent-color); }
-    /* Responsive Styles */
-    @media (max-width:768px) { main { padding: 1rem; } .side-nav { width: 250px; left: -250px; } .section-title { font-size: 1.5rem; } }
-    @media (max-width:480px) { header { padding: 0 1rem; } .logo { font-size: 1.5rem; } }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: var(--card-bg-solid);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px);
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--secondary-color);
+    }
+    
+    /* Prayer Modal */
+    .prayer-modal-content {
+      text-align: center;
+    }
+    
+    .prayer-modal-title {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+    }
+    
+    .prayer-modal-message {
+      margin-bottom: 1.5rem;
+    }
+    
+    .prayer-countdown {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 1.5rem 0;
+      color: var(--accent-color);
+    }
+    
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--border-radius);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .btn-primary {
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #00796b;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    /* ========================================================
+       Responsive Styles
+    ========================================================== */
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .side-nav {
+        width: 250px;
+        left: -250px;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .prayer-times {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      header {
+        padding: 0 1rem;
+      }
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+      
+      .hero-title {
+        font-size: 1.8rem;
+      }
+      
+      main {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -189,167 +624,218 @@
 
   <!-- Header -->
   <header>
-    <a href="#" class="logo">Fadis Youth</a>
-    <div class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+    <a href="#" class="logo">
+      <i class="fas fa-mosque"></i>
+      <span>Fadis Youth</span>
+    </a>
+    
+    <div class="header-actions">
+      <div class="notification-bell">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" id="notificationCount">3</span>
+      </div>
+      
+      <div class="user-avatar" id="userAvatar">
+        <i class="fas fa-user"></i>
+        <img id="userAvatarImage" src="" alt="User Avatar" style="display: none;">
+      </div>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </div>
   </header>
 
   <!-- Side Navigation -->
-  <nav class="side-nav">
-    <a href="#" class="nav-link" id="dashboardLink"><i class="fas fa-home"></i> <span data-key="dashboard">Dashboard</span></a>
-    <a href="quran.html" class="nav-link" id="quranLink"><i class="fas fa-book-quran"></i> <span data-key="quran">Quran</span></a>
-    <!-- Replace Prayer Times with Donate -->
-    <a href="pay.html" class="nav-link" id="donateLink"><i class="fas fa-donate"></i> <span data-key="donate">Donate</span></a>
-    <!-- Fatwa Link -->
-    <a href="#" class="nav-link" id="fatwaLink"><i class="fas fa-comments"></i> <span data-key="fatwa">Fatwa</span></a>
-    <!-- Fatwa Dropdown for Not Signed In Users -->
-    <div class="settings-dropdown" id="fatwaDropdown" style="display:none; margin-top:5px;">
-      <textarea id="fatwaQuestion" style="width:100%; height:60px; border:1px solid var(--secondary-color); border-radius:5px; padding:5px; background: transparent; color: var(--text-light);" placeholder="Enter your question..."></textarea>
-      <button id="fatwaSendBtn" class="submit-btn" style="margin-top:5px;">Send</button>
+  <nav class="side-nav" id="sideNav">
+    <div class="nav-section-title">Main Menu</div>
+    <a href="#" class="nav-link active" id="dashboardLink">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </a>
+    
+    <a href="quran.html" class="nav-link" id="quranLink">
+      <i class="fas fa-book-quran"></i>
+      <span>Quran</span>
+    </a>
+    
+    <a href="pay.html" class="nav-link" id="donateLink">
+      <i class="fas fa-donate"></i>
+      <span>Donate</span>
+    </a>
+    
+    <a href="#" class="nav-link" id="fatwaLink">
+      <i class="fas fa-comments"></i>
+      <span>Fatwa</span>
+    </a>
+    
+    <div class="nav-dropdown" id="fatwaDropdown">
+      <textarea id="fatwaQuestion" placeholder="Enter your question..." style="width: 100%; height: 80px; padding: 0.5rem; margin: 0.5rem 0; border-radius: 5px; background: rgba(0,0,0,0.2); border: 1px solid var(--secondary-color); color: var(--text-light);"></textarea>
+      <button id="fatwaSendBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">Send Question</button>
     </div>
-    <!-- About Us Link -->
-    <a href="about.html" class="nav-link" id="aboutLink"><i class="fas fa-info-circle"></i> <span data-key="aboutUs">About Us</span></a>
-    <!-- Settings Dropdown -->
-    <a href="#" class="nav-link" id="settingsLink"><i class="fas fa-cog"></i> <span data-key="settings">Settings</span></a>
-    <div class="settings-dropdown" id="settingsDropdown">
-      <div class="settings-section" id="accountsSection">
-        <a href="#" class="settings-header" id="accountsHeader"><i class="fas fa-user"></i> <span data-key="accounts">Accounts</span></a>
-        <div class="settings-submenu" id="accountsSubmenu">
-          <!-- Updated dynamically based on auth state -->
-        </div>
-      </div>
-      <div class="settings-section" id="languageSection">
-        <a href="#" class="settings-header" id="languageHeader"><i class="fas fa-language"></i> <span data-key="language">Language</span></a>
-        <div class="settings-submenu" id="languageSubmenu">
-          <a href="#" class="settings-item" data-lang="en" data-key="english">English</a>
-          <a href="#" class="settings-item" data-lang="om" data-key="afaanOromoo">Afaan Oromoo</a>
-          <a href="#" class="settings-item" data-lang="am" data-key="amharic">Amharic</a>
-        </div>
-      </div>
+    
+    <a href="about.html" class="nav-link" id="aboutLink">
+      <i class="fas fa-info-circle"></i>
+      <span>About Us</span>
+    </a>
+    
+    <div class="nav-section-title">Settings</div>
+    
+    <a href="#" class="nav-link" id="settingsLink">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+    
+    <div class="nav-dropdown" id="settingsDropdown">
+      <a href="#" id="editProfileLink">Edit Profile</a>
+      <a href="#" id="changeLanguageLink">Change Language</a>
+      <a href="#" id="logoutLink">Logout</a>
     </div>
-    <!-- Contact Dropdown -->
-    <a href="#" class="nav-link" id="contactLink"><i class="fas fa-address-book"></i> <span data-key="contactUs">Contact Us</span></a>
-    <div class="contact-dropdown" id="contactDropdown">
-      <a href="contact.html" class="contact-item" data-key="userContact">User Contact</a>
-      <a href="contactadmin.html" class="contact-item" data-key="adminContact">Admin Contact</a>
+    
+    <a href="#" class="nav-link" id="contactLink">
+      <i class="fas fa-address-book"></i>
+      <span>Contact Us</span>
+    </a>
+    
+    <div class="nav-dropdown" id="contactDropdown">
+      <a href="contact.html">User Contact</a>
+      <a href="contactadmin.html">Admin Contact</a>
     </div>
   </nav>
 
-  <!-- Fatwa Not Signed In Modal -->
-  <div class="fatwa-modal" id="fatwaModal">
-    <div class="fatwa-modal-content">
-      <p>Please sign in to send your Fatwa question.</p>
-      <button id="fatwaModalSignIn" class="submit-btn">Sign In</button>
-      <button id="fatwaModalCancel" class="submit-btn">Cancel</button>
-    </div>
-  </div>
-
-  <!-- Edit Account Modal -->
-  <div class="modal" id="editAccountModal">
-    <div class="modal-content">
-      <h3 data-key="editAccountTitle">Edit Account</h3>
-      <p id="userInfo"></p>
-      <!-- Profile Picture Upload -->
-      <div class="profile-upload" style="margin-bottom:1rem;">
-        <label for="profilePicUpload" style="display:block; margin-bottom:5px;">Profile Picture:</label>
-        <input type="file" id="profilePicUpload" accept="image/*">
-        <img id="profilePicPreview" src="" alt="Profile Picture Preview" style="display:none; width:100px; height:100px; border-radius:50%; margin-top:10px;">
-      </div>
-      <input type="text" id="newName" placeholder="New Name">
-      <input type="email" id="newEmail" placeholder="New Email">
-      <input type="password" id="newPassword" placeholder="New Password">
-      <input type="password" id="currentPassword" placeholder="Current Password">
-      <br>
-      <button id="saveAccountBtn" style="font-size:1.2em; padding:10px 20px; margin-top:10px;">Save</button>
-      <button id="cancelAccountBtn" style="font-size:1.2em; padding:10px 20px; margin-top:10px;">Cancel</button>
-      <br>
-      <span id="saveSpinner" style="display:none; font-size:1.1em; color: var(--secondary-color);">
-        <i class="fas fa-spinner fa-spin"></i> Updating...
-      </span>
-    </div>
-  </div>
-
   <!-- Main Content -->
   <main>
-    <!-- Profile Card Section (New) -->
-    <section class="dashboard-section" id="profileCardSection" style="display:none;">
-      <div class="profile-card">
-        <div id="profileCircle">
-          <i class="fas fa-user"></i>
-          <img id="profileImage" src="" alt="Profile Picture">
-        </div>
-        <div id="profileBio" style="margin-top:10px; color: var(--text-light);"></div>
-        <div style="margin-top:10px;">
-          <button id="profileLogoutBtn" class="submit-btn" style="margin-right:10px;">Logout</button>
-          <button id="profileEditBtn" class="submit-btn">Edit</button>
-        </div>
-        <input type="file" id="profileFileInput" accept="image/png, image/jpeg, image/jpg" style="display:none;">
-      </div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h1 class="hero-title">Welcome to Fadis Youth</h1>
+      <p class="hero-subtitle">Empowering Muslim youth through knowledge, community, and spiritual growth</p>
     </section>
-
-    <!-- Auth Checking Animation (in Prayer Section) -->
-    <div id="authCheck">
-      <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
-      <p>Checking account status...</p>
+    
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Prayer Times Card -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h3 class="card-title">Prayer Times</h3>
+          <div class="card-icon">
+            <i class="fas fa-pray"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <div id="dateDisplay" style="text-align: center; margin-bottom: 1rem; font-weight: 600;"></div>
+          <div class="prayer-times" id="prayerTimesContainer">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- User Profile Card -->
+      <div class="dashboard-card" id="profileCard" style="display: none;">
+        <div class="card-header">
+          <h3 class="card-title">Your Profile</h3>
+          <div class="card-icon">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        <div class="card-content" style="text-align: center;">
+          <div id="profileCircle" style="width: 100px; height: 100px; border-radius: 50%; background: #ccc; margin: 0 auto 1rem; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-user" style="font-size: 2.5rem; color: white;"></i>
+            <img id="profileImage" src="" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+          </div>
+          <h4 id="userName">Guest User</h4>
+          <p id="userEmail" style="opacity: 0.8; margin-bottom: 1rem;">Not signed in</p>
+          <div style="display: flex; gap: 0.5rem; justify-content: center;">
+            <button id="loginBtn" class="btn btn-primary">Login</button>
+            <button id="editProfileBtn" class="btn btn-secondary" style="display: none;">Edit Profile</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Actions Card -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h3 class="card-title">Quick Actions</h3>
+          <div class="card-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+        </div>
+        <div class="card-content">
+          <button class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="window.location.href='post.html'">
+            <i class="fas fa-share-alt" style="margin-right: 0.5rem;"></i> Share Your Thoughts
+          </button>
+          <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="window.location.href='fatwa.html'">
+            <i class="fas fa-question-circle" style="margin-right: 0.5rem;"></i> Ask a Fatwa
+          </button>
+          <button class="btn btn-secondary" style="width: 100%;" onclick="window.location.href='events.html'">
+            <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i> View Events
+          </button>
+        </div>
+      </div>
     </div>
-
-    <!-- Prayer Times Section -->
-    <section class="dashboard-section" id="prayerSection">
-      <div id="dateDisplay"></div>
-      <div id="upcomingPrayer"></div>
-    </section>
     
-    <!-- Donate Section (Replaces Fadis Sheik Section) -->
-    <section class="dashboard-section" id="donateSection">
-      <div class="section-header">
-        <h2 class="section-title" data-key="donate">Donate</h2>
+    <!-- Announcements Section -->
+    <div class="announcements-container">
+      <h2 style="margin-bottom: 1rem; color: var(--secondary-color);">Latest Announcements</h2>
+      <div id="announcementsList">
+        <!-- Filled by JavaScript -->
       </div>
-      <div style="text-align:center;">
-        <p data-key="donateDesc">Click the button below to donate.</p>
-        <button onclick="window.location.href='pay.html'" style="padding:10px 20px; font-size:1em; border:none; border-radius:5px; background: var(--accent-color); color: var(--text-light); cursor:pointer;" data-key="donateBtn">Donate Now</button>
-      </div>
-    </section>
+    </div>
     
-    <!-- posting -->
-    <section class="dashboard-section" id="topicSection">
-      <div class="section-header">
-        <i class="fas fa-bolt fa-2x" style="color: var(--accent-color)"></i>
-        <h2 class="section-title" data-key="topicSection">Yaada kee c</h2>
+    <!-- Recent Activities Section -->
+    <div class="dashboard-card" style="margin-top: 2rem;">
+      <div class="card-header">
+        <h3 class="card-title">Recent Activities</h3>
+        <div class="card-icon">
+          <i class="fas fa-history"></i>
+        </div>
       </div>
-      <div class="topic-card" onclick="window.location.href='post.html'">
-        <img src="post.png" alt="Featured Topic" class="topic-image">
-        <h3 class="topic-title" id="flashTopicTitle" data-key="featuredTopicTitle">Yaada kee share godhi</h3>
-        <p class="topic-description" id="flashTopicDesc" data-key="featuredTopicDescription">Yaada keef muudannoo kee qooduufi namootaa akka kee qunnamuuf buttoni kan chuqaasi</p>
+      <div class="card-content">
+        <div class="activity-list" id="activityList">
+          <!-- Filled by JavaScript -->
+        </div>
       </div>
-    </section>
+    </div>
   </main>
 
-  <!-- Prayer Now Modal -->
-  <div class="prayer-modal" id="prayerModal">
-    <div class="prayer-modal-content">
-      <h3 data-key="prayerNowTitle">Dhuhr prayer is now</h3>
-      <p data-key="prayerNowMessage">The Dhuhr prayer has started.</p>
-      <div id="prayerModalCountdown" style="font-size:1.5rem; margin:1rem 0;">15:00</div>
-      <button id="btnGoToPrayer" data-key="btnGoToPrayer">Go to Prayer</button>
-      <button id="btnImAnIdiot" data-key="btnImAnIdiot">I'm an idiot</button>
+  <!-- Prayer Modal -->
+  <div class="modal-overlay" id="prayerModal">
+    <div class="modal-content prayer-modal-content">
+      <button class="modal-close" id="closePrayerModal">&times;</button>
+      <h3 class="prayer-modal-title" id="prayerModalTitle">Dhuhr Prayer is Now</h3>
+      <p class="prayer-modal-message" id="prayerModalMessage">The Dhuhr prayer has started.</p>
+      <div class="prayer-countdown" id="prayerModalCountdown">15:00</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnGoToPrayer">Go to Prayer</button>
+        <button class="btn btn-secondary" id="btnImAnIdiot">I'm an idiot</button>
+      </div>
     </div>
   </div>
 
   <!-- Idiot Modal -->
-  <div class="idiot-modal" id="idiotModal">
-    <div class="idiot-modal-content">
-      <h3 data-key="idiotNotificationTitle">Warning</h3>
-      <p data-key="idiotNotificationMessage">You cannot cancel this notification for 14 minutes. Time left:</p>
-      <div id="idiotModalCountdown" style="font-size:1.5rem; margin:1rem 0;">14:00</div>
+  <div class="modal-overlay" id="idiotModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Warning</h3>
+      <p>You cannot cancel this notification for 14 minutes. Time left:</p>
+      <div class="prayer-countdown" id="idiotModalCountdown">14:00</div>
     </div>
   </div>
 
-  <!-- ========================================================
-       Service Worker Registration
-  ========================================================== -->
+  <!-- Fatwa Modal -->
+  <div class="modal-overlay" id="fatwaModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeFatwaModal">&times;</button>
+      <h3 class="modal-title">Fatwa Question</h3>
+      <p>Please sign in to send your Fatwa question.</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="fatwaModalSignIn">Sign In</button>
+        <button class="btn btn-secondary" id="fatwaModalCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -364,9 +850,7 @@
     }
   </script>
 
-  <!-- ========================================================
-       JavaScript: Global Functions & Initialization
-  ========================================================== -->
+  <!-- Main JavaScript -->
   <script>
     /* ---------------------------
        Global Variables
@@ -379,175 +863,292 @@
     let prayerModalShown = false;
     let prayerModalTimerInterval;
     let idiotModalTimerInterval;
-    const flashTopics = [
-      { title: "Ikhwat Al-inaam", desc: "yaada kee share godhuun foyys'i" },
-      { title: "Fadis Youth", desc: "muudannoobteetis share godhuu ni dandeessa" },
-      { title: "Waliin Hojjannee", desc: "fi fatwas gaafi barbaaddeef deebi argachuuf" },
-      { title: "Ofis Has Jijjiruu", desc: "Baga nagaan dhufte" },
-      { title: "Other Motivation", desc: "Motivational message 5" }
-    ];
-    let flashIndex = 0;
+    const db = firebase.firestore();
+    const storage = firebase.storage();
     
     /* ---------------------------
-       Translation Data
+       DOM Elements
     --------------------------- */
-    const translations = {
-      en: {
-        dashboard: "Dashboard",
-        quran: "Quran",
-        prayerTimes: "Prayer Times",
-        fatwa: "Fatwa",
-        settings: "Settings",
-        contactUs: "Contact Us",
-        aboutUs: "About Us",
-        prayerSection: "Prayer Times",
-        fadisSheik: "Fadis Sheik",
-        fadisDescription: "Click the button below to view details about Fadis Sheik.",
-        viewFadis: "View Fadis Sheik",
-        prayerNowTitle: "Dhuhr prayer is now",
-        prayerNowMessage: "The Dhuhr prayer has started.",
-        btnGoToPrayer: "Go to Prayer",
-        btnImAnIdiot: "I'm an idiot",
-        idiotNotificationTitle: "Warning",
-        idiotNotificationMessage: "You cannot cancel this notification for 14 minutes. Time left:",
-        accounts: "Accounts",
-        language: "Language",
-        editAccount: "Edit Account",
-        logout: "Logout",
-        editAccountTitle: "Edit Account",
-        login: "Login",
-        topicSection: "Featured Topic",
-        featuredTopicTitle: "Ikhwat Al-inaam",
-        featuredTopicDescription: "Click here to explore the featured topic.",
-        userContact: "User Contact",
-        adminContact: "Admin Contact",
-        donate: "Donate",
-        donateDesc: "Click the button below to donate.",
-        donateBtn: "Donate Now"
-      },
-      om: {
-        dashboard: "Balbala",
-        quran: "Quraana",
-        prayerTimes: "Yeroo kadhannaa",
-        fatwa: "Fatawaa",
-        settings: "To’annaa",
-        contactUs: "Nu qunnamaa",
-        aboutUs: "Wa'ee",
-        prayerSection: "Yeroo kadhannaa",
-        fadisSheik: "Fadis Sheik",
-        fadisDescription: "Tartiiba Fadis Sheik ilaalchisee odeeffannoo argachuuf cuqaasaa.",
-        viewFadis: "Fadis Sheik Ilaali",
-        prayerNowTitle: "Kadhannaa Zuhur ammaa jirti",
-        prayerNowMessage: "Kadhannaa Zuhur jalqabameera.",
-        btnGoToPrayer: "Kadhannaa deemi",
-        btnImAnIdiot: "Ani dadhabne",
-        idiotNotificationTitle: "Beeksisa",
-        idiotNotificationMessage: "Kuni 14 daqiiqaa hin dhiyaatu. Yeroo hafe:",
-        accounts: "Akaawuntii",
-        language: "Afaan",
-        editAccount: "Edit Account",
-        logout: "Logout",
-        editAccountTitle: "Edit Account",
-        login: "Seensa",
-        topicSection: "Yaada kee qooduuf",
-        featuredTopicTitle: "Ikhwat Al-inaam",
-        featuredTopicDescription: "Asitti, yaada kee namiota muslimasf qoodi.",
-        userContact: "Nu qunnamaa",
-        adminContact: "Qunnamtii Bulchaa",
-        donate: "Kennaa",
-        donateDesc: "Asitti, kennaa gochuuf cuqaasaa.",
-        donateBtn: "Ammas Kennaa"
-      },
-      am: {
-        dashboard: "ዳሽቦርድ",
-        quran: "ቁርአን",
-        prayerTimes: "የጸሎት ሰዓታት",
-        fatwa: "ፋትዋ",
-        settings: "ቅንብሮች",
-        contactUs: "አድራሻ",
-        aboutUs: "ስለ እኛ",
-        prayerSection: "የጸሎት ሰዓታት",
-        fadisSheik: "Fadis Sheik",
-        fadisDescription: "በFadis Sheik ዙሪያ ዝርዝር መረጃ ለማግኘት አድርጉ.",
-        viewFadis: "Fadis Sheik አሳይ",
-        prayerNowTitle: "ዱሁር ጸሎት አሁን ይቀርባል",
-        prayerNowMessage: "ዱሁር ጸሎት ጀምሯል።",
-        btnGoToPrayer: "ወደ ጸሎት ሂድ",
-        btnImAnIdiot: "እኔ ድካም ነኝ",
-        idiotNotificationTitle: "ማሳወቂያ",
-        idiotNotificationMessage: "ይህ 14 ደቂቃ በሙሉ አይቋረጥም። የቀረው ጊዜ:",
-        accounts: "መለያዎች",
-        language: "ቋንቋ",
-        editAccount: "Edit Account",
-        logout: "Logout",
-        editAccountTitle: "Edit Account",
-        login: "ግባ",
-        topicSection: "ተጨማሪ ርእሶች",
-        featuredTopicTitle: "ኢክህዋት አል-ኢናም",
-        featuredTopicDescription: "ተጨማሪ ርእስ ለማየት እዚህ ጠቅ ያድርጉ።",
-        userContact: "የተጠቃሚ አድራሻ",
-        adminContact: "የአስተዳደር አድራሻ",
-        donate: "Donate",
-        donateDesc: "Click the button below to donate.",
-        donateBtn: "Donate Now"
-      }
-    };
-
+    const hamburger = document.getElementById('hamburger');
+    const sideNav = document.getElementById('sideNav');
+    const userAvatar = document.getElementById('userAvatar');
+    const userAvatarImage = document.getElementById('userAvatarImage');
+    const profileCard = document.getElementById('profileCard');
+    const profileCircle = document.getElementById('profileCircle');
+    const profileImage = document.getElementById('profileImage');
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const loginBtn = document.getElementById('loginBtn');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const prayerTimesContainer = document.getElementById('prayerTimesContainer');
+    const announcementsList = document.getElementById('announcementsList');
+    const activityList = document.getElementById('activityList');
+    
     /* ---------------------------
-       Update Translations Function
+       Initialize UI
     --------------------------- */
-    function updateTranslations() {
-      document.querySelectorAll('[data-key]').forEach(el => {
-        const key = el.getAttribute('data-key');
-        if (translations[currentLanguage] && translations[currentLanguage][key]) {
-          el.textContent = translations[currentLanguage][key];
+    document.addEventListener('DOMContentLoaded', () => {
+      initNavigation();
+      initModals();
+      fetchHijriDate();
+      getPrayerTimes();
+      fetchAnnouncements();
+      fetchRecentActivities();
+      
+      // Create extra floating ornaments for effect
+      for (let i = 0; i < 5; i++) {
+        const ornament = document.createElement('div');
+        ornament.className = 'floating-ornament';
+        ornament.style.left = `${Math.random() * 100}%`;
+        ornament.style.animationDelay = `${Math.random() * 10}s`;
+        document.body.appendChild(ornament);
+      }
+      
+      // Initialize Firebase auth state listener
+      firebase.auth().onAuthStateChanged(user => {
+        updateUserProfile(user);
+      });
+    });
+    
+    /* ---------------------------
+       Navigation Functions
+    --------------------------- */
+    function initNavigation() {
+      // Hamburger menu toggle
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        sideNav.classList.toggle('active');
+      });
+      
+      // Fatwa dropdown toggle
+      const fatwaLink = document.getElementById('fatwaLink');
+      const fatwaDropdown = document.getElementById('fatwaDropdown');
+      fatwaLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const user = firebase.auth().currentUser;
+        if (user) {
+          window.location.href = 'fatwa.html';
+        } else {
+          fatwaDropdown.style.display = fatwaDropdown.style.display === 'flex' ? 'none' : 'flex';
         }
       });
-      updateDateDisplay();
-      updateAccountsSubmenu();
+      
+      // Settings dropdown toggle
+      const settingsLink = document.getElementById('settingsLink');
+      const settingsDropdown = document.getElementById('settingsDropdown');
+      settingsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        settingsDropdown.style.display = settingsDropdown.style.display === 'flex' ? 'none' : 'flex';
+      });
+      
+      // Contact dropdown toggle
+      const contactLink = document.getElementById('contactLink');
+      const contactDropdown = document.getElementById('contactDropdown');
+      contactLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        contactDropdown.style.display = contactDropdown.style.display === 'flex' ? 'none' : 'flex';
+      });
+      
+      // Fatwa send button
+      const fatwaSendBtn = document.getElementById('fatwaSendBtn');
+      fatwaSendBtn.addEventListener('click', () => {
+        const question = document.getElementById('fatwaQuestion').value.trim();
+        if (!question) {
+          alert('Please enter your question.');
+          return;
+        }
+        
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          document.getElementById('fatwaModal').classList.add('active');
+          return;
+        }
+        
+        // Save question to Firestore
+        db.collection('fatwaQuestions').add({
+          question: question,
+          userId: user.uid,
+          userName: user.displayName || 'Anonymous',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          status: 'pending'
+        }).then(() => {
+          alert('Your question has been submitted successfully!');
+          document.getElementById('fatwaQuestion').value = '';
+          fatwaDropdown.style.display = 'none';
+        }).catch(error => {
+          console.error('Error submitting question:', error);
+          alert('There was an error submitting your question. Please try again.');
+        });
+      });
+      
+      // Login button
+      loginBtn.addEventListener('click', () => {
+        window.location.href = 'login.html';
+      });
+      
+      // Edit profile button
+      editProfileBtn.addEventListener('click', () => {
+        window.location.href = 'account.html';
+      });
+      
+      // Logout link
+      const logoutLink = document.getElementById('logoutLink');
+      logoutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        firebase.auth().signOut().then(() => {
+          window.location.reload();
+        }).catch(error => {
+          console.error('Logout error:', error);
+        });
+      });
     }
-
+    
     /* ---------------------------
-       Date & Calendar Functions
+       Modal Functions
     --------------------------- */
-    function updateDateDisplay() {
-      const dateDisplay = document.getElementById("dateDisplay");
-      let now = new Date();
-      let day = now.getDate();
-      let month = now.toLocaleString(currentLanguage, { month: 'long' });
-      let year = now.getFullYear();
-      gregorianDateStr = `${day} ${month} ${year}`;
-      dateDisplay.textContent = (displayHijri && hijriDateStr) ? hijriDateStr : gregorianDateStr;
+    function initModals() {
+      // Prayer modal
+      const prayerModal = document.getElementById('prayerModal');
+      const closePrayerModal = document.getElementById('closePrayerModal');
+      const btnGoToPrayer = document.getElementById('btnGoToPrayer');
+      const btnImAnIdiot = document.getElementById('btnImAnIdiot');
+      
+      closePrayerModal.addEventListener('click', () => {
+        prayerModal.classList.remove('active');
+      });
+      
+      btnGoToPrayer.addEventListener('click', () => {
+        window.close();
+      });
+      
+      btnImAnIdiot.addEventListener('click', () => {
+        clearInterval(prayerModalTimerInterval);
+        prayerModal.classList.remove('active');
+        showIdiotModal();
+      });
+      
+      // Fatwa modal
+      const fatwaModal = document.getElementById('fatwaModal');
+      const closeFatwaModal = document.getElementById('closeFatwaModal');
+      const fatwaModalSignIn = document.getElementById('fatwaModalSignIn');
+      const fatwaModalCancel = document.getElementById('fatwaModalCancel');
+      
+      closeFatwaModal.addEventListener('click', () => {
+        fatwaModal.classList.remove('active');
+      });
+      
+      fatwaModalSignIn.addEventListener('click', () => {
+        window.location.href = 'login.html';
+      });
+      
+      fatwaModalCancel.addEventListener('click', () => {
+        fatwaModal.classList.remove('active');
+      });
     }
-    function fetchHijriDate() {
-      let now = new Date();
-      let dd = String(now.getDate()).padStart(2, '0');
-      let mm = String(now.getMonth() + 1).padStart(2, '0');
-      let yyyy = now.getFullYear();
-      const endpoint = `https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`;
-      fetch(endpoint)
-        .then(response => response.json())
-        .then(data => {
-          const hijri = data.data.hijri;
-          hijriDateStr = `${hijri.day} ${hijri.month.en} ${hijri.year}`;
-          updateDateDisplay();
-        })
-        .catch(err => { hijriDateStr = ""; updateDateDisplay(); });
+    
+    function showPrayerModal() {
+      const prayerModal = document.getElementById('prayerModal');
+      prayerModal.classList.add('active');
+      prayerModalShown = true;
+      
+      let countdown = 15 * 60;
+      updatePrayerModalCountdown(countdown);
+      
+      prayerModalTimerInterval = setInterval(() => {
+        countdown--;
+        updatePrayerModalCountdown(countdown);
+        
+        if (countdown <= 0) {
+          clearInterval(prayerModalTimerInterval);
+          prayerModal.classList.remove('active');
+          prayerModalShown = false;
+        }
+      }, 1000);
     }
-    setInterval(() => { displayHijri = !displayHijri; updateDateDisplay(); }, 30000);
-
+    
+    function updatePrayerModalCountdown(seconds) {
+      const element = document.getElementById('prayerModalCountdown');
+      let min = Math.floor(seconds / 60);
+      let sec = seconds % 60;
+      element.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+    
+    function showIdiotModal() {
+      const idiotModal = document.getElementById('idiotModal');
+      idiotModal.classList.add('active');
+      
+      let countdown = 14 * 60;
+      updateIdiotModalCountdown(countdown);
+      
+      idiotModalTimerInterval = setInterval(() => {
+        countdown--;
+        updateIdiotModalCountdown(countdown);
+        
+        if (countdown <= 0) {
+          clearInterval(idiotModalTimerInterval);
+          idiotModal.classList.remove('active');
+        }
+      }, 1000);
+    }
+    
+    function updateIdiotModalCountdown(seconds) {
+      const element = document.getElementById('idiotModalCountdown');
+      let min = Math.floor(seconds / 60);
+      let sec = seconds % 60;
+      element.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+    
     /* ---------------------------
-       Sidebar & Hamburger Toggle
+       User Profile Functions
     --------------------------- */
-    const hamburger = document.querySelector('.hamburger');
-    const sideNav = document.querySelector('.side-nav');
-    hamburger.addEventListener('click', () => { 
-      hamburger.classList.toggle('active'); 
-      sideNav.classList.toggle('active'); 
-    });
-
+    function updateUserProfile(user) {
+      if (user) {
+        // User is signed in
+        profileCard.style.display = 'block';
+        userName.textContent = user.displayName || 'User';
+        userEmail.textContent = user.email;
+        loginBtn.style.display = 'none';
+        editProfileBtn.style.display = 'block';
+        
+        // Update avatar in header
+        if (user.photoURL) {
+          userAvatarImage.src = user.photoURL;
+          userAvatarImage.style.display = 'block';
+          userAvatar.querySelector('i').style.display = 'none';
+        } else {
+          userAvatarImage.style.display = 'none';
+          userAvatar.querySelector('i').style.display = 'block';
+        }
+        
+        // Update profile picture
+        if (user.photoURL) {
+          profileImage.src = user.photoURL;
+          profileImage.style.display = 'block';
+          profileCircle.querySelector('i').style.display = 'none';
+        } else {
+          profileImage.style.display = 'none';
+          profileCircle.querySelector('i').style.display = 'block';
+        }
+      } else {
+        // User is signed out
+        profileCard.style.display = 'block';
+        userName.textContent = 'Guest User';
+        userEmail.textContent = 'Not signed in';
+        loginBtn.style.display = 'block';
+        editProfileBtn.style.display = 'none';
+        
+        // Reset avatar
+        userAvatarImage.style.display = 'none';
+        userAvatar.querySelector('i').style.display = 'block';
+        
+        // Reset profile picture
+        profileImage.style.display = 'none';
+        profileCircle.querySelector('i').style.display = 'block';
+      }
+    }
+    
     /* ---------------------------
-       Prayer Times & Countdown Functions
+       Prayer Times Functions
     --------------------------- */
     async function getPrayerTimes() {
       try {
@@ -556,21 +1157,28 @@
         let mm = String(today.getMonth() + 1).padStart(2, '0');
         let yyyy = today.getFullYear();
         const currentDate = `${dd}-${mm}-${yyyy}`;
+        
         const endpoint = `https://api.aladhan.com/v1/timingsByAddress/${currentDate}?address=Addis%20Ababa,Ethiopia&method=8`;
         const response = await fetch(endpoint);
         const data = await response.json();
+        
         prayerTimings = data.data.timings;
-        updateUpcomingPrayer();
+        updatePrayerTimesDisplay();
       } catch (error) {
-        document.getElementById('upcomingPrayer').innerHTML = `<p class="error">Unable to fetch prayer times</p>`;
+        console.error('Error fetching prayer times:', error);
+        prayerTimesContainer.innerHTML = '<p>Unable to fetch prayer times</p>';
       }
     }
-    function updateUpcomingPrayer() {
+    
+    function updatePrayerTimesDisplay() {
       if (!prayerTimings) return;
-      let now = new Date();
+      
       const prayerNames = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-      let upcomingPrayerName = "";
-      let upcomingPrayerTime = null;
+      let now = new Date();
+      let currentPrayer = null;
+      let nextPrayer = null;
+      
+      // Find current and next prayer
       for (let i = 0; i < prayerNames.length; i++) {
         let pname = prayerNames[i];
         let timeStr = prayerTimings[pname];
@@ -578,8 +1186,95 @@
         let hours = parseInt(parts[0], 10);
         let minutes = parseInt(parts[1], 10);
         let prayerDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-        if (prayerDate > now) { upcomingPrayerName = pname; upcomingPrayerTime = prayerDate; break; }
+        
+        if (prayerDate <= now) {
+          currentPrayer = pname;
+        } else if (!nextPrayer) {
+          nextPrayer = pname;
+        }
       }
+      
+      // If no current prayer found (before Fajr), set Isha as current
+      if (!currentPrayer) {
+        currentPrayer = "Isha";
+        let yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        let timeStr = prayerTimings["Isha"];
+        let parts = timeStr.split(":");
+        let hours = parseInt(parts[0], 10);
+        let minutes = parseInt(parts[1], 10);
+        let prayerDate = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), hours, minutes, 0);
+        
+        if (prayerDate <= now) {
+          currentPrayer = "Isha";
+        }
+      }
+      
+      // Display prayer times
+      prayerTimesContainer.innerHTML = '';
+      
+      prayerNames.forEach(pname => {
+        const prayerTime = document.createElement('div');
+        prayerTime.className = 'prayer-time';
+        
+        if (pname === currentPrayer) {
+          prayerTime.classList.add('current-prayer');
+        }
+        
+        const prayerName = document.createElement('div');
+        prayerName.className = 'prayer-name';
+        prayerName.textContent = pname;
+        
+        const prayerTimeValue = document.createElement('div');
+        prayerTimeValue.className = 'prayer-time-value';
+        prayerTimeValue.textContent = convertToEthiopianTimeStr(prayerTimings[pname]);
+        
+        prayerTime.appendChild(prayerName);
+        prayerTime.appendChild(prayerTimeValue);
+        prayerTimesContainer.appendChild(prayerTime);
+      });
+      
+      // Update countdown to next prayer
+      updatePrayerCountdown();
+    }
+    
+    function convertToEthiopianTimeStr(timeStr) {
+      const parts = timeStr.split(":");
+      let hours = parseInt(parts[0], 10);
+      let minutes = parseInt(parts[1], 10);
+      
+      // Ethiopian time is GMT+3, so subtract 6 hours for display (since API returns local time)
+      let etHour = hours - 6;
+      if (etHour <= 0) { etHour += 12; }
+      
+      let label = (hours >= 6 && hours < 18) ? "AM" : "PM";
+      return `${etHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${label}`;
+    }
+    
+    function updatePrayerCountdown() {
+      if (!prayerTimings) return;
+      
+      let now = new Date();
+      const prayerNames = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+      let upcomingPrayerName = "";
+      let upcomingPrayerTime = null;
+      
+      for (let i = 0; i < prayerNames.length; i++) {
+        let pname = prayerNames[i];
+        let timeStr = prayerTimings[pname];
+        let parts = timeStr.split(":");
+        let hours = parseInt(parts[0], 10);
+        let minutes = parseInt(parts[1], 10);
+        let prayerDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        
+        if (prayerDate > now) {
+          upcomingPrayerName = pname;
+          upcomingPrayerTime = prayerDate;
+          break;
+        }
+      }
+      
       if (!upcomingPrayerTime) {
         let timeStr = prayerTimings["Fajr"];
         let parts = timeStr.split(":");
@@ -590,341 +1285,162 @@
         tomorrow.setDate(tomorrow.getDate() + 1);
         upcomingPrayerTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), hours, minutes, 0);
       }
+      
       let diffSec = Math.floor((upcomingPrayerTime - now) / 1000);
-      if (diffSec <= 0 && !prayerModalShown) { showPrayerModal(); }
-      let hoursLeft = Math.floor(diffSec / 3600);
-      let minutesLeft = Math.floor((diffSec % 3600) / 60);
-      let secondsLeft = diffSec % 60;
-      let countdownStr = `${hoursLeft.toString().padStart(2, '0')}:${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`;
-      let etPrayerTimeStr = convertToEthiopianTime(upcomingPrayerTime);
-      const upcomingDiv = document.getElementById("upcomingPrayer");
-      upcomingDiv.innerHTML = `<div style="font-size:1.4rem; margin-bottom:0.5rem;">Upcoming Prayer: <strong>${upcomingPrayerName}</strong></div>
-        <div style="font-size:1.2rem;">Time: ${etPrayerTimeStr}</div>
-        <div style="font-size:1.2rem;">Time Left: ${countdownStr}</div>`;
+      
+      // If prayer time has arrived and modal not shown yet
+      if (diffSec <= 0 && !prayerModalShown) {
+        showPrayerModal();
+      }
     }
-    setInterval(updateUpcomingPrayer, 1000);
-    function convertToEthiopianTime(dateObj) {
-      let standardHours = dateObj.getHours();
-      let minutes = dateObj.getMinutes();
-      let etHour = standardHours - 6;
-      if (etHour <= 0) { etHour += 12; }
-      let label = (standardHours >= 6 && standardHours < 18) ? "AM" : "PM";
-      return `${etHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${label}`;
-    }
-    function showPrayerModal() {
-      const modal = document.getElementById("prayerModal");
-      modal.style.display = "flex";
-      prayerModalShown = true;
-      let countdown = 15 * 60;
-      updatePrayerModalCountdown(countdown);
-      prayerModalTimerInterval = setInterval(() => {
-        countdown--;
-        updatePrayerModalCountdown(countdown);
-        if (countdown <= 0) { clearInterval(prayerModalTimerInterval); modal.style.display = "none"; prayerModalShown = false; }
-      }, 1000);
-    }
-    function updatePrayerModalCountdown(seconds) {
-      const element = document.getElementById("prayerModalCountdown");
-      let min = Math.floor(seconds / 60);
-      let sec = seconds % 60;
-      element.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    }
-    function showIdiotModal() {
-      const idiotModal = document.getElementById("idiotModal");
-      idiotModal.style.display = "flex";
-      let countdown = 14 * 60;
-      updateIdiotModalCountdown(countdown);
-      idiotModalTimerInterval = setInterval(() => {
-        countdown--;
-        updateIdiotModalCountdown(countdown);
-        if (countdown <= 0) { clearInterval(idiotModalTimerInterval); idiotModal.style.display = "none"; }
-      }, 1000);
-    }
-    function updateIdiotModalCountdown(seconds) {
-      const element = document.getElementById("idiotModalCountdown");
-      let min = Math.floor(seconds / 60);
-      let sec = seconds % 60;
-      element.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    }
-    document.getElementById("btnGoToPrayer").addEventListener('click', () => { window.close(); });
-    document.getElementById("btnImAnIdiot").addEventListener('click', () => { clearInterval(prayerModalTimerInterval); document.getElementById("prayerModal").style.display = "none"; showIdiotModal(); });
-
+    
+    setInterval(updatePrayerCountdown, 1000);
+    
     /* ---------------------------
-       Featured Topic Flashcard Rotation
+       Date & Calendar Functions
     --------------------------- */
-    function rotateFlashTopic() {
-      flashIndex = (flashIndex + 1) % flashTopics.length;
-      const topicTitleEl = document.getElementById("flashTopicTitle");
-      const topicDescEl = document.getElementById("flashTopicDesc");
-      topicTitleEl.textContent = flashTopics[flashIndex].title;
-      topicDescEl.textContent = flashTopics[flashIndex].desc;
-    }
-    setInterval(rotateFlashTopic, 20000);
-
-    /* ---------------------------
-       Contact Dropdown Toggle
-    --------------------------- */
-    const contactLink = document.getElementById('contactLink');
-    const contactDropdown = document.getElementById('contactDropdown');
-    contactLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      contactDropdown.style.display = (contactDropdown.style.display === 'none' || contactDropdown.style.display === '') ? 'flex' : 'none';
-    });
-
-    /* ---------------------------
-       Fatwa Dropdown for Not Signed In Users
-    --------------------------- */
-    const fatwaLink = document.getElementById("fatwaLink");
-    const fatwaDropdown = document.getElementById("fatwaDropdown");
-    const fatwaSendBtn = document.getElementById("fatwaSendBtn");
-    fatwaLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      const user = firebase.auth().currentUser;
-      if (user) { window.location.href = "fatwa.html"; }
-      else { fatwaDropdown.style.display = (fatwaDropdown.style.display === "none" || fatwaDropdown.style.display === "") ? "block" : "none"; }
-    });
-    fatwaSendBtn.addEventListener("click", () => {
-      const question = document.getElementById("fatwaQuestion").value.trim();
-      if (!question) { alert("Please enter your question."); return; }
-      document.getElementById("fatwaModal").style.display = "flex";
-    });
-    const fatwaModalSignIn = document.getElementById("fatwaModalSignIn");
-    const fatwaModalCancel = document.getElementById("fatwaModalCancel");
-    fatwaModalSignIn.addEventListener("click", () => { window.location.href = "login.html"; });
-    fatwaModalCancel.addEventListener("click", () => { document.getElementById("fatwaModal").style.display = "none"; });
-
-    /* ---------------------------
-       Accounts Submenu Update
-    --------------------------- */
-    function updateAccountsSubmenu() {
-      const accountsSubmenu = document.getElementById("accountsSubmenu");
-      accountsSubmenu.innerHTML = "";
-      const user = firebase.auth().currentUser;
-      if (user) {
-        accountsSubmenu.innerHTML = `<a href="#" class="settings-item" id="editAccountLink" data-key="editAccount">Edit Account</a>
-                                     <a href="#" class="settings-item" id="logoutLink" data-key="logout">Logout</a>`;
-        document.getElementById("editAccountLink").addEventListener("click", (e) => {
-          e.preventDefault();
-          const unsubscribe = firebase.auth().onAuthStateChanged(u => {
-            unsubscribe();
-            if (!u) {
-              alert("You don't have an account. Please sign in.");
-              window.location.href = "login.html";
-            } else {
-              document.getElementById("userInfo").innerText = "Logged in as: " + (u.displayName || "Unknown") + " (" + u.email + ")";
-              document.getElementById("newName").value = "";
-              document.getElementById("newEmail").value = "";
-              document.getElementById("newPassword").value = "";
-              document.getElementById("currentPassword").value = "";
-              document.getElementById("profilePicUpload").value = "";
-              document.getElementById("profilePicPreview").style.display = "none";
-              document.getElementById("profilePicPreview").src = "";
-              document.getElementById("editAccountModal").style.display = "flex";
-            }
-          });
+    function fetchHijriDate() {
+      let now = new Date();
+      let dd = String(now.getDate()).padStart(2, '0');
+      let mm = String(now.getMonth() + 1).padStart(2, '0');
+      let yyyy = now.getFullYear();
+      
+      const endpoint = `https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`;
+      
+      fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+          const hijri = data.data.hijri;
+          hijriDateStr = `${hijri.day} ${hijri.month.en} ${hijri.year}`;
+          updateDateDisplay();
+        })
+        .catch(err => {
+          console.error('Error fetching Hijri date:', err);
+          hijriDateStr = "";
+          updateDateDisplay();
         });
-        document.getElementById("logoutLink").addEventListener("click", (e) => {
-          e.preventDefault();
-          firebase.auth().signOut().then(() => { window.location.href = "login.html"; }).catch(error => { console.error(error); });
-        });
-      } else {
-        accountsSubmenu.innerHTML = `<a href="login.html" class="settings-item" data-key="login">Login</a>`;
-      }
     }
-
+    
+    function updateDateDisplay() {
+      const dateDisplay = document.getElementById("dateDisplay");
+      let now = new Date();
+      
+      let day = now.getDate();
+      let month = now.toLocaleString(currentLanguage, { month: 'long' });
+      let year = now.getFullYear();
+      gregorianDateStr = `${day} ${month} ${year}`;
+      
+      dateDisplay.textContent = (displayHijri && hijriDateStr) ? hijriDateStr : gregorianDateStr;
+    }
+    
+    // Toggle between Gregorian and Hijri every 30 seconds
+    setInterval(() => {
+      displayHijri = !displayHijri;
+      updateDateDisplay();
+    }, 30000);
+    
     /* ---------------------------
-       Edit Account Modal Functionality (with Spinner & Profile Picture Upload)
+       Announcements Functions
     --------------------------- */
-    const editAccountModal = document.getElementById("editAccountModal");
-    const saveAccountBtn = document.getElementById("saveAccountBtn");
-    const cancelAccountBtn = document.getElementById("cancelAccountBtn");
-    cancelAccountBtn.addEventListener("click", () => { editAccountModal.style.display = "none"; });
-    saveAccountBtn.addEventListener("click", async () => {
-      const spinner = document.getElementById("saveSpinner");
-      spinner.style.display = "inline-block";
-      const user = firebase.auth().currentUser;
-      if (user) {
-        const newName = document.getElementById("newName").value.trim();
-        const newEmail = document.getElementById("newEmail").value.trim();
-        const newPassword = document.getElementById("newPassword").value;
-        const currentPassword = document.getElementById("currentPassword").value;
-        const profilePicInput = document.getElementById("profilePicUpload");
-        let profilePicDataUrl = "";
-        if (profilePicInput.files.length > 0) {
-          const file = profilePicInput.files[0];
-          profilePicDataUrl = await new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onload = function(evt) { resolve(evt.target.result); };
-            reader.readAsDataURL(file);
-          });
-        }
-        if ((newEmail && newEmail !== user.email) || newPassword) {
-          if (!currentPassword) { alert("Please enter your current password for verification."); spinner.style.display = "none"; return; }
-          const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-          try { await user.reauthenticateWithCredential(credential); }
-          catch (error) { alert("Current password is incorrect. " + error.message); spinner.style.display = "none"; return; }
-        }
-        try {
-          if (newName && newName !== user.displayName) { await user.updateProfile({ displayName: newName }); }
-          if (newEmail && newEmail !== user.email) { await user.updateEmail(newEmail); }
-          if (newPassword) { await user.updatePassword(newPassword); }
-          if (profilePicDataUrl) { await user.updateProfile({ photoURL: profilePicDataUrl }); }
-          alert("Account updated successfully!");
-          editAccountModal.style.display = "none";
-        } catch (error) { alert("Error updating account: " + error.message); }
-      }
-      spinner.style.display = "none";
-    });
-
-    /* ---------------------------
-       Profile Card Setup (New)
-    --------------------------- */
-    function setupProfileCard() {
-      const profileCardSection = document.getElementById('profileCardSection');
-      const profileCircle = document.getElementById('profileCircle');
-      const profileFileInput = document.getElementById('profileFileInput');
-      const profileImage = document.getElementById('profileImage');
-      const profileBio = document.getElementById('profileBio');
-      const profileLogoutBtn = document.getElementById('profileLogoutBtn');
-      const profileEditBtn = document.getElementById('profileEditBtn');
-
-      const user = firebase.auth().currentUser;
-      if (user) {
-        profileCardSection.style.display = 'block';
-        // Set bio: display name, email, and a short message
-        profileBio.innerHTML = `<strong>${user.displayName || "User"}</strong><br>${user.email}<br>This is your account.`;
-        if (user.photoURL) {
-          profileImage.src = user.photoURL;
-          profileImage.style.display = 'block';
-          profileCircle.querySelector('i').style.display = 'none';
-        } else {
-          profileImage.style.display = 'none';
-          profileCircle.querySelector('i').style.display = 'block';
-        }
-      } else {
-        profileCardSection.style.display = 'none';
-      }
-
-      profileCircle.addEventListener('click', () => { profileFileInput.click(); });
-
-      profileFileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async function(evt) {
-            profileImage.src = evt.target.result;
-            profileImage.style.display = 'block';
-            profileCircle.querySelector('i').style.display = 'none';
-            try {
-              await firebase.auth().currentUser.updateProfile({ photoURL: evt.target.result });
-              alert("Profile picture updated!");
-            } catch (err) {
-              alert("Failed to update profile picture: " + err.message);
-            }
+    function fetchAnnouncements() {
+      db.collection('announcements')
+        .orderBy('createdAt', 'desc')
+        .limit(5)
+        .get()
+        .then(querySnapshot => {
+          announcementsList.innerHTML = '';
+          
+          if (querySnapshot.empty) {
+            announcementsList.innerHTML = '<p>No announcements found</p>';
+            return;
           }
-          reader.readAsDataURL(file);
-        }
-      });
-
-      profileLogoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        firebase.auth().signOut().then(() => { window.location.href = "login.html"; }).catch(err => { console.error(err); });
-      });
-
-      profileEditBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = "account.html";
-      });
+          
+          querySnapshot.forEach(doc => {
+            const announcement = doc.data();
+            const announcementElement = document.createElement('div');
+            announcementElement.className = 'announcement';
+            
+            const title = document.createElement('h3');
+            title.className = 'announcement-title';
+            title.textContent = announcement.title;
+            
+            const date = document.createElement('div');
+            date.className = 'announcement-date';
+            date.textContent = new Date(announcement.createdAt.seconds * 1000).toLocaleDateString();
+            
+            const content = document.createElement('div');
+            content.className = 'announcement-content';
+            content.textContent = announcement.content;
+            
+            announcementElement.appendChild(title);
+            announcementElement.appendChild(date);
+            announcementElement.appendChild(content);
+            
+            announcementsList.appendChild(announcementElement);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching announcements:', error);
+          announcementsList.innerHTML = '<p>Error loading announcements</p>';
+        });
     }
-
+    
     /* ---------------------------
-       Language & Settings Dropdown
+       Recent Activities Functions
     --------------------------- */
-    const settingsLink = document.getElementById('settingsLink');
-    const settingsDropdown = document.getElementById('settingsDropdown');
-    settingsLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      settingsDropdown.style.display = (settingsDropdown.style.display === 'none' || settingsDropdown.style.display === '') ? 'flex' : 'none';
-    });
-    const accountsHeader = document.getElementById('accountsHeader');
-    const accountsSubmenu = document.getElementById('accountsSubmenu');
-    accountsHeader.addEventListener('click', (e) => {
-      e.preventDefault();
-      accountsSubmenu.style.display = (accountsSubmenu.style.display === 'none' || accountsSubmenu.style.display === '') ? 'flex' : 'none';
-    });
-    const languageHeader = document.getElementById('languageHeader');
-    const languageSubmenu = document.getElementById('languageSubmenu');
-    languageHeader.addEventListener('click', (e) => {
-      e.preventDefault();
-      languageSubmenu.style.display = (languageSubmenu.style.display === 'none' || languageSubmenu.style.display === '') ? 'flex' : 'none';
-    });
-    const langLinks = languageSubmenu.querySelectorAll('a');
-    langLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        currentLanguage = link.getAttribute('data-lang');
-        document.documentElement.lang = currentLanguage;
-        updateTranslations();
-        languageSubmenu.style.display = 'none';
-      });
-    });
-
-    /* ---------------------------
-       Initialization
-    --------------------------- */
-    document.addEventListener('DOMContentLoaded', () => {
-      updateTranslations();
-      fetchHijriDate();
-      getPrayerTimes();
-      // Create extra floating ornaments for effect.
-      for (let i = 0; i < 5; i++) {
-        const ornament = document.createElement('div');
-        ornament.className = 'floating-ornament';
-        ornament.style.left = `${Math.random() * 100}%`;
-        ornament.style.animationDelay = `${Math.random() * 10}s`;
-        document.body.appendChild(ornament);
-      }
-      firebase.auth().onAuthStateChanged(user => {
-        updateAccountsSubmenu();
-        if (user) { 
-          setupProfileCard(); 
-        } else { 
-          document.getElementById('profileCardSection').style.display = 'none'; 
-        }
-        // Hide the auth-check spinner now that auth state is known.
-        document.getElementById('authCheck').style.display = 'none';
-      });
-    });
-  </script>
-
-  <!-- ========================================================
-       AI Agent Embedded Code
-  ========================================================== -->
-  <script src="https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js"></script>
-  <script>
-    window.addEventListener("DOMContentLoaded", function() {
-      window.AgentInitializer.init({
-        agentRenderURL: "https://agent.jotform.com/0195ac7939af7170ac9db5210b74bd4a25fb",
-        rootId: "JotformAgent-0195ac7939af7170ac9db5210b74bd4a25fb",
-        formID: "0195ac7939af7170ac9db5210b74bd4a25fb",
-        queryParams: ["skipWelcome=1", "maximizable=1"],
-        domain: "https://www.jotform.com",
-        isDraggable: false,
-        background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-        buttonBackgroundColor: "#0066C3",
-        buttonIconColor: "#FFFFFF",
-        variant: false,
-        customizations: {
-          "greeting": "Yes",
-          "greetingMessage": "Hi! Fadis youth ai assistant ",
-          "openByDefault": "No",
-          "pulse": "Yes",
-          "position": "right",
-          "autoOpenChatIn": "0"
-        },
-        isVoice: undefined
-      });
-    });
+    function fetchRecentActivities() {
+      db.collection('activities')
+        .orderBy('timestamp', 'desc')
+        .limit(5)
+        .get()
+        .then(querySnapshot => {
+          activityList.innerHTML = '';
+          
+          if (querySnapshot.empty) {
+            activityList.innerHTML = '<p>No recent activities</p>';
+            return;
+          }
+          
+          querySnapshot.forEach(doc => {
+            const activity = doc.data();
+            const activityElement = document.createElement('div');
+            activityElement.className = 'activity-item';
+            
+            const icon = document.createElement('div');
+            icon.className = 'activity-icon';
+            
+            let iconClass = 'fas fa-bell';
+            if (activity.type === 'post') iconClass = 'fas fa-comment';
+            else if (activity.type === 'event') iconClass = 'fas fa-calendar';
+            else if (activity.type === 'prayer') iconClass = 'fas fa-pray';
+            
+            icon.innerHTML = `<i class="${iconClass}"></i>`;
+            
+            const details = document.createElement('div');
+            details.className = 'activity-details';
+            
+            const title = document.createElement('div');
+            title.className = 'activity-title';
+            title.textContent = activity.title;
+            
+            const time = document.createElement('div');
+            time.className = 'activity-time';
+            time.textContent = new Date(activity.timestamp.seconds * 1000).toLocaleString();
+            
+            details.appendChild(title);
+            details.appendChild(time);
+            
+            activityElement.appendChild(icon);
+            activityElement.appendChild(details);
+            
+            activityList.appendChild(activityElement);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching activities:', error);
+          activityList.innerHTML = '<p>Error loading activities</p>';
+        });
+    }
   </script>
 </body>
 </html>
