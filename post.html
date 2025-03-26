@@ -2,37 +2,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Post Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fadis Youth Community</title>
   <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset and Base Styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #1c1e21; }
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --danger: #ef233c;
+      --gray: #6c757d;
+      --gray-light: #e9ecef;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
+      --shadow-xl: 0 15px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--gray-light);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary);
+    }
 
     /* Top Navigation */
     .top-nav {
+      position: sticky;
+      top: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background: linear-gradient(45deg, #7f7fd5, #86a8e7);
+      padding: 12px 5%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    .nav-left {
+
+    .logo {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white;
+      text-decoration: none;
     }
+
+    .logo i {
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
     .account-icon {
       width: 45px;
       height: 45px;
       border-radius: 50%;
-      background: #ff6f61;
+      background: linear-gradient(45deg, var(--accent), var(--warning));
       color: white;
       font-weight: bold;
       font-size: 1.2rem;
@@ -40,88 +111,276 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 2px solid white;
     }
+
+    .account-icon:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-md);
+    }
+
     .chat-btn {
-      background: #fff;
-      color: #1877f2;
+      background: white;
+      color: var(--primary);
       border: none;
-      padding: 8px 12px;
-      border-radius: 20px;
+      padding: 8px 16px;
+      border-radius: 25px;
       cursor: pointer;
+      font-weight: 500;
       font-size: 0.9rem;
-      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    .search-container { position: relative; }
-    .search-icon { font-size: 1.5rem; color: white; cursor: pointer; }
+
+    .chat-btn:hover {
+      background: var(--light);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .search-container {
+      position: relative;
+      width: 300px;
+    }
+
     .search-box {
-      position: absolute;
-      top: 40px;
-      right: 0;
-      width: 250px;
-      padding: 8px;
+      width: 100%;
+      padding: 10px 15px 10px 40px;
       border: none;
-      border-radius: 20px;
+      border-radius: 25px;
       outline: none;
-      display: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.9);
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
     }
+
+    .search-box:focus {
+      box-shadow: var(--shadow-md);
+      background: white;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      pointer-events: none;
+    }
+
     .search-results {
       position: absolute;
-      top: 70px;
-      right: 0;
-      width: 250px;
+      top: 50px;
+      left: 0;
+      width: 100%;
       background: white;
-      border: 1px solid #ddd;
       border-radius: 10px;
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
-      display: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: var(--shadow-lg);
       z-index: 100;
+      display: none;
     }
+
     .search-result-item {
-      padding: 10px;
+      padding: 12px 15px;
       cursor: pointer;
-      border-bottom: 1px solid #eee;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .search-result-item:last-child { border-bottom: none; }
-    .search-result-item:hover { background: #f0f2f5; }
+
+    .search-result-item:hover {
+      background: var(--gray-light);
+    }
+
+    .search-result-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .search-result-name {
+      font-weight: 500;
+    }
 
     /* Main Container */
     .container {
-      max-width: 800px;
+      max-width: 1200px;
       margin: 2rem auto;
-      padding: 20px;
-    }
-    .loading {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 50px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 2.5fr 1fr;
+      gap: 20px;
     }
 
-    /* Post Card Styles */
-    .post-card {
-      background: linear-gradient(135deg, #ffffff, #fffefc);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      margin-bottom: 20px;
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+
+    .sidebar-card {
+      background: white;
+      border-radius: 15px;
       padding: 20px;
-      transition: transform 0.3s ease;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--dark);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      background: var(--primary-light);
+      color: white;
+    }
+
+    .sidebar-menu a i {
+      width: 20px;
+      text-align: center;
+    }
+
+    .trending-topics .topic {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .trending-topics .topic:last-child {
+      border-bottom: none;
+    }
+
+    .topic-name {
+      font-weight: 500;
+    }
+
+    .topic-count {
+      background: var(--gray-light);
+      color: var(--gray);
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    /* Posts Section */
+    .posts-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: var(--gray);
+    }
+
+    .no-posts {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .no-posts h3 {
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+
+    .no-posts p {
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+
+    .no-posts-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .no-posts-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Post Card */
+    .post-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      overflow: hidden;
       position: relative;
     }
-    .post-card:hover { transform: translateY(-3px); }
+
+    .post-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
 
     .post-header {
       display: flex;
       align-items: center;
-      margin-bottom: 15px;
+      padding: 15px 20px;
+      position: relative;
     }
+
     .author-avatar {
-      width: 45px;
-      height: 45px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      background: #1877f2;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
       color: white;
       font-size: 1.2rem;
       font-weight: bold;
@@ -130,294 +389,1060 @@
       justify-content: center;
       margin-right: 15px;
       overflow: hidden;
+      border: 2px solid white;
+      box-shadow: var(--shadow-sm);
     }
-    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .author-info { flex-grow: 1; }
-    .author-name { font-weight: 600; }
-    .post-time { color: #65676b; font-size: 0.85em; }
 
-    .post-content { margin-bottom: 20px; }
-    .post-content h2 { margin-bottom: 10px; color: #2c3e50; }
-    .post-content p { line-height: 1.6; }
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .post-actions {
+    .author-info {
+      flex-grow: 1;
+    }
+
+    .author-name {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+
+    .post-meta {
       display: flex;
-      gap: 15px;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
       align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--gray);
     }
-    .action-btn {
+
+    .post-time {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .post-visibility {
+      background: var(--gray-light);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .post-actions-menu {
+      position: relative;
+    }
+
+    .post-menu-btn {
+      background: none;
+      border: none;
+      color: var(--gray);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .post-menu-btn:hover {
+      background: var(--gray-light);
+      color: var(--dark);
+    }
+
+    .post-dropdown {
+      position: absolute;
+      right: 0;
+      top: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      min-width: 180px;
+      z-index: 10;
+      display: none;
+    }
+
+    .post-dropdown.show {
+      display: block;
+    }
+
+    .post-dropdown-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .post-dropdown-item:hover {
+      background: var(--gray-light);
+    }
+
+    .post-dropdown-item i {
+      width: 20px;
+      color: var(--gray);
+    }
+
+    .post-dropdown-item.delete {
+      color: var(--danger);
+    }
+
+    .post-dropdown-item.delete i {
+      color: var(--danger);
+    }
+
+    .post-content {
+      padding: 0 20px 15px;
+    }
+
+    .post-topic {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 10px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .post-body {
+      color: var(--dark);
+      line-height: 1.7;
+      margin-bottom: 15px;
+    }
+
+    .post-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .post-image:hover {
+      opacity: 0.9;
+    }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .post-tag {
+      background: var(--gray-light);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .post-tag:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+
+    .post-stats {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-top: 1px solid var(--gray-light);
+      border-bottom: 1px solid var(--gray-light);
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .post-stat {
       display: flex;
       align-items: center;
       gap: 5px;
-      cursor: pointer;
-      transition: color 0.3s ease;
     }
-    .action-btn:hover { color: #1877f2; }
-    .like-btn { color: #555; }
-    .like-btn.active { color: red; }
+
+    .post-actions {
+      display: flex;
+      padding: 10px 20px;
+    }
+
+    .action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+      color: var(--gray);
+    }
+
+    .action-btn:hover {
+      background: var(--gray-light);
+      color: var(--primary);
+    }
+
+    .action-btn.active {
+      color: var(--accent);
+    }
+
+    .action-btn.active i {
+      color: var(--accent);
+    }
 
     /* Comments Section */
     .comments-section {
-      display: none;
-      margin-top: 10px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--light);
     }
+
+    .comments-section.show {
+      max-height: 1000px;
+      padding: 15px 20px;
+    }
+
+    .comments-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+    }
+
     .comment {
       display: flex;
-      flex-direction: column;
-      margin-bottom: 10px;
+      gap: 12px;
+      margin-bottom: 15px;
     }
+
     .comment-avatar {
-      width: 35px;
-      height: 35px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #1877f2;
+      background: linear-gradient(45deg, var(--success), var(--primary-light));
       color: white;
       font-weight: bold;
       font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 10px;
       flex-shrink: 0;
     }
+
     .comment-content {
-      background: #f0f2f5;
-      padding: 10px;
-      border-radius: 10px;
       flex-grow: 1;
-      font-size: 0.95rem;
     }
-    /* Replies hidden by default */
-    .replies-container { display: none; margin-left: 40px; margin-top: 5px; }
-    .view-replies {
-      color: blue;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-left: 40px;
-      margin-top: 5px;
-    }
-    .sub-comment {
-      background: #e9ecef;
-      padding: 8px;
-      border-radius: 8px;
-      margin-top: 5px;
-      font-size: 0.85rem;
-    }
-    .comment-input-section {
-      display: none;
-      margin-top: 10px;
-    }
-    .comment-input-container {
+
+    .comment-header {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
+      margin-bottom: 5px;
     }
+
+    .comment-author {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .comment-time {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
+    .comment-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 15px;
+      font-size: 0.8rem;
+    }
+
+    .comment-action {
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .comment-action:hover {
+      color: var(--primary);
+    }
+
+    .replies-container {
+      margin-left: 40px;
+      margin-top: 10px;
+      padding-left: 10px;
+      border-left: 2px solid var(--gray-light);
+    }
+
+    .view-replies {
+      color: var(--primary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin: 5px 0 10px 40px;
+      display: inline-block;
+      font-weight: 500;
+    }
+
+    .comment-input-section {
+      padding: 15px 20px;
+      background: white;
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .comment-input-container {
+      display: flex;
+      gap: 10px;
+    }
+
     .comment-input {
       flex-grow: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
+      padding: 10px 15px;
+      border: 1px solid var(--gray-light);
+      border-radius: 25px;
       resize: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: var(--transition);
     }
+
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
     .send-btn {
-      background: #ff6f61;
+      background: var(--primary);
       border: none;
       color: white;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
     }
 
     /* New Post Form */
     .new-post {
-      background: linear-gradient(135deg, #86a8e7, #7f7fd5);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--shadow-sm);
       padding: 20px;
-      margin-top: 30px;
-      color: white;
+      margin-bottom: 20px;
     }
-    .new-post h2 { margin-bottom: 15px; }
+
+    .new-post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .new-post-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .new-post-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--gray-light);
+      margin-bottom: 15px;
+    }
+
+    .new-post-tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--gray);
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .new-post-tab.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .new-post-tab:hover {
+      color: var(--dark);
+    }
+
     .new-post input[type="text"],
     .new-post textarea {
       width: 100%;
-      padding: 12px;
+      padding: 12px 15px;
       margin-bottom: 10px;
-      border: none;
+      border: 1px solid var(--gray-light);
       border-radius: 8px;
       font-size: 1rem;
+      font-family: inherit;
+      transition: var(--transition);
     }
-    .new-post input[type="text"] { font-weight: 600; }
-    .new-post textarea { resize: vertical; min-height: 100px; }
-    .new-post .btn-post {
-      background: #ff6f61;
+
+    .new-post input[type="text"]:focus,
+    .new-post textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .new-post input[type="text"] {
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .new-post textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .new-post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .post-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .post-option-btn {
+      background: none;
+      border: none;
+      color: var(--gray);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .post-option-btn:hover {
+      color: var(--primary);
+    }
+
+    .btn-post {
+      background: var(--primary);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 10px 25px;
+      border-radius: 25px;
       cursor: pointer;
       font-size: 1rem;
-      transition: background 0.3s ease;
-    }
-    .new-post .btn-post:hover { background: #e65b50; }
-
-    /* No Posts Message */
-    .no-posts {
-      text-align: center;
-      font-size: 1.1rem;
-      color: #65676b;
-      margin: 40px 0;
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* Navigation Modal */
-    .nav-modal {
-      display: none;
+    .btn-post:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Right Sidebar */
+    .online-users .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .online-users .user:last-child {
+      border-bottom: none;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .user-avatar.online::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .user-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .user-status {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    /* Modals */
+    .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
     }
-    .nav-modal.active { display: flex; }
-    .nav-modal .modal-content {
-      background: #fff;
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
       border-radius: 15px;
-      padding: 20px;
       width: 90%;
       max-width: 500px;
-      text-align: center;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
       position: relative;
     }
-    .nav-modal h2 { margin-bottom: 10px; color: #2B5A46; }
-    .nav-modal p { margin-bottom: 20px; color: #555; }
-    .nav-modal .nav-buttons {
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-light);
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .close-modal:hover {
+      color: var(--danger);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid var(--gray-light);
+      display: flex;
+      justify-content: flex-end;
       gap: 10px;
     }
-    .nav-modal .nav-buttons a {
-      text-decoration: none;
-      background: #86a8e7;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
     }
-    .nav-modal .nav-buttons a:hover { transform: translateY(-3px); }
-    .nav-modal .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: red;
+
+    .btn-primary {
+      background: var(--primary);
       color: white;
       border: none;
-      font-size: 1.2rem;
-      padding: 5px 10px;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255,0,0,0.8);
-      animation: glow 1.5s infinite alternate;
     }
-    @keyframes glow {
-      from { box-shadow: 0 0 5px rgba(255,0,0,0.8); }
-      to { box-shadow: 0 0 20px rgba(255,0,0,1); }
+
+    .btn-primary:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: none;
+      border: 1px solid var(--gray-light);
+      color: var(--dark);
+    }
+
+    .btn-outline:hover {
+      background: var(--gray-light);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: #d90429;
+      transform: translateY(-2px);
     }
 
     /* Edit Post Modal */
-    .edit-modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 20000;
-    }
-    .edit-modal .edit-content {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      width: 90%;
-      max-width: 600px;
-      position: relative;
-      min-height: 400px; /* Increased height to prevent overlap */
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .edit-modal .close-edit {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-      font-size: 1.2rem;
-      background: #ff6f61;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-    }
     .edit-tabs {
       display: flex;
-      gap: 10px;
+      border-bottom: 1px solid var(--gray-light);
       margin-bottom: 15px;
     }
+
     .edit-tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--gray);
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
       flex: 1;
       text-align: center;
-      padding: 10px;
-      cursor: pointer;
-      border: 1px solid #ddd;
-      border-radius: 5px;
     }
+
     .edit-tab.active {
-      background: #7f7fd5;
-      color: white;
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
     }
-    .edit-section { display: none; }
-    .edit-section.active { display: block; }
-    /* Separate the update area from the delete button */
-    .edit-post-content, .edit-reaction-content {
-      margin-bottom: 30px;
+
+    .edit-section {
+      display: none;
     }
-    .edit-section input[type="text"],
-    .edit-section textarea,
-    .edit-section select {
+
+    .edit-section.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .form-control {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    .btn-action {
-      background: #ff6f61;
-      color: white;
-      border: none;
       padding: 10px 15px;
-      border-radius: 5px;
+      border: 1px solid var(--gray-light);
+      border-radius: 8px;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-label {
+      font-size: 0.95rem;
+      color: var(--dark);
+    }
+
+    /* Image Preview */
+    .image-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .preview-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--danger);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
       cursor: pointer;
     }
-    .btn-action:hover { background: #e65b50; }
-    .edit-delete-section {
-      margin-top: auto;
-      text-align: center;
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    .edit-delete-section hr {
-      margin-bottom: 10px;
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .slide-up {
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .top-nav {
+        padding: 12px 3%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .post-actions {
+        flex-wrap: wrap;
+      }
+      .action-btn {
+        flex: 0 0 calc(50% - 10px);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .top-nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+      .nav-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .search-container {
+        width: 100%;
+      }
+      .post-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .author-info {
+        width: 100%;
+      }
+      .post-meta {
+        justify-content: space-between;
+        width: 100%;
+      }
+    }
+
+    /* Dark Mode Toggle */
+    .dark-mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .dark-mode-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .sidebar-card,
+    body.dark-mode .post-card,
+    body.dark-mode .new-post,
+    body.dark-mode .modal-content,
+    body.dark-mode .comment-input,
+    body.dark-mode .search-box,
+    body.dark-mode .search-results,
+    body.dark-mode .post-dropdown {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .author-name,
+    body.dark-mode .post-topic,
+    body.dark-mode .sidebar-title,
+    body.dark-mode .modal-title,
+    body.dark-mode .comments-title,
+    body.dark-mode .new-post-title,
+    body.dark-mode .comment-author {
+      color: #ffffff;
+    }
+
+    body.dark-mode .post-body,
+    body.dark-mode .comment-text,
+    body.dark-mode .form-label,
+    body.dark-mode .checkbox-label {
+      color: #b0b0b0;
+    }
+
+    body.dark-mode .post-time,
+    body.dark-mode .comment-time,
+    body.dark-mode .user-status {
+      color: #757575;
+    }
+
+    body.dark-mode .post-visibility,
+    body.dark-mode .topic-count,
+    body.dark-mode .post-tag {
+      background-color: #333;
+    }
+
+    body.dark-mode .action-btn:hover,
+    body.dark-mode .sidebar-menu a:hover,
+    body.dark-mode .sidebar-menu a.active,
+    body.dark-mode .post-dropdown-item:hover {
+      background-color: #333;
+    }
+
+    body.dark-mode .post-stat,
+    body.dark-mode .action-btn,
+    body.dark-mode .post-option-btn,
+    body.dark-mode .comment-action {
+      color: #b0b0b0;
+    }
+
+    body.dark-mode .action-btn:hover,
+    body.dark-mode .comment-action:hover,
+    body.dark-mode .post-option-btn:hover {
+      color: var(--primary-light);
+    }
+
+    body.dark-mode .post-tag:hover {
+      background: var(--primary);
+    }
+
+    body.dark-mode .border-bottom,
+    body.dark-mode .border-top,
+    body.dark-mode .modal-header,
+    body.dark-mode .modal-footer,
+    body.dark-mode .new-post-tabs,
+    body.dark-mode .edit-tabs {
+      border-color: #333 !important;
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: var(--shadow-xl);
+    }
+
+    /* Notification Badge */
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      bottom: 30px;
+    }
+
+    .toast.success {
+      background: var(--success);
+    }
+
+    .toast.error {
+      background: var(--danger);
+    }
+
+    .toast.warning {
+      background: var(--warning);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Pulse Animation */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Reaction Picker */
+    .reaction-picker {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      background: white;
+      border-radius: 30px;
+      padding: 5px 10px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      gap: 5px;
+      z-index: 10;
+      display: none;
+    }
+
+    .reaction-picker.show {
+      display: flex;
+    }
+
+    .reaction {
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .reaction:hover {
+      transform: scale(1.3) translateY(-5px);
     }
   </style>
 </head>
@@ -425,49 +1450,235 @@
   <!-- Top Navigation -->
   <div class="top-nav">
     <div class="nav-left">
-      <div class="account-icon" onclick="window.location.href='post_account.html'">A</div>
-      <button class="chat-btn" onclick="window.location.href='chat.html'">Chat</button>
+      <a href="#" class="logo">
+        <i class="fas fa-mosque"></i>
+        <span>Fadis Youth</span>
+      </a>
+      <div class="account-icon" onclick="window.location.href='post_account.html'">
+        <i class="fas fa-user"></i>
+      </div>
+      <button class="chat-btn" onclick="window.location.href='chat.html'">
+        <i class="fas fa-comment-dots"></i> Chat
+      </button>
     </div>
     <div class="search-container">
-      <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
-      <input type="text" class="search-box" id="searchBox" placeholder="Search users...">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search posts, people...">
       <div class="search-results" id="searchResults"></div>
     </div>
   </div>
   
+  <!-- Main Container -->
   <div class="container">
-    <div id="loading" class="loading">Checking login status...</div>
-    <div id="postsSection" style="display:none;"></div>
-    <div id="noPostsMessage" class="no-posts" style="display:none;">No one has posted yet. Be the first to post!</div>
-    
-    <!-- New Post Form (visible only if logged in) -->
-    <div class="new-post" id="newPostForm" style="display:none;">
-      <h2>Create a New Post</h2>
-      <input type="text" id="postTopic" placeholder="Topic">
-      <textarea id="postBody" placeholder="What's on your mind?"></textarea>
-      <button class="btn-post" onclick="postNewPost()">Post</button>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><i class="fas fa-compass"></i> Navigation</h3>
+        <ul class="sidebar-menu">
+          <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="#"><i class="fas fa-user-friends"></i> Friends</a></li>
+          <li><a href="#"><i class="fas fa-bell"></i> Notifications <span class="notification-badge">3</span></a></li>
+          <li><a href="#"><i class="fas fa-envelope"></i> Messages</a></li>
+          <li><a href="#"><i class="fas fa-bookmark"></i> Saved</a></li>
+          <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><i class="fas fa-fire"></i> Trending Topics</h3>
+        <div class="trending-topics">
+          <div class="topic">
+            <span class="topic-name">Ramadan Preparation</span>
+            <span class="topic-count">245</span>
+          </div>
+          <div class="topic">
+            <span class="topic-name">Quran Memorization</span>
+            <span class="topic-count">189</span>
+          </div>
+          <div class="topic">
+            <span class="topic-name">Islamic Finance</span>
+            <span class="topic-count">132</span>
+          </div>
+          <div class="topic">
+            <span class="topic-name">Youth Challenges</span>
+            <span class="topic-count">98</span>
+          </div>
+          <div class="topic">
+            <span class="topic-name">Dawah Tips</span>
+            <span class="topic-count">76</span>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <!-- Main Content -->
+    <div class="posts-section">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading community posts...</p>
+      </div>
+      
+      <div id="noPostsMessage" class="no-posts" style="display:none;">
+        <h3>No Posts Yet</h3>
+        <p>Be the first to share your thoughts with the community!</p>
+        <button class="no-posts-btn" onclick="document.getElementById('newPostForm').style.display='block'">
+          <i class="fas fa-plus"></i> Create Post
+        </button>
+      </div>
+      
+      <!-- New Post Form -->
+      <div class="new-post" id="newPostForm" style="display:none;">
+        <div class="new-post-header">
+          <div class="author-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h3 class="new-post-title">Create Post</h3>
+        </div>
+        
+        <div class="new-post-tabs">
+          <div class="new-post-tab active">Post</div>
+          <div class="new-post-tab">Media</div>
+          <div class="new-post-tab">Poll</div>
+        </div>
+        
+        <input type="text" id="postTopic" placeholder="What's your post about?">
+        <textarea id="postBody" placeholder="Share your thoughts with the community..."></textarea>
+        
+        <div class="image-preview" id="imagePreview"></div>
+        
+        <div class="new-post-footer">
+          <div class="post-options">
+            <button class="post-option-btn" title="Add Image">
+              <i class="fas fa-image"></i>
+            </button>
+            <button class="post-option-btn" title="Add Video">
+              <i class="fas fa-video"></i>
+            </button>
+            <button class="post-option-btn" title="Add Poll">
+              <i class="fas fa-poll"></i>
+            </button>
+            <button class="post-option-btn" title="Add Location">
+              <i class="fas fa-map-marker-alt"></i>
+            </button>
+          </div>
+          <button class="btn-post" onclick="postNewPost()">
+            <i class="fas fa-paper-plane"></i> Post
+          </button>
+        </div>
+      </div>
+      
+      <!-- Posts will be inserted here -->
+      <div id="postsSection" style="display:none;"></div>
+    </div>
+    
+    <!-- Right Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><i class="fas fa-users"></i> Online Now</h3>
+        <div class="online-users">
+          <div class="user">
+            <div class="user-avatar online">A</div>
+            <div>
+              <div class="user-name">Ahmed Ali</div>
+              <div class="user-status">Active now</div>
+            </div>
+          </div>
+          <div class="user">
+            <div class="user-avatar online">M</div>
+            <div>
+              <div class="user-name">Mariam Yusuf</div>
+              <div class="user-status">Active now</div>
+            </div>
+          </div>
+          <div class="user">
+            <div class="user-avatar">I</div>
+            <div>
+              <div class="user-name">Ibrahim Omar</div>
+              <div class="user-status">Last seen 15m ago</div>
+            </div>
+          </div>
+          <div class="user">
+            <div class="user-avatar online">F</div>
+            <div>
+              <div class="user-name">Fatima Hassan</div>
+              <div class="user-status">Active now</div>
+            </div>
+          </div>
+          <div class="user">
+            <div class="user-avatar">Y</div>
+            <div>
+              <div class="user-name">Yusuf Adam</div>
+              <div class="user-status">Last seen 1h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar-card">
+        <h3 class="sidebar-title"><i class="fas fa-calendar-alt"></i> Upcoming Events</h3>
+        <div class="event">
+          <div class="event-date">MAR 30</div>
+          <div class="event-title">Friday Lecture: Patience in Islam</div>
+          <div class="event-time">8:00 PM - 9:30 PM</div>
+        </div>
+        <div class="event">
+          <div class="event-date">APR 2</div>
+          <div class="event-title">Quran Study Circle</div>
+          <div class="event-time">6:00 PM - 7:30 PM</div>
+        </div>
+        <div class="event">
+          <div class="event-date">APR 5</div>
+          <div class="event-title">Youth Halaqa: Building Character</div>
+          <div class="event-time">7:00 PM - 8:30 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Floating Action Button -->
+  <div class="fab" onclick="document.getElementById('newPostForm').style.display='block'">
+    <i class="fas fa-plus"></i>
+  </div>
+  
+  <!-- Dark Mode Toggle -->
+  <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+    <i class="fas fa-moon"></i>
   </div>
   
   <!-- Navigation Modal -->
-  <div class="nav-modal" id="navModal" onclick="closeNavModal()">
+  <div class="modal" id="navModal" onclick="closeNavModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeNavModal()">X</button>
-      <h2>Fadis Youth Portal</h2>
-      <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
-      <div class="nav-buttons">
-        <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank">Home</a>
-        <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank">Quraana</a>
-        <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank">Fatwaa</a>
+      <div class="modal-header">
+        <h3 class="modal-title">Fadis Youth Portal</h3>
+        <button class="close-modal" onclick="closeNavModal()">&times;</button>
       </div>
-      <button class="btn-post" style="margin-top:20px;" onclick="closeNavModal()">Close</button>
+      <div class="modal-body">
+        <p>Welcome to Fadis Youth – a vibrant community for learning and growth. Explore our resources below.</p>
+        <div class="nav-buttons">
+          <a href="https://murt6749.github.io/Fadisyouth/index.html" target="_blank" class="btn btn-primary">
+            <i class="fas fa-home"></i> Home
+          </a>
+          <a href="https://murt6749.github.io/Fadisyouth/quran.html" target="_blank" class="btn btn-primary">
+            <i class="fas fa-quran"></i> Quraana
+          </a>
+          <a href="https://murt6749.github.io/Fadisyouth/fatwa.html" target="_blank" class="btn btn-primary">
+            <i class="fas fa-scroll"></i> Fatwaa
+          </a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeNavModal()">Close</button>
+      </div>
     </div>
   </div>
   
-  <!-- Edit Post Modal (Injected Dynamically) -->
+  <!-- Edit Post Modal (Dynamically Injected) -->
+  
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
   
   <script>
-    // Initialize Firebase using your configuration
+    // Initialize Firebase
     var firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -485,18 +1696,13 @@
     let isLoggedIn = false;
     let authResolved = false;
     
-    // --- Auth Check: Wait until Firebase responds or 10 seconds pass ---
+    // --- Auth Check ---
     const authTimeout = setTimeout(() => {
       if (!authResolved) {
-        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
+        showToast("We couldn't verify your login status. Please log in.", "error");
+        setTimeout(() => {
           window.location.href = "login.html";
-        } else {
-          isLoggedIn = false;
-          authResolved = true;
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("postsSection").style.display = "block";
-          loadPosts();
-        }
+        }, 3000);
       }
     }, 10000);
     
@@ -504,36 +1710,69 @@
       authResolved = true;
       clearTimeout(authTimeout);
       document.getElementById("loading").style.display = "none";
+      
       if (user) {
         isLoggedIn = true;
         document.getElementById("postsSection").style.display = "block";
         document.getElementById("newPostForm").style.display = "block";
-        const displayName = user.displayName || "A";
-        document.querySelector(".account-icon").innerText = displayName.charAt(0).toUpperCase();
+        
+        // Update user avatar
+        const displayName = user.displayName || "User";
+        const avatar = document.querySelector(".account-icon");
+        if (user.photoURL) {
+          avatar.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+        } else {
+          avatar.textContent = displayName.charAt(0).toUpperCase();
+        }
+        
         loadPosts();
       } else {
-        if (confirm("You are not logged in. Do you want to log in?")) {
-          window.location.href = "login.html";
-        } else {
-          isLoggedIn = false;
-          document.getElementById("postsSection").style.display = "block";
-          loadPosts();
-        }
+        isLoggedIn = false;
+        document.getElementById("postsSection").style.display = "block";
+        loadPosts();
+        showToast("You're viewing as a guest. Sign in for full features.", "warning");
       }
     });
     
-    // --- Search Functionality ---
-    function toggleSearch() {
-      const searchBox = document.getElementById("searchBox");
-      const resultsDiv = document.getElementById("searchResults");
-      if (searchBox.style.display === "block") {
-        searchBox.style.display = "none";
-        resultsDiv.style.display = "none";
+    // --- Toast Notification ---
+    function showToast(message, type = "info") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "toast";
+      toast.classList.add(type);
+      
+      setTimeout(() => {
+        toast.classList.add("show");
+      }, 100);
+      
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+    
+    // --- Dark Mode Toggle ---
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      const icon = document.querySelector(".dark-mode-toggle i");
+      if (document.body.classList.contains("dark-mode")) {
+        icon.classList.remove("fa-moon");
+        icon.classList.add("fa-sun");
+        localStorage.setItem("darkMode", "enabled");
       } else {
-        searchBox.style.display = "block";
-        searchBox.focus();
+        icon.classList.remove("fa-sun");
+        icon.classList.add("fa-moon");
+        localStorage.setItem("darkMode", "disabled");
       }
     }
+    
+    // Check for saved dark mode preference
+    if (localStorage.getItem("darkMode") === "enabled") {
+      document.body.classList.add("dark-mode");
+      document.querySelector(".dark-mode-toggle i").classList.remove("fa-moon");
+      document.querySelector(".dark-mode-toggle i").classList.add("fa-sun");
+    }
+    
+    // --- Search Functionality ---
     document.getElementById("searchBox").addEventListener("input", function() {
       const query = this.value.trim();
       const resultsDiv = document.getElementById("searchResults");
@@ -542,6 +1781,8 @@
         resultsDiv.style.display = "none";
         return;
       }
+      
+      // Search users
       db.collection("users")
         .orderBy("displayName")
         .startAt(query)
@@ -551,14 +1792,54 @@
           let html = "";
           snapshot.forEach(doc => {
             const user = doc.data();
-            html += `<div class="search-result-item" onclick="goToUserProfile('${doc.id}')">${user.displayName}</div>`;
+            html += `
+              <div class="search-result-item" onclick="goToUserProfile('${doc.id}')">
+                <div class="search-result-avatar">${user.displayName.charAt(0).toUpperCase()}</div>
+                <div class="search-result-name">${user.displayName}</div>
+              </div>`;
           });
-          resultsDiv.innerHTML = html;
-          resultsDiv.style.display = "block";
+          
+          // Search posts if no users found
+          if (html === "") {
+            db.collection("posts")
+              .where("keywords", "array-contains", query.toLowerCase())
+              .limit(10)
+              .get().then(snapshot => {
+                if (snapshot.empty) {
+                  html = `<div class="search-result-item">No results found</div>`;
+                } else {
+                  snapshot.forEach(doc => {
+                    const post = doc.data();
+                    html += `
+                      <div class="search-result-item" onclick="scrollToPost('${doc.id}')">
+                        <i class="fas fa-file-alt"></i>
+                        ${post.topic || "Untitled post"} by ${post.authorName}
+                      </div>`;
+                  });
+                }
+                resultsDiv.innerHTML = html;
+                resultsDiv.style.display = "block";
+              });
+          } else {
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = "block";
+          }
         });
     });
+    
     function goToUserProfile(userId) {
       window.location.href = "profile.html?uid=" + userId;
+    }
+    
+    function scrollToPost(postId) {
+      const post = document.getElementById("post-" + postId);
+      if (post) {
+        post.scrollIntoView({ behavior: "smooth" });
+        post.classList.add("pulse");
+        setTimeout(() => post.classList.remove("pulse"), 2000);
+      }
+      document.getElementById("searchResults").style.display = "none";
+      document.getElementById("searchBox").value = "";
     }
     
     // --- Load Posts ---
@@ -567,6 +1848,7 @@
         .onSnapshot(snapshot => {
           const postsSection = document.getElementById("postsSection");
           postsSection.innerHTML = "";
+          
           if (snapshot.empty) {
             document.getElementById("noPostsMessage").style.display = "block";
           } else {
@@ -575,52 +1857,112 @@
               const post = doc.data();
               postsSection.innerHTML += renderPost(doc.id, post);
             });
-            // After rendering all posts, update follow button states
             updateFollowButtons();
           }
+        }, error => {
+          console.error("Error loading posts:", error);
+          showToast("Error loading posts. Please refresh.", "error");
         });
     }
     
-    // --- Render a Post Card with Comment Input Section ---
+    // --- Enhanced Post Rendering ---
     function renderPost(id, post) {
-      let timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
-      let avatarHTML = "";
-      if (post.authorAvatar) {
-        avatarHTML = `<img src="${post.authorAvatar}" alt="Avatar" class="author-avatar">`;
-      } else {
-        const name = post.authorName || "A";
-        const hue = Math.floor(Math.random() * 360);
-        avatarHTML = `<div class="author-avatar" style="background: hsl(${hue}, 70%, 80%); color: #1c1e21;">${name.charAt(0).toUpperCase()}</div>`;
-      }
+      const timeString = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString() : "Just now";
+      const currentUser = auth.currentUser;
+      const isAuthor = currentUser && currentUser.uid === post.authorUID;
+      
+      // Generate avatar HTML
+      let avatarHTML = post.authorAvatar 
+        ? `<img src="${post.authorAvatar}" alt="${post.authorName}">`
+        : `<span>${(post.authorName || "U").charAt(0).toUpperCase()}</span>`;
+      
+      // Generate follow button for non-author posts
       let followBtn = "";
-      if (isLoggedIn && auth.currentUser && auth.currentUser.uid !== post.authorUID) {
-        followBtn = `<button class="btn-post follow-btn" id="follow-${id}" data-author="${post.authorUID}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">+</button>`;
+      if (isLoggedIn && currentUser && !isAuthor) {
+        followBtn = `<button class="btn-post follow-btn" id="follow-${id}" data-author="${post.authorUID}" onclick="toggleFollow(event, '${post.authorUID}', '${id}')">
+                      <i class="fas fa-user-plus"></i> Follow
+                    </button>`;
       }
-      // Add edit icon if the current user is the author
-      let editIcon = "";
-      if (isLoggedIn && auth.currentUser && auth.currentUser.uid === post.authorUID) {
-        editIcon = `<div class="action-btn" onclick="openEditMenu(event, '${id}')">
-                      <i class="fas fa-edit"></i> Edit
-                    </div>`;
+      
+      // Generate post menu for author
+      let postMenu = "";
+      if (isAuthor) {
+        postMenu = `
+          <div class="post-actions-menu">
+            <button class="post-menu-btn" onclick="togglePostMenu(event)">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="post-dropdown">
+              <div class="post-dropdown-item" onclick="openEditMenu(event, '${id}')">
+                <i class="fas fa-edit"></i> Edit Post
+              </div>
+              <div class="post-dropdown-item delete" onclick="deletePost('${id}')">
+                <i class="fas fa-trash"></i> Delete Post
+              </div>
+            </div>
+          </div>`;
       }
+      
+      // Generate tags HTML if they exist
+      let tagsHTML = "";
+      if (post.tags && post.tags.length > 0) {
+        tagsHTML = `<div class="post-tags">`;
+        post.tags.forEach(tag => {
+          tagsHTML += `<span class="post-tag">#${tag}</span>`;
+        });
+        tagsHTML += `</div>`;
+      }
+      
+      // Generate image HTML if it exists
+      let imageHTML = "";
+      if (post.imageUrl) {
+        imageHTML = `<img src="${post.imageUrl}" class="post-image" alt="Post image">`;
+      }
+      
+      // Generate visibility icon
+      let visibilityIcon = "globe";
+      if (post.visibility === "private") visibilityIcon = "lock";
+      if (post.visibility === "friends") visibilityIcon = "user-friends";
+      
       return `
-      <div class="post-card" id="post-${id}">
+      <div class="post-card fade-in" id="post-${id}">
         <div class="post-header">
-          ${avatarHTML}
+          <div class="author-avatar" onclick="window.location.href='profile.html?uid=${post.authorUID}'">
+            ${avatarHTML}
+          </div>
           <div class="author-info">
             <div class="author-name">${post.authorName || "Anonymous"}</div>
-            <div class="post-time">${timeString}</div>
+            <div class="post-meta">
+              <span class="post-time"><i class="far fa-clock"></i> ${timeString}</span>
+              <span class="post-visibility"><i class="fas fa-${visibilityIcon}"></i> ${post.visibility || "public"}</span>
+            </div>
           </div>
           ${followBtn}
+          ${postMenu}
         </div>
+        
         <div class="post-content">
-          <h2>${post.topic || "Untitled"}</h2>
-          <p>${post.body || ""}</p>
+          <h2 class="post-topic">${post.topic || "Untitled"}</h2>
+          ${imageHTML}
+          <div class="post-body">${post.body || ""}</div>
+          ${tagsHTML}
         </div>
+        
+        <div class="post-stats">
+          <div class="post-stat">
+            <i class="far fa-heart"></i> ${post.likesCount || 0} likes
+          </div>
+          <div class="post-stat">
+            <i class="far fa-comment"></i> ${post.commentsCount || 0} comments
+          </div>
+          <div class="post-stat">
+            <i class="fas fa-share"></i> ${post.sharesCount || 0} shares
+          </div>
+        </div>
+        
         <div class="post-actions">
           <div class="action-btn like-btn" onclick="toggleLike(event, '${id}')">
-            <i class="far fa-heart"></i>
-            <span class="like-count">${post.likesCount || 0}</span>
+            <i class="far fa-heart"></i> Like
           </div>
           <div class="action-btn" onclick="toggleComments(event, '${id}')">
             <i class="far fa-comment"></i> Comment
@@ -628,10 +1970,10 @@
           <div class="action-btn" onclick="sharePost(event, '${id}')">
             <i class="fas fa-share"></i> Share
           </div>
-          ${editIcon}
         </div>
+        
         <div class="comments-section" id="comments-${id}"></div>
-        <!-- Comment Input Section (initially hidden) -->
+        
         <div class="comment-input-section" id="commentInput-${id}" style="display:none;">
           <div class="comment-input-container">
             <textarea class="comment-input" id="commentText-${id}" placeholder="Write a comment..."></textarea>
@@ -643,14 +1985,37 @@
       </div>`;
     }
     
-    // --- Update Follow Buttons on Render ---
+    // Toggle post dropdown menu
+    function togglePostMenu(event) {
+      event.stopPropagation();
+      const dropdown = event.target.closest(".post-actions-menu").querySelector(".post-dropdown");
+      dropdown.classList.toggle("show");
+      
+      // Close when clicking elsewhere
+      document.addEventListener("click", function closeMenu(e) {
+        if (!e.target.closest(".post-actions-menu")) {
+          dropdown.classList.remove("show");
+          document.removeEventListener("click", closeMenu);
+        }
+      });
+    }
+    
+    // --- Update Follow Buttons ---
     function updateFollowButtons() {
       if (!isLoggedIn || !auth.currentUser) return;
+      
       document.querySelectorAll('.follow-btn').forEach(btn => {
-        let authorUID = btn.getAttribute('data-author');
-        let followDocId = auth.currentUser.uid + "_" + authorUID;
+        const authorUID = btn.getAttribute('data-author');
+        const followDocId = auth.currentUser.uid + "_" + authorUID;
+        
         db.collection("follows").doc(followDocId).get().then(doc => {
-          btn.innerText = doc.exists ? "Following" : "+";
+          if (doc.exists) {
+            btn.innerHTML = `<i class="fas fa-user-check"></i> Following`;
+            btn.classList.add("active");
+          } else {
+            btn.innerHTML = `<i class="fas fa-user-plus"></i> Follow`;
+            btn.classList.remove("active");
+          }
         });
       });
     }
@@ -658,44 +2023,84 @@
     // --- Like Functionality ---
     function toggleLike(e, postId) {
       e.stopPropagation();
-      if (!isLoggedIn) { alert("Please log in to like posts."); return; }
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to like posts.", "warning");
+        return;
+      }
+      
       const user = auth.currentUser;
       const postRef = db.collection("posts").doc(postId);
+      const likeBtn = e.target.closest(".like-btn");
+      
       postRef.get().then(doc => {
         if (doc.exists) {
-          let data = doc.data();
+          const data = doc.data();
           let likes = data.likes || [];
+          let likesCount = data.likesCount || 0;
+          
           if (likes.includes(user.uid)) {
+            // Unlike
             likes = likes.filter(uid => uid !== user.uid);
+            likesCount--;
+            likeBtn.classList.remove("active");
+            showToast("You unliked this post", "info");
           } else {
+            // Like
             likes.push(user.uid);
+            likesCount++;
+            likeBtn.classList.add("active");
+            showToast("You liked this post", "success");
           }
-          postRef.update({ likes: likes, likesCount: likes.length });
+          
+          postRef.update({ 
+            likes: likes, 
+            likesCount: likesCount 
+          });
         }
+      }).catch(error => {
+        console.error("Error toggling like:", error);
+        showToast("Error updating like. Please try again.", "error");
       });
     }
     
     // --- Follow Functionality ---
     function toggleFollow(e, authorUID, postId) {
       e.stopPropagation();
-      if (!isLoggedIn) { alert("Please log in to follow users."); return; }
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to follow users.", "warning");
+        return;
+      }
+      
       const user = auth.currentUser;
       const followDocId = user.uid + "_" + authorUID;
       const followRef = db.collection("follows").doc(followDocId);
+      const followBtn = document.getElementById("follow-" + postId);
+      
       followRef.get().then(doc => {
         if (doc.exists) {
+          // Unfollow
           followRef.delete().then(() => {
-            document.getElementById("follow-" + postId).innerText = "+";
+            followBtn.innerHTML = `<i class="fas fa-user-plus"></i> Follow`;
+            followBtn.classList.remove("active");
+            showToast("You unfollowed this user", "info");
           });
         } else {
+          // Follow
           followRef.set({
             follower: user.uid,
             following: authorUID,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           }).then(() => {
-            document.getElementById("follow-" + postId).innerText = "Following";
+            followBtn.innerHTML = `<i class="fas fa-user-check"></i> Following`;
+            followBtn.classList.add("active");
+            showToast("You're now following this user", "success");
           });
         }
+      }).catch(error => {
+        console.error("Error toggling follow:", error);
+        showToast("Error updating follow. Please try again.", "error");
       });
     }
     
@@ -704,29 +2109,38 @@
       e.stopPropagation();
       const commentsSection = document.getElementById("comments-" + postId);
       const commentInputSection = document.getElementById("commentInput-" + postId);
-      if (commentsSection.style.display === "block") {
-        commentsSection.style.display = "none";
+      
+      if (commentsSection.classList.contains("show")) {
+        commentsSection.classList.remove("show");
         commentInputSection.style.display = "none";
       } else {
-        commentsSection.style.display = "block";
+        commentsSection.classList.add("show");
         commentInputSection.style.display = "block";
         loadComments(postId);
       }
     }
     
-    // Updated loadComments to group replies and add a toggle link
     function loadComments(postId) {
       const commentsSection = document.getElementById("comments-" + postId);
+      commentsSection.innerHTML = `<div class="spinner"></div>`;
+      
       db.collection("posts").doc(postId).collection("comments")
         .orderBy("timestamp", "asc")
         .get().then(snapshot => {
+          if (snapshot.empty) {
+            commentsSection.innerHTML = `<p class="no-comments">No comments yet. Be the first to comment!</p>`;
+            return;
+          }
+          
           let mainComments = [];
           let repliesMap = {};
+          
           snapshot.forEach(doc => {
             let comment = doc.data();
             comment.id = doc.id;
-            if(comment.parentId) {
-              if(!repliesMap[comment.parentId]) {
+            
+            if (comment.parentId) {
+              if (!repliesMap[comment.parentId]) {
                 repliesMap[comment.parentId] = [];
               }
               repliesMap[comment.parentId].push(comment);
@@ -734,124 +2148,270 @@
               mainComments.push(comment);
             }
           });
-          let html = "";
+          
+          let html = `<h4 class="comments-title"><i class="fas fa-comments"></i> Comments (${mainComments.length})</h4>`;
+          
           mainComments.forEach(comment => {
-            html += renderMainComment(comment, repliesMap[comment.id] || []);
+            html += renderComment(comment, repliesMap[comment.id] || [], postId);
           });
+          
           commentsSection.innerHTML = html;
+        }).catch(error => {
+          console.error("Error loading comments:", error);
+          commentsSection.innerHTML = `<p class="error">Error loading comments. Please try again.</p>`;
         });
     }
     
-    function renderMainComment(comment, replies) {
-      let commentTime = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString() : "Just now";
-      let html = `<div class="comment">
-                    <div style="display:flex; align-items:center;">
-                      <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
-                      <div class="comment-content">
-                        <div class="comment-author">${comment.authorName || "Anonymous"}</div>
-                        <p>${comment.text}</p>
-                        <div class="comment-actions">
-                          <span>${commentTime}</span>
-                          <span onclick="toggleLikeComment(this)">Like</span>
-                          <span onclick="toggleReplyForm(this)">Reply</span>
-                        </div>
-                      </div>
-                    </div>`;
-      // If there are replies, add a "View replies" toggle link
-      if(replies.length > 0) {
-        html += `<div class="view-replies" onclick="toggleReplies(this)">View replies (${replies.length})</div>`;
-        html += `<div class="replies-container">`;
+    function renderComment(comment, replies, postId) {
+      const timeString = comment.timestamp ? new Date(comment.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "Just now";
+      const isAuthor = auth.currentUser && auth.currentUser.uid === comment.authorUID;
+      
+      let html = `
+      <div class="comment" id="comment-${comment.id}">
+        <div class="comment-avatar">${(comment.authorName || "U").charAt(0).toUpperCase()}</div>
+        <div class="comment-content">
+          <div class="comment-header">
+            <div class="comment-author">${comment.authorName || "Anonymous"}</div>
+            <div class="comment-time">${timeString}</div>
+            ${isAuthor ? `<i class="fas fa-trash delete-comment" onclick="deleteComment('${postId}', '${comment.id}')"></i>` : ''}
+          </div>
+          <div class="comment-text">${comment.text}</div>
+          <div class="comment-actions">
+            <span class="comment-action" onclick="toggleLikeComment('${postId}', '${comment.id}')">
+              <i class="far fa-heart"></i> Like (${comment.likesCount || 0})
+            </span>
+            <span class="comment-action" onclick="toggleReplyForm(this, '${postId}', '${comment.id}')">
+              <i class="fas fa-reply"></i> Reply
+            </span>
+          </div>
+          
+          <!-- Reply form (hidden by default) -->
+          <div class="reply-form" style="display:none;">
+            <div class="comment-input-container">
+              <textarea class="comment-input" placeholder="Write a reply..."></textarea>
+              <button class="send-btn" onclick="postReply(event, '${postId}', '${comment.id}')">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      
+      // Add replies if they exist
+      if (replies.length > 0) {
+        html += `<div class="view-replies" onclick="toggleReplies(this)">
+                  <i class="fas fa-caret-down"></i> View replies (${replies.length})
+                </div>
+                <div class="replies-container" style="display:none;">`;
+        
         replies.forEach(reply => {
-          let replyTime = reply.timestamp ? new Date(reply.timestamp.toDate()).toLocaleTimeString() : "Just now";
-          html += `<div class="comment sub-comment">
-                      <div style="display:flex; align-items:center;">
-                        <div class="comment-avatar">${(reply.authorName || "U").charAt(0).toUpperCase()}</div>
-                        <div class="comment-content">
-                          <div class="comment-author">${reply.authorName || "Anonymous"}</div>
-                          <p>${reply.text}</p>
-                          <div class="comment-actions">
-                            <span>${replyTime}</span>
-                            <span onclick="toggleLikeComment(this)">Like</span>
-                            <span onclick="toggleReplyForm(this)">Reply</span>
-                          </div>
-                          <div class="reply-form" style="display:none;">
-                            <div class="comment-input-container">
-                              <textarea class="comment-input" placeholder="Write a reply..."></textarea>
-                              <button class="send-btn" onclick="postReply(event, '${comment.id}', this)">
-                                <i class="fas fa-paper-plane"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>`;
+          html += renderComment(reply, [], postId);
         });
+        
         html += `</div>`;
       }
-      html += `</div>`;
+      
       return html;
     }
     
-    function toggleLikeComment(el) { el.classList.toggle("active"); }
-    function toggleReplyForm(el) {
-      const replyForm = el.closest(".comment-content").querySelector(".reply-form");
-      replyForm.style.display = (replyForm.style.display === "none" || replyForm.style.display === "") ? "block" : "none";
+    function toggleLikeComment(postId, commentId) {
+      if (!isLoggedIn) {
+        showToast("Please log in to like comments.", "warning");
+        return;
+      }
+      
+      const user = auth.currentUser;
+      const commentRef = db.collection("posts").doc(postId).collection("comments").doc(commentId);
+      
+      commentRef.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          let likes = data.likes || [];
+          let likesCount = data.likesCount || 0;
+          
+          if (likes.includes(user.uid)) {
+            // Unlike
+            likes = likes.filter(uid => uid !== user.uid);
+            likesCount--;
+          } else {
+            // Like
+            likes.push(user.uid);
+            likesCount++;
+          }
+          
+          commentRef.update({ 
+            likes: likes, 
+            likesCount: likesCount 
+          });
+        }
+      }).catch(error => {
+        console.error("Error toggling comment like:", error);
+        showToast("Error updating comment like. Please try again.", "error");
+      });
     }
-    function toggleReplies(el) {
-      const repliesContainer = el.nextElementSibling;
-      if(repliesContainer.style.display === "none" || repliesContainer.style.display === "") {
-        repliesContainer.style.display = "block";
-        el.innerText = "Hide replies";
-      } else {
-        repliesContainer.style.display = "none";
-        // Extract number from the parent's text if needed
-        const count = repliesContainer.children.length;
-        el.innerText = `View replies (${count})`;
+    
+    function toggleReplyForm(element, postId, parentId) {
+      const replyForm = element.closest(".comment-content").querySelector(".reply-form");
+      replyForm.style.display = replyForm.style.display === "none" ? "block" : "none";
+      
+      if (replyForm.style.display === "block") {
+        replyForm.querySelector("textarea").focus();
       }
     }
-    function postReply(e, parentId, btn) {
+    
+    function toggleReplies(element) {
+      const repliesContainer = element.nextElementSibling;
+      const isHidden = repliesContainer.style.display === "none";
+      
+      repliesContainer.style.display = isHidden ? "block" : "none";
+      element.innerHTML = isHidden 
+        ? `<i class="fas fa-caret-up"></i> Hide replies` 
+        : `<i class="fas fa-caret-down"></i> View replies (${repliesContainer.children.length})`;
+    }
+    
+    function postReply(e, postId, parentId) {
       e.stopPropagation();
-      const replyForm = btn.closest(".reply-form");
+      const replyForm = e.target.closest(".reply-form");
       const replyInput = replyForm.querySelector("textarea");
-      if(replyInput.value.trim() === "") return;
+      const replyText = replyInput.value.trim();
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to post replies.", "warning");
+        return;
+      }
+      
+      if (replyText === "") {
+        showToast("Reply cannot be empty.", "warning");
+        return;
+      }
+      
       const user = auth.currentUser;
       const reply = {
         authorName: user.displayName || "User",
-        text: replyInput.value,
+        authorUID: user.uid,
+        text: replyText,
         parentId: parentId,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0
       };
-      // Here we assume the reply is added under the same post's comments collection.
-      // You might need to adjust if you want to nest further.
-      const postId = btn.getAttribute("data-postid") || parentId; 
+      
       db.collection("posts").doc(postId).collection("comments").add(reply)
-        .then(() => { replyInput.value = ""; replyForm.style.display = "none"; loadComments(postId); });
+        .then(() => {
+          replyInput.value = "";
+          replyForm.style.display = "none";
+          loadComments(postId);
+          showToast("Reply posted successfully", "success");
+          
+          // Update comment count
+          db.collection("posts").doc(postId).update({
+            commentsCount: firebase.firestore.FieldValue.increment(1)
+          });
+        })
+        .catch(error => {
+          console.error("Error posting reply:", error);
+          showToast("Error posting reply. Please try again.", "error");
+        });
+    }
+    
+    function deleteComment(postId, commentId) {
+      if (!confirm("Are you sure you want to delete this comment?")) return;
+      
+      db.collection("posts").doc(postId).collection("comments").doc(commentId).delete()
+        .then(() => {
+          loadComments(postId);
+          showToast("Comment deleted", "success");
+          
+          // Update comment count
+          db.collection("posts").doc(postId).update({
+            commentsCount: firebase.firestore.FieldValue.increment(-1)
+          });
+        })
+        .catch(error => {
+          console.error("Error deleting comment:", error);
+          showToast("Error deleting comment. Please try again.", "error");
+        });
     }
     
     // Post Comment using the comment input section
     function postComment(e, postId) {
       e.stopPropagation();
       const commentInput = document.getElementById("commentText-" + postId);
-      if (!commentInput || commentInput.value.trim() === "") return;
+      const commentText = commentInput.value.trim();
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to post comments.", "warning");
+        return;
+      }
+      
+      if (commentText === "") {
+        showToast("Comment cannot be empty.", "warning");
+        return;
+      }
+      
       const user = auth.currentUser;
       const comment = {
         authorName: user.displayName || "User",
-        text: commentInput.value,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        authorUID: user.uid,
+        text: commentText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: [],
+        likesCount: 0
       };
+      
       db.collection("posts").doc(postId).collection("comments").add(comment)
-        .then(() => { commentInput.value = ""; loadComments(postId); });
+        .then(() => {
+          commentInput.value = "";
+          loadComments(postId);
+          showToast("Comment posted successfully", "success");
+          
+          // Update comment count
+          db.collection("posts").doc(postId).update({
+            commentsCount: firebase.firestore.FieldValue.increment(1)
+          });
+        })
+        .catch(error => {
+          console.error("Error posting comment:", error);
+          showToast("Error posting comment. Please try again.", "error");
+        });
     }
     
     // --- Share Functionality ---
     function sharePost(e, postId) {
       e.stopPropagation();
-      const postURL = window.location.href + "#post-" + postId;
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to share posts.", "warning");
+        return;
+      }
+      
+      const postURL = window.location.href.split('#')[0] + `#post-${postId}`;
+      
       if (navigator.share) {
-        navigator.share({ title: "Check out this post", url: postURL })
-          .catch(err => console.error("Error sharing:", err));
+        navigator.share({
+          title: "Check out this post on Fadis Youth",
+          text: "I found this interesting post you might like",
+          url: postURL
+        }).then(() => {
+          // Update share count
+          db.collection("posts").doc(postId).update({
+            sharesCount: firebase.firestore.FieldValue.increment(1)
+          });
+        }).catch(err => {
+          console.error("Error sharing:", err);
+        });
       } else {
-        navigator.clipboard.writeText(postURL).then(() => { alert("Post URL copied to clipboard."); });
+        navigator.clipboard.writeText(postURL).then(() => {
+          showToast("Post link copied to clipboard", "success");
+          
+          // Update share count
+          db.collection("posts").doc(postId).update({
+            sharesCount: firebase.firestore.FieldValue.increment(1)
+          });
+        }).catch(err => {
+          console.error("Error copying to clipboard:", err);
+          showToast("Error sharing post. Please try again.", "error");
+        });
       }
     }
     
@@ -859,8 +2419,17 @@
     function postNewPost() {
       const topic = document.getElementById("postTopic").value.trim();
       const body = document.getElementById("postBody").value.trim();
-      if(topic === "" || body === "") { alert("Please fill in both a topic and body."); return; }
-      if (!isLoggedIn) { alert("Please log in to create posts."); return; }
+      
+      if (!isLoggedIn) {
+        showToast("Please log in to create posts.", "warning");
+        return;
+      }
+      
+      if (topic === "" || body === "") {
+        showToast("Please fill in both a topic and body.", "warning");
+        return;
+      }
+      
       const user = auth.currentUser;
       const post = {
         authorName: user.displayName || "Anonymous",
@@ -871,71 +2440,126 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         likes: [],
         likesCount: 0,
-        // Default reaction permissions and visibility
+        commentsCount: 0,
+        sharesCount: 0,
         allowLike: true,
         allowShare: true,
         allowComment: true,
-        visibility: "public"
+        visibility: "public",
+        keywords: (topic + " " + body).toLowerCase().split(/\s+/)
       };
+      
+      // Add tags if implemented
+      // if (tags) post.tags = tags;
+      
+      // Add image if implemented
+      // if (imageUrl) post.imageUrl = imageUrl;
+      
       db.collection("posts").add(post)
         .then(() => {
           document.getElementById("postTopic").value = "";
           document.getElementById("postBody").value = "";
+          showToast("Post created successfully", "success");
         })
-        .catch(error => { console.error("Error posting new post:", error); });
+        .catch(error => {
+          console.error("Error creating post:", error);
+          showToast("Error creating post. Please try again.", "error");
+        });
     }
     
     // --- Navigation Modal ---
     function openNavModal() {
       document.getElementById("navModal").classList.add("active");
     }
+    
     function closeNavModal() {
       document.getElementById("navModal").classList.remove("active");
     }
     
-    // --- Edit Post Modal Functionality ---
+    // --- Edit Post Modal ---
     function openEditMenu(e, postId) {
       e.stopPropagation();
-      // Fetch current post data
+      
       db.collection("posts").doc(postId).get().then(doc => {
-        if (!doc.exists) return;
+        if (!doc.exists) {
+          showToast("Post not found.", "error");
+          return;
+        }
+        
         const postData = doc.data();
-        // Create modal container with updated layout:
         const modal = document.createElement("div");
-        modal.className = "edit-modal";
+        modal.className = "modal active";
         modal.innerHTML = `
-          <div class="edit-content">
-            <button class="close-edit" onclick="this.parentElement.parentElement.remove()">X</button>
-            <div class="edit-tabs">
-              <div class="edit-tab active" data-tab="postTab" onclick="switchEditTab(event)">Post</div>
-              <div class="edit-tab" data-tab="reactionTab" onclick="switchEditTab(event)">Reactions & Visibility</div>
+          <div class="modal-content slide-up">
+            <div class="modal-header">
+              <h3 class="modal-title">Edit Post</h3>
+              <button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button>
             </div>
-            <div id="postTab" class="edit-section active">
-              <div class="edit-post-content">
-                <input type="text" id="editTopic" placeholder="Topic" value="${postData.topic || ''}">
-                <textarea id="editBody" placeholder="Post body">${postData.body || ''}</textarea>
-                <button class="btn-action update-post-btn" onclick="updatePost('${postId}')">Update Post</button>
+            <div class="modal-body">
+              <div class="edit-tabs">
+                <div class="edit-tab active" data-tab="postTab" onclick="switchEditTab(event)">Post Content</div>
+                <div class="edit-tab" data-tab="settingsTab" onclick="switchEditTab(event)">Post Settings</div>
+              </div>
+              
+              <div id="postTab" class="edit-section active">
+                <div class="form-group">
+                  <label class="form-label">Topic</label>
+                  <input type="text" class="form-control" id="editTopic" value="${postData.topic || ''}">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Content</label>
+                  <textarea class="form-control" id="editBody" rows="5">${postData.body || ''}</textarea>
+                </div>
+              </div>
+              
+              <div id="settingsTab" class="edit-section">
+                <div class="form-group">
+                  <label class="form-label">Post Visibility</label>
+                  <select class="form-control" id="editVisibility">
+                    <option value="public" ${postData.visibility === "public" ? "selected" : ""}>Public</option>
+                    <option value="friends" ${postData.visibility === "friends" ? "selected" : ""}>Friends Only</option>
+                    <option value="private" ${postData.visibility === "private" ? "selected" : ""}>Private</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Interaction Settings</label>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="editAllowLike" ${postData.allowLike ? "checked" : ""}>
+                    <label class="checkbox-label" for="editAllowLike">Allow Likes</label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="editAllowComment" ${postData.allowComment ? "checked" : ""}>
+                    <label class="checkbox-label" for="editAllowComment">Allow Comments</label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="editAllowShare" ${postData.allowShare ? "checked" : ""}>
+                    <label class="checkbox-label" for="editAllowShare">Allow Sharing</label>
+                  </div>
+                </div>
               </div>
             </div>
-            <div id="reactionTab" class="edit-section">
-              <div class="edit-reaction-content">
-                <label><input type="checkbox" id="editAllowLike" ${postData.allowLike ? 'checked' : ''}> Allow Likes</label><br>
-                <label><input type="checkbox" id="editAllowShare" ${postData.allowShare ? 'checked' : ''}> Allow Shares</label><br>
-                <label><input type="checkbox" id="editAllowComment" ${postData.allowComment ? 'checked' : ''}> Allow Comments</label><br>
-                <select id="editVisibility">
-                  <option value="public" ${postData.visibility==="public" ? "selected" : ""}>Public</option>
-                  <option value="private" ${postData.visibility==="private" ? "selected" : ""}>Private</option>
-                  <option value="friends" ${postData.visibility==="friends" ? "selected" : ""}>Friends</option>
-                </select>
-                <button class="btn-action update-reaction-btn" onclick="updatePost('${postId}')">Update Settings</button>
-              </div>
-            </div>
-            <div class="edit-delete-section">
-              <hr>
-              <button class="btn-action delete-post-btn" style="background:red;" onclick="deletePost('${postId}', this)">Delete Post</button>
+            <div class="modal-footer">
+              <button class="btn btn-danger" onclick="deletePost('${postId}')">
+                <i class="fas fa-trash"></i> Delete Post
+              </button>
+              <button class="btn btn-primary" onclick="updatePost('${postId}')">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
             </div>
           </div>`;
+        
         document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener("click", function(e) {
+          if (e.target === modal) {
+            modal.remove();
+          }
+        });
+      }).catch(error => {
+        console.error("Error loading post for edit:", error);
+        showToast("Error loading post. Please try again.", "error");
       });
     }
     
@@ -943,66 +2567,79 @@
       const tabs = e.target.parentElement.querySelectorAll(".edit-tab");
       tabs.forEach(tab => tab.classList.remove("active"));
       e.target.classList.add("active");
-      const sections = e.target.parentElement.parentElement.querySelectorAll(".edit-section");
+      
+      const sections = e.target.closest(".modal-content").querySelectorAll(".edit-section");
       sections.forEach(sec => sec.classList.remove("active"));
+      
       document.getElementById(e.target.getAttribute("data-tab")).classList.add("active");
     }
     
     function updatePost(postId) {
-      // Retrieve updated values from the modal
       const newTopic = document.getElementById("editTopic").value.trim();
       const newBody = document.getElementById("editBody").value.trim();
       const allowLike = document.getElementById("editAllowLike").checked;
       const allowShare = document.getElementById("editAllowShare").checked;
       const allowComment = document.getElementById("editAllowComment").checked;
       const visibility = document.getElementById("editVisibility").value;
-      if(newTopic === "" || newBody === "") {
-        alert("Topic and body cannot be empty.");
+      
+      if (newTopic === "" || newBody === "") {
+        showToast("Topic and body cannot be empty.", "warning");
         return;
       }
-      db.collection("posts").doc(postId).update({
+      
+      const updateData = {
         topic: newTopic,
         body: newBody,
         allowLike: allowLike,
         allowShare: allowShare,
         allowComment: allowComment,
-        visibility: visibility
-      }).then(() => {
-        // Remove the modal after update
-        document.querySelector(".edit-modal").remove();
-      }).catch(err => {
-        console.error("Error updating post:", err);
-      });
-    }
-    
-    function deletePost(postId, btn) {
-      if(confirm("Are you sure you want to delete this post?")) {
-        db.collection("posts").doc(postId).delete().then(() => {
-          // Remove the modal
-          document.querySelector(".edit-modal").remove();
-        }).catch(err => {
-          console.error("Error deleting post:", err);
+        visibility: visibility,
+        keywords: (newTopic + " " + newBody).toLowerCase().split(/\s+/),
+        lastEdited: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      db.collection("posts").doc(postId).update(updateData)
+        .then(() => {
+          document.querySelector(`.modal`).remove();
+          showToast("Post updated successfully", "success");
+        })
+        .catch(error => {
+          console.error("Error updating post:", error);
+          showToast("Error updating post. Please try again.", "error");
         });
-      }
     }
     
-    // --- Sparkle Animation ---
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.post-card').forEach(card => {
-        let sparkleContainer = document.createElement('div');
-        sparkleContainer.className = 'sparkles';
-        card.appendChild(sparkleContainer);
-        for(let i = 0; i < 15; i++){
-          const sparkle = document.createElement('div');
-          sparkle.className = 'sparkle';
-          sparkle.style.left = Math.random() * 100 + '%';
-          sparkle.style.top = Math.random() * 100 + '%';
-          sparkle.style.animationDelay = Math.random() * 1.5 + 's';
-          sparkleContainer.appendChild(sparkle);
+    function deletePost(postId) {
+      if (!confirm("Are you sure you want to delete this post? This action cannot be undone.")) return;
+      
+      db.collection("posts").doc(postId).delete()
+        .then(() => {
+          document.querySelector(`.modal`).remove();
+          showToast("Post deleted successfully", "success");
+        })
+        .catch(error => {
+          console.error("Error deleting post:", error);
+          showToast("Error deleting post. Please try again.", "error");
+        });
+    }
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add click event to logo to open nav modal
+      document.querySelector('.logo').addEventListener('click', function(e) {
+        e.preventDefault();
+        openNavModal();
+      });
+      
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.post-dropdown') && !e.target.closest('.post-menu-btn')) {
+          document.querySelectorAll('.post-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+          });
         }
       });
     });
   </script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 </body>
 </html>
