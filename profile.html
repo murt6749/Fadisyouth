@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile - Fadis Youth</title>
+  <title>My Profile - Fadis Youth</title>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -12,7 +12,7 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #4361ee;
@@ -25,253 +25,418 @@
       --gray-light: #e9ecef;
       --success: #4cc9f0;
       --danger: #ef233c;
+      --warning: #f8961e;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
       --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
-      --transition: all 0.3s ease;
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: var(--light);
+      background-color: #f5f7fa;
       color: var(--dark);
       line-height: 1.6;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
-
     /* Profile Header */
     .profile-header {
+      position: relative;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      color: white;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1518655048521-f130df041f66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') center/cover;
+      opacity: 0.2;
+    }
+    .profile-content {
+      position: relative;
       display: flex;
       gap: 30px;
       align-items: center;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
+      z-index: 1;
+      flex-wrap: wrap;
     }
-
+    /* Reduced avatar size */
     .profile-avatar {
-      width: 150px;
-      height: 150px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border: 3px solid white;
+      background: linear-gradient(45deg, var(--accent), var(--warning));
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 5px solid white;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-lg);
+      position: relative;
     }
-
     .profile-avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
     .profile-avatar i {
-      font-size: 4rem;
+      font-size: 2.5rem;
       color: white;
     }
-
+    .avatar-edit {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: var(--transition);
+    }
+    .profile-avatar:hover .avatar-edit {
+      opacity: 1;
+    }
+    .avatar-edit i {
+      font-size: 0.9rem;
+      color: white;
+    }
     .profile-info {
       flex: 1;
+      min-width: 250px;
     }
-
     .profile-name {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 600;
       margin-bottom: 5px;
+      font-family: 'Playfair Display', serif;
     }
-
     .profile-bio {
-      color: var(--gray);
-      margin-bottom: 15px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      max-width: 600px;
     }
-
-    .profile-location {
+    /* Additional public info */
+    .additional-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    .info-item {
       display: flex;
       align-items: center;
       gap: 5px;
-      color: var(--gray);
-      margin-bottom: 15px;
     }
-
+    .info-item i {
+      font-size: 1rem;
+    }
+    /* Social Links */
+    .social-links {
+      margin-top: 10px;
+    }
+    .social-links a {
+      color: white;
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+    .social-links a:hover {
+      transform: scale(1.1);
+    }
     .profile-actions {
       display: flex;
       gap: 10px;
+      margin-top: 15px;
     }
-
     .btn {
-      padding: 10px 20px;
-      border-radius: 5px;
+      padding: 8px 16px;
+      border-radius: 30px;
       font-weight: 500;
       cursor: pointer;
       transition: var(--transition);
       border: none;
       display: flex;
       align-items: center;
-      gap: 5px;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--secondary);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline {
-      background: none;
-      border: 1px solid var(--gray-light);
-      color: var(--dark);
-    }
-
-    .btn-outline:hover {
-      background: var(--gray-light);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    /* Stats */
-    .profile-stats {
-      display: flex;
-      gap: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
-    }
-
-    .stat {
-      text-align: center;
-      flex: 1;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    .stat-label {
-      color: var(--gray);
+      gap: 8px;
       font-size: 0.9rem;
     }
-
-    /* Posts Grid */
-    .profile-posts {
+    .btn-primary {
+      background: white;
+      color: var(--primary);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-outline {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .btn-edit {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-edit:hover {
+      background: #e5177b;
+      transform: translateY(-3px);
+    }
+    /* Stats */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
       background: white;
       border-radius: 10px;
-      box-shadow: var(--shadow-sm);
       padding: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
     }
-
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    /* Posts Section */
+    .profile-posts {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+    }
     .section-title {
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 20px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-
+    .section-title i {
+      color: var(--primary);
+    }
     .posts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
     }
-
     .post-card {
-      border: 1px solid var(--gray-light);
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
+      box-shadow: var(--shadow-sm);
       transition: var(--transition);
+      background: white;
     }
-
     .post-card:hover {
       transform: translateY(-5px);
       box-shadow: var(--shadow-md);
     }
-
     .post-image {
       width: 100%;
       height: 200px;
       object-fit: cover;
     }
-
     .post-content {
-      padding: 15px;
+      padding: 20px;
     }
-
     .post-title {
       font-weight: 600;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
     }
-
     .post-excerpt {
       color: var(--gray);
-      margin-bottom: 10px;
-      font-size: 0.9rem;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
-
     .post-meta {
       display: flex;
       justify-content: space-between;
       color: var(--gray);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .profile-header {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .profile-actions {
-        justify-content: center;
-      }
-
-      .posts-grid {
-        grid-template-columns: 1fr;
-      }
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
     }
-
-    /* Dark Mode */
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
+    .post-action {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
     }
-
-    body.dark-mode .profile-header,
-    body.dark-mode .profile-stats,
-    body.dark-mode .profile-posts {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
+    .post-action:hover {
+      color: var(--primary);
     }
-
-    body.dark-mode .btn-outline {
-      border-color: #333;
-      color: #e0e0e0;
+    /* Edit Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
     }
-
-    body.dark-mode .btn-outline:hover {
-      background-color: #333;
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .close-modal:hover {
+      color: var(--danger);
+      transform: rotate(90deg);
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--gray-light);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid var(--gray-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      bottom: 30px;
+    }
+    .toast.success {
+      background: var(--success);
+    }
+    .toast.error {
+      background: var(--danger);
     }
   </style>
 </head>
@@ -279,56 +444,130 @@
   <div class="container">
     <!-- Profile Header -->
     <div class="profile-header">
-      <div class="profile-avatar" id="profileAvatar">
-        <i class="fas fa-user"></i>
-      </div>
-      <div class="profile-info">
-        <h1 class="profile-name" id="profileName">Loading...</h1>
-        <p class="profile-bio" id="profileBio">No bio available.</p>
-        <div class="profile-location">
-          <i class="fas fa-map-marker-alt"></i>
-          <span id="profileLocation">Unknown</span>
+      <div class="profile-content">
+        <div class="profile-avatar" id="profileAvatar">
+          <i class="fas fa-user"></i>
+          <div class="avatar-edit" id="avatarEdit">
+            <i class="fas fa-camera"></i>
+            <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+          </div>
         </div>
-        <div class="profile-actions">
-          <button id="followButton" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i> Follow
-          </button>
-          <button id="messageButton" class="btn btn-outline">
-            <i class="fas fa-envelope"></i> Message
-          </button>
-          <!-- Only show edit button if it's the current user's profile -->
-          <button id="editProfileButton" class="btn btn-outline" style="display: none;">
-            <i class="fas fa-edit"></i> Edit Profile
-          </button>
+        <div class="profile-info">
+          <h1 class="profile-name" id="profileName">Loading...</h1>
+          <p class="profile-bio" id="profileBio">No bio added yet. Click edit to add one.</p>
+          <!-- Additional public info -->
+          <div class="additional-info" id="additionalInfo">
+            <!-- Example info items will be injected here -->
+          </div>
+          <!-- Social Links -->
+          <div class="social-links" id="socialLinks"></div>
+          <div class="profile-actions">
+            <button id="followButton" class="btn btn-primary" style="display: none;">
+              <i class="fas fa-user-plus"></i> Follow
+            </button>
+            <button id="messageButton" class="btn btn-outline" style="display: none;">
+              <i class="fas fa-envelope"></i> Message
+            </button>
+            <button id="editProfileButton" class="btn btn-edit">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Stats -->
+    <!-- Stats Section -->
     <div class="profile-stats">
-      <div class="stat">
+      <div class="stat-card">
         <div class="stat-value" id="postCount">0</div>
         <div class="stat-label">Posts</div>
       </div>
-      <div class="stat">
+      <div class="stat-card">
         <div class="stat-value" id="followerCount">0</div>
         <div class="stat-label">Followers</div>
       </div>
-      <div class="stat">
+      <div class="stat-card">
         <div class="stat-value" id="followingCount">0</div>
         <div class="stat-label">Following</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value" id="likeCount">0</div>
+        <div class="stat-label">Likes Received</div>
+      </div>
     </div>
-
     <!-- Posts Section -->
     <div class="profile-posts">
-      <h2 class="section-title">Recent Posts</h2>
+      <h2 class="section-title">
+        <i class="fas fa-file-alt"></i> Recent Posts
+      </h2>
       <div class="posts-grid" id="postsGrid">
-        <!-- Posts will be loaded here -->
+        <p>Loading posts...</p>
       </div>
     </div>
   </div>
-
+  <!-- Edit Profile Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Profile</h3>
+        <button class="close-modal" onclick="closeModal('editModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input type="text" class="form-control" id="editName" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" id="editBio" placeholder="Tell others about yourself..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job</label>
+            <input type="text" class="form-control" id="editJob" placeholder="Your current job title">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" id="editPhone" placeholder="Your phone number">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Education</label>
+            <input type="text" class="form-control" id="editEducation" placeholder="Where did you study?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" class="form-control" id="editLocation" placeholder="City, Country">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input type="url" class="form-control" id="editWebsite" placeholder="https://example.com">
+          </div>
+          <!-- Social Media Links -->
+          <div class="form-group">
+            <label class="form-label">Facebook</label>
+            <input type="url" class="form-control" id="editFacebook" placeholder="https://facebook.com/yourprofile">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Twitter</label>
+            <input type="url" class="form-control" id="editTwitter" placeholder="https://twitter.com/yourprofile">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instagram</label>
+            <input type="url" class="form-control" id="editInstagram" placeholder="https://instagram.com/yourprofile">
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input type="url" class="form-control" id="editLinkedIn" placeholder="https://linkedin.com/in/yourprofile">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
   <script>
     // Initialize Firebase
     const firebaseConfig = {
@@ -344,152 +583,146 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // Get user ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const profileUserId = urlParams.get('uid');
-    let currentUser = null;
-
     // DOM Elements
+    const profileAvatar = document.getElementById('profileAvatar');
+    const avatarEdit = document.getElementById('avatarEdit');
+    const avatarUpload = document.getElementById('avatarUpload');
+    const profileName = document.getElementById('profileName');
+    const profileBio = document.getElementById('profileBio');
+    const additionalInfo = document.getElementById('additionalInfo');
+    const socialLinks = document.getElementById('socialLinks');
     const followButton = document.getElementById('followButton');
     const messageButton = document.getElementById('messageButton');
     const editProfileButton = document.getElementById('editProfileButton');
+    const editModal = document.getElementById('editModal');
 
-    // Check if current user is viewing their own profile
+    // State
+    let currentUser = null;
+    let profileUser = null;
+    let isOwnProfile = false;
+
+    // Initialize
     auth.onAuthStateChanged(user => {
-      currentUser = user;
-      if (user && user.uid === profileUserId) {
-        followButton.style.display = 'none';
-        messageButton.style.display = 'none';
-        editProfileButton.style.display = 'inline-block';
+      if (user) {
+        currentUser = user;
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileUserId = urlParams.get('uid') || user.uid;
+        isOwnProfile = profileUserId === user.uid;
+        setupUI(isOwnProfile);
+        loadProfile(profileUserId);
+        loadStats(profileUserId);
+        loadPosts(profileUserId);
+      } else {
+        window.location.href = 'login.html';
       }
-      loadProfile();
-      loadStats();
-      loadPosts();
     });
 
+    // Setup UI based on profile ownership
+    function setupUI(isOwnProfile) {
+      if (isOwnProfile) {
+        followButton.style.display = 'none';
+        messageButton.style.display = 'none';
+        editProfileButton.style.display = 'flex';
+      } else {
+        followButton.style.display = 'flex';
+        messageButton.style.display = 'flex';
+        editProfileButton.style.display = 'none';
+      }
+    }
+
     // Load profile data
-    function loadProfile() {
-      db.collection('users').doc(profileUserId).get().then(doc => {
+    function loadProfile(userId) {
+      db.collection('users').doc(userId).get().then(doc => {
         if (doc.exists) {
-          const userData = doc.data();
-          document.getElementById('profileName').textContent = userData.displayName || 'User';
-          document.getElementById('profileBio').textContent = userData.bio || 'No bio available.';
-          document.getElementById('profileLocation').textContent = userData.location || 'Unknown';
-
-          // Set profile picture
-          const avatar = document.getElementById('profileAvatar');
-          if (userData.photoURL) {
-            avatar.innerHTML = `<img src="${userData.photoURL}" alt="Profile">`;
+          profileUser = doc.data();
+          updateProfileDisplay(profileUser);
+          if (isOwnProfile) {
+            document.getElementById('editName').value = profileUser.displayName || '';
+            document.getElementById('editBio').value = profileUser.bio || '';
+            document.getElementById('editJob').value = profileUser.job || '';
+            document.getElementById('editPhone').value = profileUser.phone || '';
+            document.getElementById('editEducation').value = profileUser.education || '';
+            document.getElementById('editLocation').value = profileUser.location || '';
+            document.getElementById('editWebsite').value = profileUser.website || '';
+            document.getElementById('editFacebook').value = profileUser.facebook || '';
+            document.getElementById('editTwitter').value = profileUser.twitter || '';
+            document.getElementById('editInstagram').value = profileUser.instagram || '';
+            document.getElementById('editLinkedIn').value = profileUser.linkedIn || '';
           }
-
-          // Check follow status if not current user
-          if (currentUser && currentUser.uid !== profileUserId) {
-            checkFollowStatus();
-          }
+          if (!isOwnProfile) checkFollowStatus();
         }
       });
     }
 
-    // Check if current user follows this profile
-    function checkFollowStatus() {
-      db.collection('follows')
-        .where('follower', '==', currentUser.uid)
-        .where('following', '==', profileUserId)
-        .get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            followButton.innerHTML = '<i class="fas fa-user-check"></i> Following';
-            followButton.classList.add('btn-danger');
-            followButton.onclick = unfollowUser;
-          } else {
-            followButton.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
-            followButton.classList.remove('btn-danger');
-            followButton.onclick = followUser;
-          }
-        });
-    }
+    // Update profile display (public fields)
+    function updateProfileDisplay(user) {
+      profileName.textContent = user.displayName || 'User';
+      profileBio.textContent = user.bio || 'No bio added yet. Click edit to add one.';
+      
+      // Build additional info section
+      let infoHTML = '';
+      if (user.job) infoHTML += `<div class="info-item"><i class="fas fa-briefcase"></i> ${user.job}</div>`;
+      if (user.phone) infoHTML += `<div class="info-item"><i class="fas fa-phone"></i> ${user.phone}</div>`;
+      if (user.education) infoHTML += `<div class="info-item"><i class="fas fa-graduation-cap"></i> ${user.education}</div>`;
+      if (user.location) infoHTML += `<div class="info-item"><i class="fas fa-map-marker-alt"></i> ${user.location}</div>`;
+      if (user.website) infoHTML += `<div class="info-item"><i class="fas fa-globe"></i> <a href="${user.website}" target="_blank">${user.website}</a></div>`;
+      additionalInfo.innerHTML = infoHTML;
+      
+      // Setup social links
+      let socialHTML = '';
+      if (user.facebook) socialHTML += `<a href="${user.facebook}" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>`;
+      if (user.twitter) socialHTML += `<a href="${user.twitter}" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>`;
+      if (user.instagram) socialHTML += `<a href="${user.instagram}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>`;
+      if (user.linkedIn) socialHTML += `<a href="${user.linkedIn}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`;
+      socialLinks.innerHTML = socialHTML;
 
-    // Follow user
-    function followUser() {
-      db.collection('follows').add({
-        follower: currentUser.uid,
-        following: profileUserId,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        checkFollowStatus();
-        updateFollowerCount(1);
-        showToast(`You're now following ${document.getElementById('profileName').textContent}`);
-      });
-    }
-
-    // Unfollow user
-    function unfollowUser() {
-      db.collection('follows')
-        .where('follower', '==', currentUser.uid)
-        .where('following', '==', profileUserId)
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(doc => doc.ref.delete());
-          checkFollowStatus();
-          updateFollowerCount(-1);
-          showToast(`You've unfollowed ${document.getElementById('profileName').textContent}`);
-        });
-    }
-
-    // Update follower count in UI
-    function updateFollowerCount(change) {
-      const countElement = document.getElementById('followerCount');
-      const currentCount = parseInt(countElement.textContent) || 0;
-      countElement.textContent = currentCount + change;
+      // Avatar update
+      if (user.photoURL) {
+        profileAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+        profileAvatar.innerHTML += `
+          <div class="avatar-edit" id="avatarEdit">
+            <i class="fas fa-camera"></i>
+            <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+          </div>
+        `;
+        setupAvatarUpload();
+      }
     }
 
     // Load profile stats
-    function loadStats() {
-      // Post count
-      db.collection('posts')
-        .where('authorUID', '==', profileUserId)
-        .get()
+    function loadStats(userId) {
+      db.collection('posts').where('authorUID', '==', userId).get()
+        .then(snapshot => document.getElementById('postCount').textContent = snapshot.size);
+      db.collection('follows').where('following', '==', userId).get()
+        .then(snapshot => document.getElementById('followerCount').textContent = snapshot.size);
+      db.collection('follows').where('follower', '==', userId).get()
+        .then(snapshot => document.getElementById('followingCount').textContent = snapshot.size);
+      db.collection('posts').where('authorUID', '==', userId).get()
         .then(snapshot => {
-          document.getElementById('postCount').textContent = snapshot.size;
-        });
-
-      // Follower count
-      db.collection('follows')
-        .where('following', '==', profileUserId)
-        .get()
-        .then(snapshot => {
-          document.getElementById('followerCount').textContent = snapshot.size;
-        });
-
-      // Following count
-      db.collection('follows')
-        .where('follower', '==', profileUserId)
-        .get()
-        .then(snapshot => {
-          document.getElementById('followingCount').textContent = snapshot.size;
+          let totalLikes = 0;
+          snapshot.forEach(doc => totalLikes += doc.data().likesCount || 0);
+          document.getElementById('likeCount').textContent = totalLikes;
         });
     }
 
-    // Load user's posts
-    function loadPosts() {
+    // Load user posts
+    function loadPosts(userId) {
       const postsGrid = document.getElementById('postsGrid');
       postsGrid.innerHTML = '<p>Loading posts...</p>';
-
       db.collection('posts')
-        .where('authorUID', '==', profileUserId)
+        .where('authorUID', '==', userId)
         .orderBy('timestamp', 'desc')
+        .limit(6)
         .get()
         .then(snapshot => {
           if (snapshot.empty) {
             postsGrid.innerHTML = '<p>No posts yet.</p>';
             return;
           }
-
           postsGrid.innerHTML = '';
           snapshot.forEach(doc => {
             const post = doc.data();
             const postDate = post.timestamp?.toDate().toLocaleDateString() || 'Recently';
-            
             postsGrid.innerHTML += `
               <div class="post-card">
                 ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image">` : ''}
@@ -500,6 +733,16 @@
                     <span><i class="far fa-heart"></i> ${post.likesCount || 0}</span>
                     <span>${postDate}</span>
                   </div>
+                  ${isOwnProfile ? `
+                  <div class="post-actions">
+                    <div class="post-action" onclick="editPost('${doc.id}')">
+                      <i class="fas fa-edit"></i> Edit
+                    </div>
+                    <div class="post-action" onclick="deletePost('${doc.id}')">
+                      <i class="fas fa-trash"></i> Delete
+                    </div>
+                  </div>
+                  ` : ''}
                 </div>
               </div>
             `;
@@ -507,24 +750,149 @@
         });
     }
 
-    // Toast notification
-    function showToast(message) {
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+    // Setup avatar upload
+    function setupAvatarUpload() {
+      avatarUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          profileAvatar.innerHTML = `<img src="${event.target.result}" alt="Profile">`;
+          profileAvatar.innerHTML += `
+            <div class="avatar-edit" id="avatarEdit">
+              <i class="fas fa-camera"></i>
+              <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+            </div>
+          `;
+          setupAvatarUpload();
+        };
+        reader.readAsDataURL(file);
+        const storageRef = storage.ref(`avatars/${currentUser.uid}/${file.name}`);
+        storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL())
+        .then(downloadURL => {
+          const updates = {
+            photoURL: downloadURL,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+          db.collection('users').doc(currentUser.uid).update(updates);
+          currentUser.updateProfile({ photoURL: downloadURL });
+          showToast('Profile picture updated successfully!', 'success');
+        }).catch(error => {
+          console.error('Error uploading avatar:', error);
+          showToast('Error updating profile picture', 'error');
+        });
+      });
     }
 
     // Edit profile button
     editProfileButton.addEventListener('click', () => {
-      window.location.href = 'edit-profile.html';
+      editModal.classList.add('active');
     });
 
-    // Message button
-    messageButton.addEventListener('click', () => {
-      window.location.href = `chat.html?uid=${profileUserId}`;
-    });
+    // Save profile changes
+    function saveProfile() {
+      const updates = {
+        displayName: document.getElementById('editName').value.trim(),
+        bio: document.getElementById('editBio').value.trim(),
+        job: document.getElementById('editJob').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        education: document.getElementById('editEducation').value.trim(),
+        location: document.getElementById('editLocation').value.trim(),
+        website: document.getElementById('editWebsite').value.trim(),
+        facebook: document.getElementById('editFacebook').value.trim(),
+        twitter: document.getElementById('editTwitter').value.trim(),
+        instagram: document.getElementById('editInstagram').value.trim(),
+        linkedIn: document.getElementById('editLinkedIn').value.trim(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection('users').doc(currentUser.uid).update(updates)
+      .then(() => {
+        profileName.textContent = updates.displayName;
+        profileBio.textContent = updates.bio || 'No bio added yet. Click edit to add one.';
+        // Update additional info and social links after save
+        updateProfileDisplay(updates);
+        currentUser.updateProfile({ displayName: updates.displayName });
+        closeModal('editModal');
+        showToast('Profile updated successfully!', 'success');
+      })
+      .catch(error => {
+        console.error('Error updating profile:', error);
+        showToast('Error updating profile', 'error');
+      });
+    }
+
+    // Follow user
+    function followUser() {
+      db.collection('follows').add({
+        follower: currentUser.uid,
+        following: profileUser.uid,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        updateFollowButton(true);
+        document.getElementById('followerCount').textContent =
+          parseInt(document.getElementById('followerCount').textContent) + 1;
+        showToast(`You're now following ${profileUser.displayName}`, 'success');
+      });
+    }
+
+    // Unfollow user
+    function unfollowUser() {
+      db.collection('follows')
+      .where('follower', '==', currentUser.uid)
+      .where('following', '==', profileUser.uid)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => doc.ref.delete());
+        updateFollowButton(false);
+        document.getElementById('followerCount').textContent =
+          parseInt(document.getElementById('followerCount').textContent) - 1;
+        showToast(`You've unfollowed ${profileUser.displayName}`, 'success');
+      });
+    }
+
+    // Update follow button state
+    function updateFollowButton(isFollowing) {
+      if (isFollowing) {
+        followButton.innerHTML = '<i class="fas fa-user-check"></i> Following';
+        followButton.classList.add('btn-danger');
+        followButton.onclick = unfollowUser;
+      } else {
+        followButton.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+        followButton.classList.remove('btn-danger');
+        followButton.onclick = followUser;
+      }
+    }
+
+    // Check follow status
+    function checkFollowStatus() {
+      if (!currentUser || !profileUser || currentUser.uid === profileUser.uid) return;
+      db.collection('follows')
+      .where('follower', '==', currentUser.uid)
+      .where('following', '==', profileUser.uid)
+      .get()
+      .then(snapshot => {
+        updateFollowButton(!snapshot.empty);
+      });
+    }
+
+    // Close modal
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Show toast
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast';
+      toast.classList.add(type);
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    setupAvatarUpload();
   </script>
 </body>
 </html>
