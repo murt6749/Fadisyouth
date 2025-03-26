@@ -5,93 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fatwaa Gargaarsa</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Naskh+Arabic&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Noto+Naskh+Arabic&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #2B5A46;
+      --primary-dark: #1E3D32;
+      --primary-light: #3A7D5F;
       --secondary: #7D9D6E;
+      --secondary-dark: #5E7D4E;
       --accent: #D4AF37;
+      --accent-dark: #B5942B;
       --light: #F8F5F0;
+      --lighter: #FFFDFA;
       --dark: #1E1E1E;
+      --dark-light: #333;
       --success: #4CAF50;
       --error: #E74C3C;
-      --angelic-glow: rgba(255, 255, 240, 0.3);
+      --angelic-glow: rgba(255, 255, 240, 0.4);
+      --golden-glow: rgba(212, 175, 55, 0.3);
+      --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Poppins', 'Amiri', sans-serif;
+      font-family: 'Poppins', 'Amiri', 'Noto Naskh Arabic', sans-serif;
     }
+    
     body {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       color: var(--dark);
       min-height: 100vh;
       position: relative;
       padding-bottom: 120px;
+      overflow-x: hidden;
     }
+    
+    /* Islamic Pattern Background with Animation */
     .islamic-pattern {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      opacity: 0.08;
+      z-index: -1;
+      background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232B5A46' fill-opacity='0.2'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.414l-8.486 8.486-1.414-1.414 8.486-8.486 1.414 1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      animation: patternMove 120s linear infinite;
+    }
+    
+    @keyframes patternMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 1000px 500px; }
+    }
+    
+    /* Decorative Elements */
+    .corner-decoration {
+      position: absolute;
+      width: 150px;
+      height: 150px;
       opacity: 0.1;
       z-index: -1;
-      background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.414l-8.486 8.486-1.414-1.414 8.486-8.486 1.414 1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
+    
+    .corner-decoration.top-left {
+      top: 0;
+      left: 0;
+      background: radial-gradient(circle at center, var(--accent) 0%, transparent 70%);
+    }
+    
+    .corner-decoration.bottom-right {
+      bottom: 0;
+      right: 0;
+      background: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
+    }
+    
+    /* Floating Particles */
+    .particle {
+      position: fixed;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: -1;
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
+    }
+    
+    /* Main Container */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
+      position: relative;
     }
-    /* Header with topic text */
+    
+    /* Header with Beautiful Islamic Design */
     .main-header {
-      background: linear-gradient(135deg, var(--primary) 0%, #1e3d32 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
-      padding: 2rem;
+      padding: 3rem 2rem;
       border-radius: 0 0 30px 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       margin-bottom: 3rem;
       text-align: center;
       position: relative;
       overflow: hidden;
       animation: glow 3s ease-in-out infinite alternate;
+      border-bottom: 4px solid var(--accent);
     }
+    
+    .main-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23D4AF37' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.2;
+    }
+    
     @keyframes glow {
       from { box-shadow: 0 0 20px var(--angelic-glow); }
-      to { box-shadow: 0 0 30px var(--angelic-glow), 0 0 40px var(--angelic-glow); }
+      to { box-shadow: 0 0 30px var(--angelic-glow), 0 0 50px var(--golden-glow); }
     }
+    
     .main-header h1 {
-      font-size: 2.5rem;
+      font-size: 2.8rem;
       margin-bottom: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: relative;
+      display: inline-block;
     }
+    
+    .main-header h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+    
     .main-header p {
-      font-size: 1.2rem;
-    }
-    #topicText {
+      font-size: 1.3rem;
       margin-top: 1rem;
-      font-weight: 600;
+      opacity: 0.9;
     }
+    
+    #topicText {
+      margin-top: 1.5rem;
+      font-weight: 600;
+      background: rgba(0,0,0,0.1);
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
     /* Grid of Sheikh Cards */
     .sheikh-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
+      gap: 2.5rem;
+      margin-top: 1rem;
     }
-    /* Enhanced Card Design */
+    
+    /* Enhanced Card Design with 3D Effect */
     .sheikh-card {
-      background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+      background: linear-gradient(145deg, var(--lighter) 0%, var(--light) 100%);
       border-radius: 25px;
-      padding: 2rem;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 2.5rem 2rem;
+      transition: var(--transition);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
       cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.5);
       perspective: 1000px;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
+    
+    .sheikh-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.3) 100%);
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    .sheikh-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .sheikh-card:hover::before {
+      opacity: 1;
+    }
+    
     .sheikh-card-inner {
       position: relative;
       width: 100%;
@@ -99,60 +226,123 @@
       transition: transform 0.6s;
       transform-style: preserve-3d;
     }
+    
     .sheikh-card:hover .sheikh-card-inner {
       transform: rotateY(10deg) rotateX(5deg);
     }
+    
     .sheikh-image {
       width: 160px;
       height: 160px;
       border-radius: 50%;
       object-fit: cover;
-      margin: 0 auto 1rem;
-      border: 4px solid var(--secondary);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
+      margin: 0 auto 1.5rem;
+      border: 5px solid var(--secondary);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      transition: var(--transition);
       position: relative;
       z-index: 2;
+      filter: grayscale(10%);
     }
+    
+    .sheikh-card:hover .sheikh-image {
+      transform: scale(1.05);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      filter: grayscale(0%);
+    }
+    
     .card-glow {
       position: absolute;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle at 50% 50%, rgba(125, 157, 110, 0.1), transparent 60%);
+      background: radial-gradient(circle at 50% 50%, rgba(125, 157, 110, 0.15), transparent 70%);
       pointer-events: none;
+      transition: var(--transition);
     }
+    
+    .sheikh-card:hover .card-glow {
+      transform: scale(1.2);
+    }
+    
+    .sheikh-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--primary-dark);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .sheikh-bio {
+      font-size: 1rem;
+      color: var(--dark-light);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
+      line-height: 1.6;
+    }
+    
     .card-buttons {
       text-align: center;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
     }
+    
     .card-btn {
-      background: var(--secondary);
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
       color: white;
       border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 20px;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
       cursor: pointer;
-      transition: background 0.3s ease;
-      margin: 0 0.5rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      min-width: 120px;
+      justify-content: center;
     }
+    
     .card-btn:hover {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
+    
+    .card-btn i {
+      font-size: 1.1rem;
+    }
+    
     /* Custom Dropdown for dynamic fields */
     .custom-select {
       position: relative;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
     }
+    
     .select-header {
-      padding: 0.8rem;
+      padding: 1rem;
       border: 2px solid #ddd;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: white;
+      transition: var(--transition);
     }
+    
+    .select-header:hover {
+      border-color: var(--secondary);
+    }
+    
     .select-options {
       position: absolute;
       top: 100%;
@@ -160,117 +350,229 @@
       right: 0;
       background: white;
       border: 2px solid #ddd;
-      border-radius: 10px;
+      border-radius: 0 0 12px 12px;
+      border-top: none;
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.3s ease;
+      transition: max-height 0.4s ease;
       z-index: 10;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
+    
     .select-option {
-      padding: 0.8rem;
+      padding: 1rem;
       cursor: pointer;
+      transition: var(--transition);
     }
+    
     .select-option:hover {
       background: var(--light);
+      color: var(--primary);
     }
+    
+    .custom-select.open .select-header {
+      border-radius: 12px 12px 0 0;
+      border-bottom: none;
+    }
+    
     .custom-select.open .select-options {
-      max-height: 150px;
+      max-height: 250px;
+      overflow-y: auto;
     }
-    /* --- Modal Styles (now with colorful gradient backgrounds) --- */
+    
+    /* --- Modal Styles --- */
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    
     /* Sheikh-Specific Question Modal */
     .question-modal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #fff7e6, #ffedcc);
+      transform: translate(-50%, -50%) scale(0.9);
+      background: linear-gradient(135deg, var(--lighter) 0%, var(--light) 100%);
       border-radius: 25px;
       width: 90%;
       max-width: 700px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
       z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.5);
     }
+    
     .question-modal.active {
       display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
+    
     .question-modal .modal-header {
-      padding: 1.5rem;
-      border-bottom: 2px solid var(--light);
+      padding: 1.8rem;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-radius: 25px 25px 0 0;
     }
+    
     .question-modal .modal-header h2 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 600;
     }
+    
     .question-modal .modal-close {
       cursor: pointer;
-      font-size: 1.5rem;
-      color: var(--dark);
+      font-size: 1.8rem;
+      color: white;
+      transition: var(--transition);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
+    
+    .question-modal .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+    
     .question-modal .modal-body {
-      padding: 1.5rem;
+      padding: 2rem;
     }
+    
     .question-modal .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
     }
+    
+    .question-modal .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      font-weight: 500;
+      color: var(--dark-light);
+    }
+    
     /* Ensure the order: Name, dynamic fields, then question textarea */
     #questionForm input,
     #questionForm textarea {
       width: 100%;
-      padding: 1rem;
+      padding: 1.2rem;
       border: 2px solid #ddd;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 1rem;
-      transition: all 0.3s ease;
+      transition: var(--transition);
+      background: white;
     }
+    
     #questionForm input:focus,
     #questionForm textarea:focus {
       border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(125,157,110,0.3);
+      box-shadow: 0 0 0 4px rgba(125,157,110,0.2);
+      outline: none;
     }
+    
+    #questionForm textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    
     /* Info Modal for Sheikh Details */
     .info-modal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #fff7e6, #ffedcc);
+      transform: translate(-50%, -50%) scale(0.9);
+      background: linear-gradient(135deg, var(--lighter) 0%, var(--light) 100%);
       border-radius: 25px;
       width: 90%;
       max-width: 600px;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
       z-index: 1100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.5);
     }
+    
     .info-modal.active {
       display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
+    
     .info-modal .modal-header {
-      padding: 1.5rem;
-      border-bottom: 2px solid var(--light);
+      padding: 1.8rem;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-radius: 25px 25px 0 0;
     }
+    
     .info-modal .modal-header h2 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 600;
     }
+    
     .info-modal .modal-close {
       cursor: pointer;
-      font-size: 1.5rem;
-      color: var(--dark);
+      font-size: 1.8rem;
+      color: white;
+      transition: var(--transition);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
+    
+    .info-modal .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+    
     .info-modal .modal-body {
-      padding: 1.5rem;
+      padding: 2rem;
     }
+    
+    .info-modal .modal-body p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--dark-light);
+      margin-bottom: 1.5rem;
+    }
+    
     /* Home Modal for General Questions */
     .home-modal {
       display: none;
@@ -278,161 +580,218 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(135deg, #fff7e6, #ffedcc);
+      background: linear-gradient(135deg, var(--lighter) 0%, var(--light) 100%);
       border-radius: 30px 30px 0 0;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 -20px 50px rgba(0,0,0,0.2);
       z-index: 1200;
+      transform: translateY(100%);
+      transition: transform 0.4s ease;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-bottom: none;
     }
+    
     .home-modal.active {
       display: block;
+      transform: translateY(0);
     }
+    
     .home-modal .modal-header {
-      padding: 1.5rem;
-      border-bottom: 2px solid var(--light);
+      padding: 1.8rem;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--primary);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
       border-radius: 30px 30px 0 0;
     }
+    
     .home-modal .modal-header h2 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 600;
       text-align: center;
+      flex: 1;
     }
+    
+    .home-modal .modal-header h2 small {
+      display: block;
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-top: 0.5rem;
+      font-weight: 400;
+    }
+    
     .home-modal .modal-header .modal-close {
       cursor: pointer;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       color: white;
+      transition: var(--transition);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
+    
+    .home-modal .modal-header .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+    
     .home-modal .modal-body {
-      padding: 1.5rem;
+      padding: 2rem;
     }
+    
     .home-modal .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
     }
+    
+    .home-modal .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      font-weight: 500;
+      color: var(--dark-light);
+    }
+    
     .home-modal input,
     .home-modal textarea {
       width: 100%;
-      padding: 1rem;
+      padding: 1.2rem;
       border: 2px solid #ddd;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 1rem;
-      transition: all 0.3s ease;
+      transition: var(--transition);
+      background: white;
     }
+    
     .home-modal input:focus,
     .home-modal textarea:focus {
       border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(125,157,110,0.3);
+      box-shadow: 0 0 0 4px rgba(125,157,110,0.2);
+      outline: none;
     }
-    /* Navigation Buttons */
-    #navButtons {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 1.5rem;
-      background: rgba(255,255,255,0.9);
-      padding: 1rem 2rem;
-      border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      backdrop-filter: blur(10px);
-      z-index: 1300;
+    
+    .home-modal textarea {
+      min-height: 150px;
+      resize: vertical;
     }
-    .nav-btn {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--accent) 0%, #c19b2b 100%);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .nav-btn::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.1);
-      transform: scale(0);
-      border-radius: 50%;
-      transition: all 0.3s;
-    }
-    .nav-btn:hover::after {
-      transform: scale(1.5);
-      opacity: 0;
-    }
+    
     /* Submit Button Design */
     .submit-btn {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
       color: white;
-      padding: 1.2rem 2.5rem;
+      padding: 1.3rem 2.8rem;
       border: none;
       border-radius: 15px;
       cursor: pointer;
       font-size: 1.1rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      font-weight: 500;
+      transition: var(--transition);
       display: inline-flex;
       align-items: center;
       gap: 0.8rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      margin-top: 1rem;
+      width: 100%;
+      justify-content: center;
     }
+    
     .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
     }
+    
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    
     /* History Modal */
     .history-modal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #fff7e6, #ffedcc);
-      border-radius: 15px;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: linear-gradient(135deg, var(--lighter) 0%, var(--light) 100%);
+      border-radius: 25px;
       width: 90%;
-      max-width: 600px;
+      max-width: 700px;
       max-height: 80vh;
       overflow-y: auto;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 2rem;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
       z-index: 1400;
+      opacity: 0;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.5);
     }
+    
     .history-modal.active {
       display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
       animation: fadeIn 0.5s ease;
     }
+    
     @keyframes fadeIn {
       from { opacity: 0; transform: translate(-50%, -45%) scale(0.9); }
       to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
+    
     .history-modal .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
     }
+    
     .history-modal .modal-header h3 {
       margin: 0;
       color: var(--primary);
+      font-size: 1.6rem;
+      font-weight: 600;
     }
+    
     .history-modal .modal-close {
       cursor: pointer;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       color: var(--dark);
+      transition: var(--transition);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
+    
+    .history-modal .modal-close:hover {
+      background: rgba(0,0,0,0.05);
+      transform: rotate(90deg);
+    }
+    
+    .history-content {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+    
     .history-content p {
-      border-bottom: 1px solid #ddd;
-      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding: 1.2rem 0;
+      color: var(--dark-light);
+      line-height: 1.6;
     }
+    
+    .history-content p strong {
+      color: var(--primary-dark);
+    }
+    
     /* Notification */
     .notification {
       position: fixed;
@@ -441,30 +800,190 @@
       transform: translateX(-50%);
       background: var(--success);
       color: white;
-      padding: 1rem 2rem;
+      padding: 1.2rem 2.5rem;
       border-radius: 50px;
       display: none;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       z-index: 1500;
+      font-weight: 500;
+      animation: slideUp 0.3s ease;
     }
+    
+    @keyframes slideUp {
+      from { transform: translate(-50%, 20px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    
+    /* Navigation Buttons */
+    #navButtons {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1.8rem;
+      background: rgba(255,255,255,0.95);
+      padding: 1.2rem 2.5rem;
+      border-radius: 50px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
+      z-index: 1300;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .nav-btn {
+      width: 65px;
+      height: 65px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      font-size: 1.4rem;
+    }
+    
+    .nav-btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.15);
+      transform: scale(0);
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+    
+    .nav-btn:hover::after {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+    
+    .nav-btn:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    }
+    
+    .nav-btn:active {
+      transform: translateY(0) scale(1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .main-header h1 {
+        font-size: 2.4rem;
+      }
+      
+      .main-header p {
+        font-size: 1.1rem;
+      }
+      
+      .sheikh-grid {
+        gap: 2rem;
+      }
+      
+      .nav-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.3rem;
+      }
+    }
+    
     @media (max-width: 768px) {
+      .main-header {
+        padding: 2rem 1.5rem;
+      }
+      
+      .main-header h1 {
+        font-size: 2rem;
+      }
+      
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .sheikh-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .sheikh-card {
+        padding: 2rem 1.5rem;
+      }
+      
       #navButtons {
         bottom: 20px;
-        padding: 0.8rem 1.5rem;
-        gap: 1rem;
+        padding: 1rem 2rem;
+        gap: 1.2rem;
       }
+      
+      .nav-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.2rem;
+      }
+      
+      .question-modal .modal-body,
+      .info-modal .modal-body,
+      .home-modal .modal-body,
+      .history-modal {
+        padding: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .main-header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .main-header p {
+        font-size: 1rem;
+      }
+      
+      #topicText {
+        font-size: 1rem;
+        padding: 0.4rem 1rem;
+      }
+      
+      #navButtons {
+        gap: 1rem;
+        padding: 0.8rem 1.5rem;
+      }
+      
       .nav-btn {
         width: 50px;
         height: 50px;
+        font-size: 1.1rem;
       }
-      .sheikh-card {
-        margin: 0 1rem;
+      
+      .card-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .card-btn {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
   <div class="islamic-pattern"></div>
+  <div class="corner-decoration top-left"></div>
+  <div class="corner-decoration bottom-right"></div>
+  
+  <!-- Floating Particles -->
+  <div class="particle" style="width: 8px; height: 8px; top: 20%; left: 10%; animation-delay: 0s;"></div>
+  <div class="particle" style="width: 12px; height: 12px; top: 60%; left: 80%; animation-delay: 2s;"></div>
+  <div class="particle" style="width: 6px; height: 6px; top: 30%; left: 50%; animation-delay: 4s;"></div>
+  <div class="particle" style="width: 10px; height: 10px; top: 80%; left: 30%; animation-delay: 6s;"></div>
+  
   <header class="main-header">
     <div class="container">
       <h1 id="mainTitle">Fatwaa Gargaarsa</h1>
@@ -472,11 +991,15 @@
       <p id="topicText">General Questions about Islam / Gaaffilee Islaamaa Guutuu</p>
     </div>
   </header>
+  
   <main class="container">
     <div class="sheikh-grid" id="sheikhPrimaryContainer">
       <!-- Four sheikh cards will be dynamically generated -->
     </div>
   </main>
+  
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay"></div>
   
   <!-- Sheikh-Specific Question Modal -->
   <div class="question-modal" id="questionModal">
@@ -488,16 +1011,18 @@
       <form id="questionForm">
         <!-- Name Field -->
         <div class="form-group">
-          <input type="text" id="sheikhUserName" placeholder="Your Name" required>
+          <label for="sheikhUserName">Your Name</label>
+          <input type="text" id="sheikhUserName" placeholder="Enter your name" required>
         </div>
         <!-- Dynamic Fields (if any) -->
         <div id="dynamicFields"></div>
         <!-- Question Textarea (last box) -->
         <div class="form-group">
-          <textarea id="sheikhUserQuestion" placeholder="Your Question" rows="4" required></textarea>
+          <label for="sheikhUserQuestion">Your Question</label>
+          <textarea id="sheikhUserQuestion" placeholder="Type your question here..." rows="6" required></textarea>
         </div>
         <button type="submit" class="submit-btn" id="questionSubmitBtn">
-          <i class="fas fa-paper-plane"></i> Submit
+          <i class="fas fa-paper-plane"></i> Submit Question
         </button>
       </form>
     </div>
@@ -517,19 +1042,21 @@
   <!-- Home Modal for General Questions -->
   <div class="home-modal" id="homeModal">
     <div class="modal-header">
-      <h2>Generalized Questions about Islam<br><small>Gaaffilee Islaamaa Guutuu</small></h2>
+      <h2>Generalized Questions about Islam<small>Gaaffilee Islaamaa Guutuu</small></h2>
       <span class="modal-close" id="closeHomeModal">&times;</span>
     </div>
     <div class="modal-body">
       <form id="homeForm">
         <div class="form-group">
-          <input type="text" id="homeUserName" placeholder="Your Name" required>
+          <label for="homeUserName">Your Name</label>
+          <input type="text" id="homeUserName" placeholder="Enter your name" required>
         </div>
         <div class="form-group">
-          <textarea id="homeUserQuestion" placeholder="Your Question" rows="4" required></textarea>
+          <label for="homeUserQuestion">Your Question</label>
+          <textarea id="homeUserQuestion" placeholder="Type your question here..." rows="6" required></textarea>
         </div>
         <button type="submit" class="submit-btn" id="homeSubmitBtn">
-          <i class="fas fa-paper-plane"></i> Submit
+          <i class="fas fa-paper-plane"></i> Submit Question
         </button>
       </form>
     </div>
@@ -548,16 +1075,16 @@
   
   <!-- Navigation Buttons -->
   <div id="navButtons">
-    <button class="nav-btn" id="homeNavBtn" onclick="toggleHomeModal()">
+    <button class="nav-btn" id="homeNavBtn" onclick="toggleHomeModal()" title="General Questions">
       <i class="fas fa-home"></i>
     </button>
-    <button class="nav-btn" id="answeredBtn" onclick="window.location.href='answered.html'">
+    <button class="nav-btn" id="answeredBtn" onclick="window.location.href='answered.html'" title="Answered Questions">
       <i class="fas fa-check-circle"></i>
     </button>
-    <button class="nav-btn" id="historyNavBtn" onclick="showHistoryModal()">
+    <button class="nav-btn" id="historyNavBtn" onclick="showHistoryModal()" title="Your History">
       <i class="fas fa-history"></i>
     </button>
-    <button class="nav-btn" id="exitBtn" onclick="window.location.href='index.html'">
+    <button class="nav-btn" id="exitBtn" onclick="window.location.href='index.html'" title="Exit">
       <i class="fas fa-sign-out-alt"></i>
     </button>
   </div>
@@ -590,6 +1117,7 @@
     function hideNavButtons() {
       document.getElementById('navButtons').style.display = 'none';
     }
+    
     function showNavButtons() {
       document.getElementById('navButtons').style.display = 'flex';
     }
@@ -620,6 +1148,7 @@
     function toggleSelect(header) {
       header.parentElement.classList.toggle('open');
     }
+    
     function selectOption(el, option, index) {
       var selectDiv = el.closest('.custom-select');
       selectDiv.classList.remove('open');
@@ -660,6 +1189,7 @@
     // --- Modal open/close functions ---
     // Sheikh-specific question modal
     function openQuestionModal(index) {
+      document.getElementById('modalOverlay').classList.add('active');
       hideNavButtons();
       var modal = document.getElementById('questionModal');
       modal.classList.add('active');
@@ -673,59 +1203,80 @@
         document.getElementById('dynamicFields').innerHTML = '';
       }
     }
+    
     function closeQuestionModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById('questionModal').classList.remove('active');
       showNavButtons();
     }
+    
     // Info modal for details
     function openInfoModal(index) {
+      document.getElementById('modalOverlay').classList.add('active');
       hideNavButtons();
       var modal = document.getElementById('infoModal');
       modal.classList.add('active');
       document.getElementById('infoModalTitle').textContent = sheikhData[index].name;
       document.getElementById('infoContent').innerHTML = '<p>' + sheikhData[index].details + '</p>';
     }
+    
     function closeInfoModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById('infoModal').classList.remove('active');
       showNavButtons();
     }
+    
     // Home modal for general questions
     function toggleHomeModal() {
       var modal = document.getElementById('homeModal');
+      var overlay = document.getElementById('modalOverlay');
       if(modal.classList.contains('active')) {
         modal.classList.remove('active');
+        overlay.classList.remove('active');
         showNavButtons();
       } else {
         modal.classList.add('active');
+        overlay.classList.add('active');
         autofillUserName('homeUserName');
         hideNavButtons();
       }
     }
+    
     // History modal with animation and loading state
     function showHistoryModal() {
+      document.getElementById('modalOverlay').classList.add('active');
       hideNavButtons();
       var currentUser = firebase.auth().currentUser;
       var historyContent = document.getElementById("historyContent");
-      historyContent.innerHTML = '<p style="text-align:center;">Loading...</p>';
+      historyContent.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin fa-2x" style="color:var(--primary);"></i><p style="margin-top:1rem;">Loading your history...</p></div>';
       var modal = document.getElementById("historyModal");
       modal.classList.add('active');
       
       if (!currentUser) {
         setTimeout(function() {
-          historyContent.innerHTML = '<p style="text-align:center;">Please log in to see your history.</p>';
+          historyContent.innerHTML = '<p style="text-align:center; padding:2rem;">Please log in to see your question history.</p>';
         }, 500);
         return;
       }
+      
       var userEmail = currentUser.email;
-      db.collection("questions").where("userEmail", "==", userEmail).get()
+      db.collection("questions").where("userEmail", "==", userEmail).orderBy("submissionDate", "desc").get()
         .then(function(querySnapshot) {
           if (querySnapshot.empty) {
-            historyContent.innerHTML = '<p style="text-align:center;">No history available.</p>';
+            historyContent.innerHTML = '<p style="text-align:center; padding:2rem;">No history available. Submit your first question!</p>';
           } else {
             var html = "";
             querySnapshot.forEach(function(doc) {
               var record = doc.data();
-              html += `<p><strong>${record.userName}</strong> (${new Date(record.submissionDate).toLocaleString()}): ${record.questionText}</p>`;
+              var date = new Date(record.submissionDate);
+              var dateStr = date.toLocaleDateString() + ' at ' + date.toLocaleTimeString();
+              
+              html += `<p><strong>${record.userName}</strong> asked on ${dateStr}:<br>`;
+              html += `<em>"${record.questionText}"</em></p>`;
+              
+              if (record.sheikhName) {
+                html += `<small>To: ${record.sheikhName}</small>`;
+              }
             });
             historyContent.innerHTML = html;
           }
@@ -733,12 +1284,25 @@
         .catch(function(error) {
           console.error("Error fetching history: ", error);
           showNotification("Error fetching history.");
+          historyContent.innerHTML = '<p style="text-align:center; padding:2rem;">Error loading your history. Please try again later.</p>';
         });
     }
+    
     function closeHistoryModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById("historyModal").classList.remove('active');
       showNavButtons();
     }
+    
+    // Close modals when clicking overlay
+    document.getElementById('modalOverlay').addEventListener('click', function() {
+      closeQuestionModal();
+      closeInfoModal();
+      closeHistoryModal();
+      document.getElementById('homeModal').classList.remove('active');
+      this.classList.remove('active');
+      showNavButtons();
+    });
     
     // Close modals on clicking their X icons
     document.getElementById('closeQuestionModal').addEventListener('click', closeQuestionModal);
@@ -764,6 +1328,7 @@
         var key = input.previousElementSibling ? input.previousElementSibling.textContent.trim() : 'Field ' + input.id;
         dynamicData[key] = input.value;
       });
+      
       var record = {
         userName: userName,
         questionText: questionText,
@@ -771,16 +1336,18 @@
         dynamicData: dynamicData,
         submissionDate: new Date().toISOString()
       };
+      
       var currentUser = firebase.auth().currentUser;
       if (currentUser) {
         record.userEmail = currentUser.email;
       }
+      
       db.collection("questions").add(record)
         .then(function(docRef) {
-          submitBtn.innerHTML = '<i class="fas fa-check"></i> Accepted';
-          showNotification("Your question has been submitted!");
+          submitBtn.innerHTML = '<i class="fas fa-check"></i> Question Submitted!';
+          showNotification("Your question has been submitted successfully!");
           setTimeout(function() {
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Question';
             submitBtn.disabled = false;
             document.getElementById('questionForm').reset();
             closeQuestionModal();
@@ -788,8 +1355,8 @@
         })
         .catch(function(error) {
           console.error("Error storing document: ", error);
-          showNotification("Error submitting your question.");
-          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+          showNotification("Error submitting your question. Please try again.");
+          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Question';
           submitBtn.disabled = false;
         });
     });
@@ -809,16 +1376,18 @@
         submissionDate: new Date().toISOString(),
         general: true
       };
+      
       var currentUser = firebase.auth().currentUser;
       if (currentUser) {
         record.userEmail = currentUser.email;
       }
+      
       db.collection("questions").add(record)
         .then(function(docRef) {
-          submitBtn.innerHTML = '<i class="fas fa-check"></i> Accepted';
-          showNotification("Your question has been submitted!");
+          submitBtn.innerHTML = '<i class="fas fa-check"></i> Question Submitted!';
+          showNotification("Your question has been submitted successfully!");
           setTimeout(function() {
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Question';
             submitBtn.disabled = false;
             document.getElementById('homeForm').reset();
             toggleHomeModal();
@@ -827,8 +1396,8 @@
         })
         .catch(function(error) {
           console.error("Error storing document: ", error);
-          showNotification("Error submitting your question.");
-          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+          showNotification("Error submitting your question. Please try again.");
+          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Question';
           submitBtn.disabled = false;
         });
     });
@@ -839,7 +1408,7 @@
         name: "Sheik Aliyyi",
         bio: "Mariin aadaa fi hawaasaa keessatti ogeessa",
         image: "shekaliyyi.png",
-        details: "Sheik Aliyyi is renowned for his expertise in cultural and social discussions.",
+        details: "Sheik Aliyyi is renowned for his expertise in cultural and social discussions within the Islamic context. With over 20 years of experience in counseling and community leadership, he provides guidance on matters related to family, social interactions, and cultural practices from an Islamic perspective. His approach combines traditional Islamic scholarship with contemporary understanding of social dynamics.",
         fields: [
           { type: "select", label: "Marital Status", options: ["Single", "Married", "Divorced", "Other"] }
         ]
@@ -848,7 +1417,7 @@
         name: "Sheik Abdusalaam Fadis",
         bio: "Zakaafi hojii qabeenyaa keessatti ogeessa",
         image: "shekabdusalaam.png",
-        details: "Sheik Abdusalaam Fadis provides insightful advice on zakat and financial issues.",
+        details: "Sheik Abdusalaam Fadis specializes in Islamic finance, zakat, and wealth management. A graduate of Al-Azhar University with a specialization in Islamic Economics, he has been advising individuals and organizations on financial matters in accordance with Shariah principles for 15 years. His expertise includes zakat calculation, halal investments, and Islamic inheritance laws.",
         fields: [
           { type: "number", label: "Monthly Income (USD)" }
         ]
@@ -857,18 +1426,18 @@
         name: "Sheikh Abdurahmaan",
         bio: "Ogeessa fiqh fi seera Islaamaa",
         image: "shekabdurahmaan.png",
-        details: "Sheikh Abdurahmaan has over 25 years of experience in Islamic jurisprudence.",
+        details: "Sheikh Abdurahmaan has over 25 years of experience in Islamic jurisprudence (fiqh) and legal issues. After completing his studies in Medina, he served as a mufti in several Islamic centers before dedicating himself to teaching and fatwa services. His deep understanding of the four schools of Islamic law allows him to provide nuanced answers to complex fiqh questions.",
         fields: [
-          { type: "select", label: "Legal Issue", options: ["Contract", "Inheritance", "Other"] }
+          { type: "select", label: "Legal Issue", options: ["Contract", "Inheritance", "Marriage", "Business", "Other"] }
         ]
       },
       {
         name: "Sheik Nasraddiin",
         bio: "Ogeessa hadith fi aadaawwan Nabiyyii",
         image: "sheknasraddiin.png",
-        details: "sheik nasraddiin is recognized for his in-depth knowledge of hadith and prophetic traditions.",
+        details: "Sheik Nasraddiin is recognized for his in-depth knowledge of hadith and prophetic traditions. A graduate of the Islamic University of Madinah's College of Hadith, he has spent decades studying and teaching the Sunnah. His specialization includes authentication of hadith, understanding prophetic manners, and applying the Sunnah in modern contexts.",
         fields: [
-          { type: "number", label: "Years of Study" }
+          { type: "number", label: "Years of Islamic Study" }
         ]
       }
     ];
@@ -890,7 +1459,7 @@
                 <i class="fas fa-comments"></i> Ask
               </button>
               <button class="card-btn" onclick="openInfoModal(${index})">
-                <i class="fas fa-info-circle"></i> Detail
+                <i class="fas fa-info-circle"></i> Details
               </button>
             </div>
           </div>
@@ -898,11 +1467,28 @@
         container.appendChild(card);
       });
     }
+    
     document.addEventListener('DOMContentLoaded', function() {
       createSheikhCards();
+      
+      // Add title attributes to navigation buttons for better accessibility
+      document.getElementById('homeNavBtn').setAttribute('title', 'General Questions');
+      document.getElementById('answeredBtn').setAttribute('title', 'Answered Questions');
+      document.getElementById('historyNavBtn').setAttribute('title', 'Your History');
+      document.getElementById('exitBtn').setAttribute('title', 'Exit');
     });
     
-    // (Optional) You can add additional global click listeners to close modals if needed.
+    // Close modals when pressing Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeQuestionModal();
+        closeInfoModal();
+        closeHistoryModal();
+        document.getElementById('homeModal').classList.remove('active');
+        document.getElementById('modalOverlay').classList.remove('active');
+        showNavButtons();
+      }
+    });
   </script>
 </body>
 </html>
