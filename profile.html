@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Fadis Youth</title>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --gray-light: #e9ecef;
+      --success: #4cc9f0;
+      --danger: #ef233c;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Profile Header */
+    .profile-header {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 5px solid white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-avatar i {
+      font-size: 4rem;
+      color: white;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .profile-bio {
+      color: var(--gray);
+      margin-bottom: 15px;
+    }
+
+    .profile-location {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--gray);
+      margin-bottom: 15px;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: none;
+      border: 1px solid var(--gray-light);
+      color: var(--dark);
+    }
+
+    .btn-outline:hover {
+      background: var(--gray-light);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* Stats */
+    .profile-stats {
+      display: flex;
+      gap: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    /* Posts Grid */
+    .profile-posts {
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .post-card {
+      border: 1px solid var(--gray-light);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .post-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .post-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .post-content {
+      padding: 15px;
+    }
+
+    .post-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .post-excerpt {
+      color: var(--gray);
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--gray);
+      font-size: 0.8rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .profile-actions {
+        justify-content: center;
+      }
+
+      .posts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .profile-header,
+    body.dark-mode .profile-stats,
+    body.dark-mode .profile-posts {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .btn-outline {
+      border-color: #333;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .btn-outline:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="profile-info">
+        <h1 class="profile-name" id="profileName">Loading...</h1>
+        <p class="profile-bio" id="profileBio">No bio available.</p>
+        <div class="profile-location">
+          <i class="fas fa-map-marker-alt"></i>
+          <span id="profileLocation">Unknown</span>
+        </div>
+        <div class="profile-actions">
+          <button id="followButton" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Follow
+          </button>
+          <button id="messageButton" class="btn btn-outline">
+            <i class="fas fa-envelope"></i> Message
+          </button>
+          <!-- Only show edit button if it's the current user's profile -->
+          <button id="editProfileButton" class="btn btn-outline" style="display: none;">
+            <i class="fas fa-edit"></i> Edit Profile
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="profile-stats">
+      <div class="stat">
+        <div class="stat-value" id="postCount">0</div>
+        <div class="stat-label">Posts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="followerCount">0</div>
+        <div class="stat-label">Followers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="followingCount">0</div>
+        <div class="stat-label">Following</div>
+      </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="profile-posts">
+      <h2 class="section-title">Recent Posts</h2>
+      <div class="posts-grid" id="postsGrid">
+        <!-- Posts will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.firebasestorage.app",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Get user ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const profileUserId = urlParams.get('uid');
+    let currentUser = null;
+
+    // DOM Elements
+    const followButton = document.getElementById('followButton');
+    const messageButton = document.getElementById('messageButton');
+    const editProfileButton = document.getElementById('editProfileButton');
+
+    // Check if current user is viewing their own profile
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      if (user && user.uid === profileUserId) {
+        followButton.style.display = 'none';
+        messageButton.style.display = 'none';
+        editProfileButton.style.display = 'inline-block';
+      }
+      loadProfile();
+      loadStats();
+      loadPosts();
+    });
+
+    // Load profile data
+    function loadProfile() {
+      db.collection('users').doc(profileUserId).get().then(doc => {
+        if (doc.exists) {
+          const userData = doc.data();
+          document.getElementById('profileName').textContent = userData.displayName || 'User';
+          document.getElementById('profileBio').textContent = userData.bio || 'No bio available.';
+          document.getElementById('profileLocation').textContent = userData.location || 'Unknown';
+
+          // Set profile picture
+          const avatar = document.getElementById('profileAvatar');
+          if (userData.photoURL) {
+            avatar.innerHTML = `<img src="${userData.photoURL}" alt="Profile">`;
+          }
+
+          // Check follow status if not current user
+          if (currentUser && currentUser.uid !== profileUserId) {
+            checkFollowStatus();
+          }
+        }
+      });
+    }
+
+    // Check if current user follows this profile
+    function checkFollowStatus() {
+      db.collection('follows')
+        .where('follower', '==', currentUser.uid)
+        .where('following', '==', profileUserId)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            followButton.innerHTML = '<i class="fas fa-user-check"></i> Following';
+            followButton.classList.add('btn-danger');
+            followButton.onclick = unfollowUser;
+          } else {
+            followButton.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+            followButton.classList.remove('btn-danger');
+            followButton.onclick = followUser;
+          }
+        });
+    }
+
+    // Follow user
+    function followUser() {
+      db.collection('follows').add({
+        follower: currentUser.uid,
+        following: profileUserId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        checkFollowStatus();
+        updateFollowerCount(1);
+        showToast(`You're now following ${document.getElementById('profileName').textContent}`);
+      });
+    }
+
+    // Unfollow user
+    function unfollowUser() {
+      db.collection('follows')
+        .where('follower', '==', currentUser.uid)
+        .where('following', '==', profileUserId)
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(doc => doc.ref.delete());
+          checkFollowStatus();
+          updateFollowerCount(-1);
+          showToast(`You've unfollowed ${document.getElementById('profileName').textContent}`);
+        });
+    }
+
+    // Update follower count in UI
+    function updateFollowerCount(change) {
+      const countElement = document.getElementById('followerCount');
+      const currentCount = parseInt(countElement.textContent) || 0;
+      countElement.textContent = currentCount + change;
+    }
+
+    // Load profile stats
+    function loadStats() {
+      // Post count
+      db.collection('posts')
+        .where('authorUID', '==', profileUserId)
+        .get()
+        .then(snapshot => {
+          document.getElementById('postCount').textContent = snapshot.size;
+        });
+
+      // Follower count
+      db.collection('follows')
+        .where('following', '==', profileUserId)
+        .get()
+        .then(snapshot => {
+          document.getElementById('followerCount').textContent = snapshot.size;
+        });
+
+      // Following count
+      db.collection('follows')
+        .where('follower', '==', profileUserId)
+        .get()
+        .then(snapshot => {
+          document.getElementById('followingCount').textContent = snapshot.size;
+        });
+    }
+
+    // Load user's posts
+    function loadPosts() {
+      const postsGrid = document.getElementById('postsGrid');
+      postsGrid.innerHTML = '<p>Loading posts...</p>';
+
+      db.collection('posts')
+        .where('authorUID', '==', profileUserId)
+        .orderBy('timestamp', 'desc')
+        .get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            postsGrid.innerHTML = '<p>No posts yet.</p>';
+            return;
+          }
+
+          postsGrid.innerHTML = '';
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            const postDate = post.timestamp?.toDate().toLocaleDateString() || 'Recently';
+            
+            postsGrid.innerHTML += `
+              <div class="post-card">
+                ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image">` : ''}
+                <div class="post-content">
+                  <h3 class="post-title">${post.topic || 'Untitled Post'}</h3>
+                  <p class="post-excerpt">${post.body?.substring(0, 100) || ''}${post.body?.length > 100 ? '...' : ''}</p>
+                  <div class="post-meta">
+                    <span><i class="far fa-heart"></i> ${post.likesCount || 0}</span>
+                    <span>${postDate}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        });
+    }
+
+    // Toast notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Edit profile button
+    editProfileButton.addEventListener('click', () => {
+      window.location.href = 'edit-profile.html';
+    });
+
+    // Message button
+    messageButton.addEventListener('click', () => {
+      window.location.href = `chat.html?uid=${profileUserId}`;
+    });
+  </script>
+</body>
+</html>
