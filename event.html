@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Islamic Quiz - Fadis Youth</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Font Awesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary-color: #4895ef;
+      --danger-color: #ef233c;
+      --danger-dark: #d90429;
+      --success-color: #4cc9f0;
+      --success-dark: #38b6db;
+      --warning-color: #f8961e;
+      --islamic-green: #2ca52a;
+      --islamic-gold: #d4af37;
+      --text-color: #333;
+      --light-text: #666;
+      --border-color: #ddd;
+      --bg-color: #f5f7fa;
+      --card-bg: #fff;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      position: relative;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: var(--islamic-green);
+      margin: 0;
+    }
+
+    .form-section {
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--islamic-green);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 15px;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--islamic-green);
+      box-shadow: 0 0 0 3px rgba(44, 165, 42, 0.2);
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .option-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .option-group .form-control {
+      flex: 1;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .btn-primary {
+      background: var(--islamic-green);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-danger {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-dark);
+    }
+
+    .btn-success {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: var(--success-dark);
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .badge-success {
+      background: var(--success-color);
+    }
+
+    .badge-warning {
+      background: var(--warning-color);
+    }
+
+    .badge-danger {
+      background: var(--danger-color);
+    }
+
+    .badge-islamic {
+      background: var(--islamic-green);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--islamic-green);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .toast.error {
+      background: var(--danger-color);
+    }
+
+    .toast.success {
+      background: var(--success-color);
+    }
+
+    .toast.warning {
+      background: var(--warning-color);
+    }
+
+    .advanced-options {
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+    .toggle-advanced {
+      background: none;
+      border: none;
+      color: var(--islamic-green);
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+    }
+
+    .toggle-advanced i {
+      margin-right: 8px;
+      transition: var(--transition);
+    }
+
+    .toggle-advanced.collapsed i {
+      transform: rotate(-90deg);
+    }
+
+    .advanced-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 0;
+    }
+
+    .advanced-content.show {
+      max-height: 1000px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .radio-option input {
+      margin-right: 10px;
+    }
+
+    .poll-preview {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px dashed var(--border-color);
+    }
+
+    .poll-preview-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--islamic-green);
+    }
+
+    .poll-option-preview {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .poll-option-preview:hover {
+      background: #f0f0f0;
+    }
+
+    .poll-option-preview.correct {
+      border-left: 4px solid var(--islamic-green);
+      background: rgba(44, 165, 42, 0.05);
+    }
+
+    .poll-option-preview.selected {
+      background: rgba(67, 97, 238, 0.1);
+      border-color: var(--primary-color);
+    }
+
+    .poll-option-preview.correct.selected {
+      background: rgba(44, 165, 42, 0.1);
+      border-color: var(--islamic-green);
+    }
+
+    .poll-option-preview.incorrect.selected {
+      background: rgba(239, 35, 60, 0.05);
+      border-color: var(--danger-color);
+    }
+
+    .option-letter {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--islamic-green);
+      color: white;
+      text-align: center;
+      line-height: 24px;
+      font-weight: 600;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex-grow: 1;
+    }
+
+    .correct-badge {
+      margin-left: 10px;
+      font-size: 12px;
+      color: var(--islamic-green);
+      font-weight: 600;
+    }
+
+    .tab-container {
+      margin-bottom: 20px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-button {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--light-text);
+      transition: var(--transition);
+    }
+
+    .tab-button.active {
+      color: var(--islamic-green);
+      border-bottom-color: var(--islamic-green);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px 0;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(44, 165, 42, 0.2);
+      border-top-color: var(--islamic-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .result-correct {
+      background: rgba(44, 165, 42, 0.1);
+      color: var(--islamic-green);
+      border: 1px solid var(--islamic-green);
+    }
+
+    .result-incorrect {
+      background: rgba(239, 35, 60, 0.1);
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+    }
+
+    .stats-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .stat-item {
+      margin-bottom: 10px;
+    }
+
+    .stat-bar {
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: var(--islamic-green);
+      border-radius: 4px;
+    }
+
+    .stat-percentage {
+      font-size: 12px;
+      color: var(--light-text);
+      margin-left: 5px;
+    }
+
+    .explanation-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f7fa;
+      border-left: 4px solid var(--islamic-gold);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .explanation-title {
+      font-weight: 600;
+      color: var(--islamic-gold);
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 20px;
+      }
+      
+      .btn {
+        padding: 8px 16px;
+      }
+
+      .option-group {
+        flex-wrap: wrap;
+      }
+
+      .option-group .form-control {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-quran"></i> Create Islamic Quiz</h1>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="showPreview()"><i class="fas fa-eye"></i> Preview</button>
+      </div>
+    </div>
+
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="openTab('basic-tab')"><i class="fas fa-cog"></i> Basic Settings</button>
+        <button class="tab-button" onclick="openTab('advanced-tab')"><i class="fas fa-sliders-h"></i> Advanced</button>
+      </div>
+
+      <form id="pollForm">
+        <div id="basic-tab" class="tab-content active">
+          <div class="form-section">
+            <div class="form-group">
+              <label for="pollTitle">Quiz Title</label>
+              <input type="text" id="pollTitle" class="form-control" placeholder="Enter quiz title" required>
+            </div>
+
+            <div class="form-group">
+              <label for="pollQuestion">Question</label>
+              <textarea id="pollQuestion" class="form-control" placeholder="Enter your quiz question" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Options <small>(Mark one as correct answer)</small></label>
+              <div id="optionsContainer">
+                <!-- Initial two options -->
+                <div class="option-group">
+                  <input type="text" class="poll-option form-control" placeholder="Option A" required>
+                  <button type="button" class="btn btn-icon btn-danger removeOptionBtn" onclick="removeOption(this)" title="Remove Option" style="display: none;"><i class="fas fa-trash-alt"></i></button>
+                  <div class="radio-option">
+                    <input type="radio" name="correctAnswer" value="0" id="correct0" onchange="updatePreview()">
+                    <label for="correct0">Correct</label>
+                  </div>
+                </div>
+                <div class="option-group">
+                  <input type="text" class="poll-option form-control" placeholder="Option B" required>
+                  <button type="button" class="btn btn-icon btn-danger removeOptionBtn" onclick="removeOption(this)" title="Remove Option"><i class="fas fa-trash-alt"></i></button>
+                  <div class="radio-option">
+                    <input type="radio" name="correctAnswer" value="1" id="correct1" onchange="updatePreview()">
+                    <label for="correct1">Correct</label>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary" id="addOptionBtn" onclick="addOption()"><i class="fas fa-plus"></i> Add Option</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="advanced-tab" class="tab-content">
+          <div class="form-section">
+            <div class="form-group">
+              <label for="pollDescription">Explanation (Optional)</label>
+              <textarea id="pollDescription" class="form-control" placeholder="Add an explanation that will be shown after answering"></textarea>
+              <small>This will be shown to users after they answer, explaining why the correct answer is right.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="pollDuration">Quiz Duration</label>
+              <input type="datetime-local" id="pollDuration" class="form-control">
+              <small>Set an expiration date/time for the quiz (optional).</small>
+            </div>
+
+            <div class="form-group">
+              <label>Quiz Settings</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="checkbox" id="showResults" checked>
+                  <label for="showResults">Show results to participants after voting</label>
+                </div>
+                <div class="radio-option">
+                  <input type="checkbox" id="multipleAttempts">
+                  <label for="multipleAttempts">Allow multiple attempts</label>
+                </div>
+                <div class="radio-option">
+                  <input type="checkbox" id="randomizeOptions">
+                  <label for="randomizeOptions">Randomize option order</label>
+                </div>
+                <div class="radio-option">
+                  <input type="checkbox" id="showExplanation" checked>
+                  <label for="showExplanation">Show explanation after answering</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="pollCategory">Category</label>
+              <select id="pollCategory" class="form-control" required>
+                <option value="">Select a category</option>
+                <option value="quran">Quran</option>
+                <option value="hadith">Hadith</option>
+                <option value="seerah">Seerah (Prophet's Biography)</option>
+                <option value="fiqh">Fiqh (Islamic Jurisprudence)</option>
+                <option value="aqeedah">Aqeedah (Islamic Creed)</option>
+                <option value="history">Islamic History</option>
+                <option value="dua">Dua & Supplications</option>
+                <option value="ethics">Islamic Ethics</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="difficultyLevel">Difficulty Level</label>
+              <select id="difficultyLevel" class="form-control">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publish Quiz</button>
+          <button type="button" class="btn" onclick="window.location.href='post.html'" style="margin-left: 10px;">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="pollPreview" class="poll-preview" style="display: none;">
+      <div class="poll-preview-title"><i class="fas fa-eye"></i> Quiz Preview</div>
+      <div id="previewContent"></div>
+      <div id="previewResults" style="display: none;">
+        <div class="result-message result-correct">
+          <i class="fas fa-check-circle"></i> Correct! Well done.
+        </div>
+        <div class="result-message result-incorrect">
+          <i class="fas fa-times-circle"></i> Incorrect. The correct answer is: <span id="correctAnswerPreview"></span>
+        </div>
+        <div class="stats-container">
+          <h4><i class="fas fa-chart-bar"></i> Statistics</h4>
+          <div id="statsPreview"></div>
+        </div>
+        <div class="explanation-box" id="explanationPreview">
+          <div class="explanation-title"><i class="fas fa-info-circle"></i> Explanation</div>
+          <div id="explanationText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // Initialize Firebase using your configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
+      authDomain: "fadis-youth.firebaseapp.com",
+      projectId: "fadis-youth",
+      storageBucket: "fadis-youth.appspot.com",
+      messagingSenderId: "1067077305340",
+      appId: "1:1067077305340:web:3ca9c71202a8020c6ba879"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Ensure user is logged in
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Tab functionality
+    function openTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+      });
+      
+      // Activate the selected tab
+      document.getElementById(tabId).classList.add('active');
+      
+      // Activate the clicked button
+      event.currentTarget.classList.add('active');
+    }
+
+    // Add a new quiz option input field
+    function addOption() {
+      const optionsContainer = document.getElementById("optionsContainer");
+      const optionCount = optionsContainer.children.length;
+      const optionLetter = String.fromCharCode(65 + optionCount); // A, B, C, etc.
+      
+      const optionGroup = document.createElement("div");
+      optionGroup.className = "option-group";
+      optionGroup.innerHTML = `
+        <input type="text" class="poll-option form-control" placeholder="Option ${optionLetter}" required oninput="updatePreview()">
+        <button type="button" class="btn btn-icon btn-danger removeOptionBtn" onclick="removeOption(this)" title="Remove Option"><i class="fas fa-trash-alt"></i></button>
+        <div class="radio-option">
+          <input type="radio" name="correctAnswer" value="${optionCount}" id="correct${optionCount}" onchange="updatePreview()">
+          <label for="correct${optionCount}">Correct</label>
+        </div>
+      `;
+      
+      optionsContainer.appendChild(optionGroup);
+      updateRemoveButtons();
+      updatePreview();
+    }
+
+    // Remove a quiz option field
+    function removeOption(btn) {
+      const optionsContainer = document.getElementById("optionsContainer");
+      if (optionsContainer.children.length > 2) { // Require at least two options
+        btn.parentElement.remove();
+        
+        // Reindex the radio buttons
+        const radioButtons = document.querySelectorAll('input[name="correctAnswer"]');
+        radioButtons.forEach((radio, index) => {
+          radio.value = index;
+          radio.id = `correct${index}`;
+          radio.nextElementSibling.htmlFor = `correct${index}`;
+        });
+      }
+      updateRemoveButtons();
+      updatePreview();
+    }
+
+    // Update the visibility of remove buttons
+    function updateRemoveButtons() {
+      const optionGroups = document.querySelectorAll(".option-group");
+      if (optionGroups.length <= 2) {
+        optionGroups.forEach((group, index) => {
+          const removeBtn = group.querySelector(".removeOptionBtn");
+          removeBtn.style.display = index === 0 ? "none" : "block";
+        });
+      } else {
+        optionGroups.forEach(group => {
+          group.querySelector(".removeOptionBtn").style.display = "block";
+        });
+      }
+    }
+
+    // Show preview of the quiz
+    function showPreview() {
+      const preview = document.getElementById("pollPreview");
+      if (preview.style.display === "none") {
+        updatePreview();
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    }
+
+    // Update the preview content
+    function updatePreview() {
+      const question = document.getElementById("pollQuestion").value.trim() || "Sample Question";
+      const title = document.getElementById("pollTitle").value.trim() || "Untitled Quiz";
+      const optionInputs = document.querySelectorAll(".poll-option");
+      const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked')?.value;
+      const explanation = document.getElementById("pollDescription").value.trim();
+      const showExplanation = document.getElementById("showExplanation").checked;
+      
+      let optionsHTML = '';
+      optionInputs.forEach((input, index) => {
+        const value = input.value.trim() || `Option ${String.fromCharCode(65 + index)}`;
+        const isCorrect = index.toString() === correctAnswer;
+        
+        optionsHTML += `
+          <div class="poll-option-preview ${isCorrect ? 'correct' : ''}" onclick="selectOptionPreview(${index})">
+            <span class="option-letter">${String.fromCharCode(65 + index)}</span>
+            <span class="option-text">${value}</span>
+            ${isCorrect ? '<span class="correct-badge"><i class="fas fa-check"></i> Correct Answer</span>' : ''}
+          </div>
+        `;
+      });
+      
+      document.getElementById("previewContent").innerHTML = `
+        <h3 style="margin-bottom: 15px;">${title}</h3>
+        <p style="margin-bottom: 20px;">${question}</p>
+        ${optionsHTML}
+        ${correctAnswer === undefined ? '<p style="color: var(--danger-color); margin-top: 15px;"><i class="fas fa-exclamation-circle"></i> No correct answer selected</p>' : ''}
+      `;
+      
+      // Update results preview
+      if (correctAnswer !== undefined) {
+        const correctOption = optionInputs[correctAnswer]?.value.trim() || `Option ${String.fromCharCode(65 + parseInt(correctAnswer))}`;
+        document.getElementById("correctAnswerPreview").textContent = correctOption;
+        
+        // Generate sample stats
+        let statsHTML = '';
+        optionInputs.forEach((input, index) => {
+          const value = input.value.trim() || `Option ${String.fromCharCode(65 + index)}`;
+          const percentage = index === parseInt(correctAnswer) ? 65 : Math.floor(Math.random() * 30) + 5;
+          
+          statsHTML += `
+            <div class="stat-item">
+              <div>${String.fromCharCode(65 + index)}. ${value} <span class="stat-percentage">${percentage}%</span></div>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+          `;
+        });
+        document.getElementById("statsPreview").innerHTML = statsHTML;
+      }
+      
+      // Update explanation
+      if (explanation && showExplanation) {
+        document.getElementById("explanationText").textContent = explanation;
+        document.getElementById("explanationPreview").style.display = 'block';
+      } else {
+        document.getElementById("explanationPreview").style.display = 'none';
+      }
+    }
+
+    // Simulate selecting an option in preview
+    function selectOptionPreview(selectedIndex) {
+      const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked')?.value;
+      if (!correctAnswer) return;
+      
+      const optionPreviews = document.querySelectorAll('.poll-option-preview');
+      optionPreviews.forEach((preview, index) => {
+        preview.classList.remove('selected', 'correct', 'incorrect');
+        
+        if (index === selectedIndex) {
+          preview.classList.add('selected');
+          if (index.toString() === correctAnswer) {
+            preview.classList.add('correct');
+          } else {
+            preview.classList.add('incorrect');
+          }
+        }
+      });
+      
+      // Show results
+      document.getElementById("previewResults").style.display = 'block';
+      if (selectedIndex.toString() === correctAnswer) {
+        document.querySelector('.result-correct').style.display = 'block';
+        document.querySelector('.result-incorrect').style.display = 'none';
+      } else {
+        document.querySelector('.result-correct').style.display = 'none';
+        document.querySelector('.result-incorrect').style.display = 'block';
+      }
+    }
+
+    // Handle quiz form submission
+    document.getElementById("pollForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = auth.currentUser;
+      
+      if (!user) {
+        showToast("You must be logged in to create a quiz.", "error");
+        return;
+      }
+      
+      const title = document.getElementById("pollTitle").value.trim();
+      const question = document.getElementById("pollQuestion").value.trim();
+      const description = document.getElementById("pollDescription").value.trim();
+      const category = document.getElementById("pollCategory").value;
+      
+      if (!title) {
+        showToast("Quiz title is required.", "error");
+        return;
+      }
+      
+      if (!question) {
+        showToast("Quiz question is required.", "error");
+        return;
+      }
+      
+      if (!category) {
+        showToast("Please select a category.", "error");
+        return;
+      }
+      
+      // Collect quiz options
+      const optionInputs = document.querySelectorAll(".poll-option");
+      let options = [];
+      optionInputs.forEach(input => {
+        const value = input.value.trim();
+        if (value) {
+          options.push(value);
+        }
+      });
+      
+      if (options.length < 2) {
+        showToast("At least two options are required.", "error");
+        return;
+      }
+      
+      const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked')?.value;
+      if (correctAnswer === undefined) {
+        showToast("You must select the correct answer.", "error");
+        return;
+      }
+      
+      // Get quiz settings
+      const showResults = document.getElementById("showResults").checked;
+      const multipleAttempts = document.getElementById("multipleAttempts").checked;
+      const randomizeOptions = document.getElementById("randomizeOptions").checked;
+      const showExplanation = document.getElementById("showExplanation").checked;
+      const difficultyLevel = document.getElementById("difficultyLevel").value;
+      
+      // Get quiz expiration if set
+      let duration = document.getElementById("pollDuration").value;
+      let expirationTimestamp = null;
+      if (duration) {
+        expirationTimestamp = new Date(duration);
+        if (isNaN(expirationTimestamp.getTime())) {
+          expirationTimestamp = null;
+        }
+      }
+      
+      // Build the quiz object
+      const quizData = {
+        title: title,
+        question: question,
+        description: description,
+        options: options,
+        correctAnswer: parseInt(correctAnswer),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        authorUID: user.uid,
+        authorName: user.displayName || "Anonymous",
+        type: "quiz",
+        votes: {}, // will hold user vote data { userId: { optionIndex: number, timestamp: Date } }
+        totalVotes: 0,
+        showResults: showResults,
+        multipleAttempts: multipleAttempts,
+        randomizeOptions: randomizeOptions,
+        showExplanation: showExplanation,
+        category: category,
+        difficulty: difficultyLevel,
+        expiration: expirationTimestamp ? firebase.firestore.Timestamp.fromDate(expirationTimestamp) : null,
+        // Statistics that will be updated as people answer
+        optionStats: options.map(() => 0) // Initialize with zeros for each option
+      };
+      
+      // Show loading overlay
+      document.getElementById("loadingOverlay").style.display = "flex";
+      
+      // Publish the quiz to Firestore
+      db.collection("posts").add(quizData)
+        .then(docRef => {
+          showToast("Quiz published successfully!", "success");
+          setTimeout(() => {
+            window.location.href = "post.html?id=" + docRef.id;
+          }, 1500);
+        })
+        .catch(error => {
+          console.error("Error publishing quiz:", error);
+          showToast("Error publishing quiz. Please try again.", "error");
+        })
+        .finally(() => {
+          document.getElementById("loadingOverlay").style.display = "none";
+        });
+    });
+
+    // Display a toast message
+    function showToast(message, type = "info") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "toast " + type;
+      toast.style.display = "flex";
+      
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+
+    // Initialize event listeners for preview updates
+    document.getElementById("pollTitle").addEventListener("input", updatePreview);
+    document.getElementById("pollQuestion").addEventListener("input", updatePreview);
+    document.getElementById("pollDescription").addEventListener("input", updatePreview);
+    document.getElementById("showExplanation").addEventListener("change", updatePreview);
+    document.querySelectorAll(".poll-option").forEach(input => {
+      input.addEventListener("input", updatePreview);
+    });
+  </script>
+</body>
+</html>
