@@ -12,41 +12,58 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
-    /* Provided Design CSS (unchanged design) */
+    /* Cosmic Color Scheme */
     :root {
-      --celestial-gradient: linear-gradient(135deg, #e6f3ff 0%, #f8f9fa 100%);
-      --primary: #2B5A46;
-      --secondary: #4A8C72;
-      --accent: #D4AF37;
-      --light: #FFFFFF;
-      --dark: #1A2E25;
-      --shadow: 0 4px 24px rgba(0,32,24,0.08);
-      --header-height: 60px;
-      --gradient: linear-gradient(135deg, #fff7e6, #ffedcc);
+      --cosmic-primary: #3a0ca3;
+      --cosmic-secondary: #4cc9f0;
+      --cosmic-accent: #f72585;
+      --cosmic-light: #f8f9fa;
+      --cosmic-dark: #1a1a2e;
+      --cosmic-gradient: linear-gradient(135deg, #3a0ca3 0%, #4361ee 50%, #4cc9f0 100%);
+      --cosmic-card-bg: rgba(255, 255, 255, 0.95);
+      --cosmic-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --cosmic-text: #1a1a2e;
+      --cosmic-text-light: #f8f9fa;
     }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+
+    /* Floating Particles Background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
     }
-    
-    @keyframes ripple {
-      from { transform: scale(0); opacity: 1; }
-      to { transform: scale(4); opacity: 0; }
+
+    .particle {
+      position: absolute;
+      background: rgba(76, 201, 240, 0.5);
+      border-radius: 50%;
+      animation: floatParticle linear infinite;
     }
-    
-    @keyframes cardEntrance {
-      from {
+
+    @keyframes floatParticle {
+      0% {
+        transform: translateY(0) translateX(0);
         opacity: 0;
-        transform: translateY(40px) rotateX(90deg);
       }
-      to {
+      10% {
         opacity: 1;
-        transform: translateY(0) rotateX(0);
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(20px);
+        opacity: 0;
       }
     }
-    
+
     /* Base Styles */
     * {
       margin: 0;
@@ -55,13 +72,491 @@
       font-family: 'Poppins', sans-serif;
       touch-action: manipulation;
     }
-    
+
     body {
-      background: var(--celestial-gradient);
-      color: var(--dark);
+      background: var(--cosmic-light);
+      color: var(--cosmic-text);
       overflow-x: hidden;
+      min-height: 100vh;
     }
-    
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--cosmic-accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 20px rgba(247, 37, 133, 0.4);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(247, 37, 133, 0.6);
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(247, 37, 133, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(247, 37, 133, 0);
+      }
+    }
+
+    /* Minimal Header */
+    .cosmic-header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      background: var(--cosmic-gradient);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(to right, white, #f8f9fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 8s ease infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      top: 70px;
+      width: 100%;
+      height: 50px;
+      background: white;
+      display: flex;
+      z-index: 40;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--cosmic-dark);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab.active {
+      color: var(--cosmic-primary);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background: var(--cosmic-primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Main Content */
+    main {
+      margin-top: 120px;
+      padding: 20px;
+    }
+
+    /* Cosmic Cards */
+    .cosmic-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 25px;
+      perspective: 1000px;
+    }
+
+    .cosmic-card {
+      background: var(--cosmic-card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--cosmic-shadow);
+      transform-style: preserve-3d;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cosmic-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--cosmic-gradient);
+    }
+
+    .cosmic-card:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header h2 {
+      font-size: 1.1rem;
+      color: var(--cosmic-primary);
+    }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .asked-by {
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: var(--cosmic-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .asked-by i {
+      color: var(--cosmic-accent);
+    }
+
+    .question {
+      margin-bottom: 15px;
+      font-weight: 500;
+      line-height: 1.5;
+      position: relative;
+      padding-left: 15px;
+    }
+
+    .question::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--cosmic-accent);
+      border-radius: 2px;
+    }
+
+    .answer-content {
+      margin: 15px 0;
+      line-height: 1.6;
+      padding: 15px;
+      background: rgba(76, 201, 240, 0.05);
+      border-radius: 10px;
+      border-left: 3px solid var(--cosmic-secondary);
+    }
+
+    /* Action Buttons */
+    .action-bar {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0 10px;
+    }
+
+    .action-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 5px 10px;
+      border-radius: 10px;
+    }
+
+    .action-btn i {
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn span {
+      font-size: 0.8rem;
+    }
+
+    .action-btn:hover {
+      color: var(--cosmic-primary);
+      background: rgba(58, 12, 163, 0.05);
+    }
+
+    .action-btn:hover i {
+      transform: scale(1.2);
+    }
+
+    .action-btn.liked {
+      color: var(--cosmic-accent);
+    }
+
+    .action-btn.disliked {
+      color: #666;
+    }
+
+    /* Comment Section */
+    .comment-section {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .comment-section.expanded {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .comments {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .comment {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .comment:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .comment-user {
+      font-weight: 600;
+      color: var(--cosmic-primary);
+      margin-bottom: 5px;
+    }
+
+    .comment-text {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 15px;
+    }
+
+    .comment-action {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .comment-action:hover {
+      color: var(--cosmic-primary);
+    }
+
+    .comment-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .comment-input input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .comment-input input:focus {
+      outline: none;
+      border-color: var(--cosmic-secondary);
+      box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+    }
+
+    .comment-input button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--cosmic-gradient);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .comment-input button:hover {
+      transform: scale(1.1);
+    }
+
+    /* Loading & No-data messages */
+    .loading {
+      text-align: center;
+      padding: 50px;
+      color: var(--cosmic-dark);
+      font-size: 1.2rem;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+      font-style: italic;
+    }
+
+    .quran-verses {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--cosmic-primary);
+      line-height: 1.6;
+    }
+
+    /* Splash Effect */
+    .splash {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .splash i {
+      font-size: 100px;
+      color: var(--cosmic-accent);
+      opacity: 0;
+      animation: heartSplash 1s ease-out;
+    }
+
+    @keyframes heartSplash {
+      0% { transform: scale(0); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* Floating Audio Player */
+    audio {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .cosmic-header {
+        height: 60px;
+        padding: 0 15px;
+      }
+
+      .header-title {
+        font-size: 1.2rem;
+      }
+
+      .tab-bar {
+        top: 60px;
+        height: 45px;
+      }
+
+      .tab {
+        font-size: 0.8rem;
+      }
+
+      main {
+        margin-top: 105px;
+        padding: 15px;
+      }
+
+      .cosmic-card {
+        padding: 15px;
+      }
+    }
+
     /* Full-screen Spinner Overlay */
     .loading-overlay {
       position: fixed;
@@ -69,389 +564,156 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(26, 26, 46, 0.8);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 3000;
+      backdrop-filter: blur(5px);
     }
-    
+
     .spinner {
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid var(--accent);
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: var(--cosmic-accent);
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
       animation: spin 1s linear infinite;
     }
-    
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
-    /* Header – Neotic, with two rows */
-    .neotic-header {
-      background: rgba(43,90,70,0.98);
+
+    /* Floating Search */
+    .search-container {
       position: fixed;
-      top: 0;
+      top: 70px;
+      left: 0;
       width: 100%;
-      z-index: 1000;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 0.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* Header Rows */
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-    }
-    
-    /* Row 1: Topic & Search */
-    .header-row-1 {
-      margin-bottom: 0.5rem;
-    }
-    .header-topic {
-      flex: 1;
-    }
-    .header-topic .angelic-title {
-      font-size: 1.4rem;
-      color: var(--light);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .header-search {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-    }
-    .header-search input {
-      width: 100%;
-      max-width: 200px;
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 20px;
-      outline: none;
-    }
-    
-    /* Row 2: 4 Uniform Controls */
-    .header-row-2 {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .header-row-2 > * {
-      flex: 1;
-      text-align: center;
-      min-width: 90px;
-    }
-    /* Keep the sacred-button design exactly as you had it */
-    .sacred-button, .post-link {
-      background: var(--accent);
-      color: var(--dark);
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-      font-size: 0.9rem;
-    }
-    .sacred-button:hover::after, .post-link:hover::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.2);
-      animation: ripple 0.6s linear;
-    }
-    .sacred-button.active {
-      background: var(--primary);
-      color: var(--light);
-    }
-    /* For the edit icon, show only the icon */
-    .post-link {
-      text-decoration: none;
-      font-size: 1.2rem;
-      padding: 0.6rem;
-    }
-    
-    /* Main Content Area */
-    main {
-      margin-top: calc(100px + 20px);
-      padding: 1rem;
-    }
-    
-    .seraphic-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      perspective: 1000px;
-    }
-    
-    .celestial-card {
-      background: rgba(255,255,255,0.95);
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-      transform-style: preserve-3d;
-      animation: cardEntrance 0.6s ease-out both;
+      background: white;
+      padding: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transform: translateY(-100%);
       transition: transform 0.3s ease;
+      z-index: 45;
     }
-    
-    .celestial-card:hover {
-      transform: translateY(-5px) rotateZ(1deg);
+
+    .search-container.visible {
+      transform: translateY(0);
     }
-    
-    /* Card Header – Green background with smaller date */
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      background-color: var(--primary);
-      color: var(--light);
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-    }
-    .card-header h2 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-    .card-header span {
-      font-size: 0.75rem;
-      opacity: 0.85;
-    }
-    
-    /* Display the "Asked by" info before the question */
-    .asked-by {
-      margin-bottom: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--secondary);
-    }
-    
-    /* Underlined, blue question text */
-    .question {
-      text-decoration: underline;
-      color: blue;
-      margin-bottom: 1rem;
-    }
-    
-    /* Action Bar (reaction buttons) – unchanged */
-    .action-bar {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 1rem;
-    }
-    .action-btn {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      background: none;
-      border: none;
-      color: var(--secondary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .action-btn:active {
-      transform: scale(0.95);
-    }
-    .action-btn:hover {
-      color: var(--primary);
-    }
-    .action-btn span {
-      font-size: 0.8rem;
-    }
-    .dislike-btn {
-      background: none;
-      border: none;
-      color: var(--secondary);
-      cursor: pointer;
-      font-size: 1.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: color 0.3s;
-    }
-    .dislike-btn:hover {
-      color: var(--primary);
-    }
-    
-    /* Comment Section */
-    .comment-section {
-      background: #fff;
-      border-top: 1px solid var(--light);
-      padding: 0.75rem 1rem;
-      font-size: 0.8rem;
-      display: none;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .comment {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.25rem;
-      margin-bottom: 0.25rem;
-    }
-    .comment .comment-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-    .comment .comment-actions button {
-      background: none;
-      border: none;
-      color: var(--secondary);
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-    .comment-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .comment-input input {
-      flex: 1;
-      padding: 0.5rem;
+
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
       border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 0.8rem;
-    }
-    .comment-input button {
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 5px;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    
-    /* Reply styling: very small and indented */
-    .reply {
-      margin-left: 1rem;
-      font-size: 0.6rem;
-      color: var(--secondary);
-    }
-    .reply-marker {
-      font-size: 0.6rem;
-      color: var(--secondary);
-      margin-bottom: 0.25rem;
-    }
-    
-    /* Loading & No-data messages */
-    .loading {
-      text-align: center;
-      font-size: 1.2rem;
-      padding: 2rem;
-      color: var(--dark);
-    }
-    .no-data {
-      text-align: center;
-      padding: 2rem;
-      font-style: italic;
-      color: var(--secondary);
-    }
-    .quran-verses {
-      margin-top: 1rem;
+      border-radius: 30px;
       font-size: 0.9rem;
-      color: var(--primary);
+      transition: all 0.3s ease;
     }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .neotic-header {
-        padding: 0.4rem 0.8rem;
-      }
-      .angelic-title {
-        font-size: 1.2rem;
-      }
-      .header-row-2 > * {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.8rem;
-      }
-      .celestial-card {
-        padding: 1rem;
-        animation-duration: 0.4s;
-      }
-      main {
-        margin-top: calc(80px + 20px);
-        padding: 0.8rem;
-      }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--cosmic-secondary);
+      box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
     }
-    
-    /* Spinner for reaction checking */
-    .spinner {
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid currentColor;
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+
+    /* Sort Dropdown */
+    .sort-dropdown {
+      position: fixed;
+      top: 120px;
+      right: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      transform: translateY(-20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 60;
     }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+
+    .sort-dropdown.visible {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sort-option {
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sort-option:hover {
+      background: rgba(58, 12, 163, 0.05);
+      color: var(--cosmic-primary);
+    }
+
+    .sort-option.active {
+      color: var(--cosmic-primary);
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
+  <!-- Floating Particles Background -->
+  <div class="particles" id="particles"></div>
+  
   <!-- Full-screen spinner overlay -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
   </div>
   
-  <!-- Magical Header (unchanged design) -->
-  <header class="neotic-header">
-    <!-- Row 1: Topic & Search -->
-    <div class="header-row header-row-1">
-      <div class="header-topic">
-        <h1 class="angelic-title">Answered Questions</h1>
-      </div>
-      <div class="header-search">
-        <input type="text" id="searchInput" placeholder="Search answers...">
-      </div>
-    </div>
-    <!-- Row 2: 4 Uniform Controls -->
-    <div class="header-row header-row-2">
-      <!-- Edit icon only -->
-      <button class="sacred-button" id="editPost" onclick="window.location.href='post.html'">
-        <i class="fas fa-edit"></i>
+  <!-- Minimal Header -->
+  <header class="cosmic-header">
+    <h1 class="header-title">Divine Answers</h1>
+    <div class="header-actions">
+      <button class="header-btn" id="searchBtn">
+        <i class="fas fa-search"></i>
       </button>
-      <!-- Tab: General -->
-      <button class="sacred-button active" data-tab="general">General</button>
-      <!-- Tab: Scholars -->
-      <button class="sacred-button" data-tab="sheikh">Scholars</button>
-      <!-- Sort drop-down remains unchanged -->
-      <select id="sortSelect" class="sort-select">
-        <option value="recent" selected>Recent</option>
-        <option value="popular">Popular</option>
-        <option value="seen">Seen</option>
-      </select>
+      <button class="header-btn" id="sortBtn">
+        <i class="fas fa-sort"></i>
+      </button>
+      <button class="header-btn" id="postBtn">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
   </header>
   
+  <!-- Floating Search -->
+  <div class="search-container" id="searchContainer">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search answers...">
+  </div>
+  
+  <!-- Sort Dropdown -->
+  <div class="sort-dropdown" id="sortDropdown">
+    <div class="sort-option active" data-sort="recent">Recent</div>
+    <div class="sort-option" data-sort="popular">Popular</div>
+    <div class="sort-option" data-sort="seen">Most Viewed</div>
+  </div>
+  
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="general">General</div>
+    <div class="tab" data-tab="sheikh">Scholars</div>
+  </div>
+  
   <!-- Main Content Area -->
   <main>
-    <div id="cardsContainer" class="seraphic-grid">
-      <div class="loading" id="loadingMessage">Loading answered questions...</div>
+    <div id="cardsContainer" class="cosmic-grid">
+      <div class="loading" id="loadingMessage">Loading divine answers...</div>
     </div>
   </main>
   
+  <!-- Floating Action Button -->
+  <div class="fab" id="fabBtn">
+    <i class="fas fa-plus"></i>
+  </div>
+  
   <script>
-    // Initialize Firebase – replace config if needed
+    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
@@ -472,10 +734,40 @@
     let currentSearch = "";
     let replyTarget = null;
     
-    // Global spinner functions (full screen)
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = window.innerWidth < 768 ? 30 : 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random size between 2px and 6px
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation duration between 10s and 20s
+        const duration = Math.random() * 10 + 10;
+        particle.style.animationDuration = `${duration}s`;
+        
+        // Random delay
+        particle.style.animationDelay = `${Math.random() * 20}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Global spinner functions
     function showGlobalSpinner() {
       document.getElementById("loadingOverlay").style.display = "flex";
     }
+    
     function hideGlobalSpinner() {
       document.getElementById("loadingOverlay").style.display = "none";
     }
@@ -496,32 +788,71 @@
       renderCards();
     });
     
-    // Sort drop-down listener
-    document.getElementById("sortSelect").addEventListener("change", function() {
-      currentSort = this.value;
-      renderCards();
-    });
-    
-    // Tab switching for General / Scholars
-    document.querySelectorAll(".sacred-button[data-tab]").forEach(btn => {
-      btn.addEventListener("click", function() {
-        document.querySelectorAll(".sacred-button[data-tab]").forEach(b => b.classList.remove("active"));
+    // Tab switching
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", function() {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         this.classList.add("active");
         currentTab = this.getAttribute("data-tab");
         renderCards();
       });
     });
     
-    // Search input listener
+    // Sort dropdown
+    const sortBtn = document.getElementById("sortBtn");
+    const sortDropdown = document.getElementById("sortDropdown");
+    
+    sortBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      sortDropdown.classList.toggle("visible");
+    });
+    
+    document.querySelectorAll(".sort-option").forEach(option => {
+      option.addEventListener("click", function() {
+        document.querySelectorAll(".sort-option").forEach(opt => opt.classList.remove("active"));
+        this.classList.add("active");
+        currentSort = this.getAttribute("data-sort");
+        sortDropdown.classList.remove("visible");
+        renderCards();
+      });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function() {
+      sortDropdown.classList.remove("visible");
+    });
+    
+    // Search functionality
+    const searchBtn = document.getElementById("searchBtn");
+    const searchContainer = document.getElementById("searchContainer");
+    
+    searchBtn.addEventListener("click", function() {
+      searchContainer.classList.toggle("visible");
+      if (searchContainer.classList.contains("visible")) {
+        document.getElementById("searchInput").focus();
+      }
+    });
+    
     document.getElementById("searchInput").addEventListener("input", function() {
       currentSearch = this.value;
       renderCards();
+    });
+    
+    // Post button
+    document.getElementById("postBtn").addEventListener("click", function() {
+      window.location.href = "post.html";
+    });
+    
+    // FAB button
+    document.getElementById("fabBtn").addEventListener("click", function() {
+      window.location.href = "post.html";
     });
     
     // Render posts based on filters
     function renderCards() {
       const container = document.getElementById("cardsContainer");
       container.innerHTML = "";
+      
       let filtered = allAnswered.filter(doc => {
         if (currentTab === "general") {
           return doc.general === true;
@@ -529,6 +860,7 @@
           return doc.sheikhName && doc.general !== true;
         }
       });
+      
       if (currentSearch.trim() !== "") {
         const kw = currentSearch.toLowerCase();
         filtered = filtered.filter(doc =>
@@ -537,6 +869,7 @@
           (doc.answerText && doc.answerText.toLowerCase().includes(kw))
         );
       }
+      
       if (currentSort === "recent") {
         filtered.sort((a, b) => new Date(b.answerDate || b.submissionDate) - new Date(a.answerDate || a.submissionDate));
       } else if (currentSort === "popular") {
@@ -544,6 +877,7 @@
       } else if (currentSort === "seen") {
         filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
       }
+      
       if (filtered.length === 0) {
         container.innerHTML = `<div class="no-data">
           <p>No answered questions found for the current filter.</p>
@@ -554,9 +888,89 @@
         </div>`;
         return;
       }
+      
       filtered.forEach(doc => {
         updateViewCount(doc);
         container.innerHTML += createCardHTML(doc);
+      });
+      
+      // Add event listeners to new cards
+      document.querySelectorAll(".comment-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+          const commentSection = this.closest(".cosmic-card").querySelector(".comment-section");
+          commentSection.classList.toggle("expanded");
+        });
+      });
+      
+      document.querySelectorAll(".action-btn.like-btn").forEach(btn => {
+        btn.addEventListener("click", async function() {
+          const docId = this.getAttribute("data-id");
+          if (await requireLogin("like")) {
+            if (hasLiked(docId)) { 
+              alert("You have already liked this post."); 
+              return; 
+            }
+            showGlobalSpinner();
+            await db.collection("questionsanswered").doc(docId).update({ 
+              likes: firebase.firestore.FieldValue.increment(1) 
+            });
+            setLiked(docId);
+            hideGlobalSpinner();
+            this.classList.add("liked");
+            createSplashEffect(this.closest(".cosmic-card"));
+          }
+        });
+      });
+      
+      document.querySelectorAll(".action-btn.dislike-btn").forEach(btn => {
+        btn.addEventListener("click", async function() {
+          const docId = this.getAttribute("data-id");
+          if (await requireLogin("dislike")) {
+            if (hasDisliked(docId)) { 
+              alert("You have already disliked this post."); 
+              return; 
+            }
+            showGlobalSpinner();
+            await db.collection("questionsanswered").doc(docId).update({ 
+              dislikes: firebase.firestore.FieldValue.increment(1) 
+            });
+            setDisliked(docId);
+            hideGlobalSpinner();
+            this.classList.add("disliked");
+          }
+        });
+      });
+      
+      document.querySelectorAll(".send-comment-btn").forEach(btn => {
+        btn.addEventListener("click", async function() {
+          const input = this.parentElement.querySelector("input");
+          let text = input.value.trim();
+          if (!text) return;
+          
+          const docId = this.getAttribute("data-id");
+          if (!(await requireLogin("comment"))) return;
+          
+          showGlobalSpinner();
+          if (replyTarget) {
+            text = 'Replied to ' + replyTarget + ': ' + text;
+          }
+          
+          const user = firebase.auth().currentUser;
+          const userName = user.displayName || user.email;
+          
+          await db.collection("questionsanswered").doc(docId).update({
+            comments: firebase.firestore.FieldValue.arrayUnion({ 
+              user: userName, 
+              text: text, 
+              likes: 0 
+            })
+          });
+          
+          input.value = '';
+          replyTarget = null;
+          input.placeholder = 'Add a comment...';
+          hideGlobalSpinner();
+        });
       });
     }
     
@@ -572,7 +986,7 @@
       }
     }
     
-    // Utility: Check login status with full-screen spinner
+    // Utility: Check login status
     async function requireLogin(action) {
       showGlobalSpinner();
       const user = await new Promise(resolve => {
@@ -589,34 +1003,21 @@
       return true;
     }
     
-    // Like/dislike utilities via localStorage for logged-in users
+    // Like/dislike utilities via localStorage
     function hasLiked(docId) {
       return localStorage.getItem("liked_" + docId) === "true";
     }
+    
     function setLiked(docId) {
       localStorage.setItem("liked_" + docId, "true");
     }
+    
     function hasDisliked(docId) {
       return localStorage.getItem("disliked_" + docId) === "true";
     }
+    
     function setDisliked(docId) {
       localStorage.setItem("disliked_" + docId, "true");
-    }
-    
-    // Update a comment's like count in Firestore for a given comment index
-    function updateCommentLikeFB(docId, commentIndex, callback) {
-      db.collection("questionsanswered").doc(docId).get().then(docSnap => {
-        if (docSnap.exists) {
-          let comments = docSnap.data().comments || [];
-          if (comments[commentIndex]) {
-            comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
-            return db.collection("questionsanswered").doc(docId).update({ comments: comments })
-              .then(() => callback(comments[commentIndex].likes));
-          }
-        }
-      }).catch(err => {
-        console.error("Error updating comment like:", err);
-      });
     }
     
     // Create TikTok-style heart splash effect
@@ -624,19 +1025,11 @@
       const splash = document.createElement("div");
       splash.className = "splash";
       splash.innerHTML = '<i class="fas fa-heart"></i>';
-      cardElement.insertAdjacentElement('afterbegin', splash);
+      cardElement.appendChild(splash);
       splash.addEventListener("animationend", () => splash.remove());
     }
     
-    // Show full-screen spinner on reaction buttons
-    function showGlobalSpinnerOnReaction() {
-      showGlobalSpinner();
-    }
-    function hideGlobalSpinnerOnReaction() {
-      hideGlobalSpinner();
-    }
-    
-    // Build card HTML (keeping design unchanged, with added "Asked by" info)
+    // Build card HTML
     function createCardHTML(q) {
       let commentsHTML = "";
       if (q.comments && q.comments.length > 0) {
@@ -644,93 +1037,58 @@
           commentsHTML += createCommentHTML(comm, q.id, index);
         });
       }
+      
+      const isLiked = hasLiked(q.id) ? "liked" : "";
+      const isDisliked = hasDisliked(q.id) ? "disliked" : "";
+      
       return `
-      <article class="celestial-card" ondblclick="(async function(){
+      <article class="cosmic-card animate__animated animate__fadeIn" ondblclick="(async function(){
         if(await requireLogin('like')) {
           if(!hasLiked('${q.id}')){
-            document.querySelector('[data-id="${q.id}"].like-btn').click();
+            this.querySelector('.like-btn').click();
             createSplashEffect(this);
           }
         }
       }).call(this)">
         <div class="card-header">
-          <div><strong>${q.sheikhName || 'General'}</strong></div>
-          <div><small>${new Date(q.answerDate || q.submissionDate).toLocaleDateString()}</small></div>
+          <h2>${q.sheikhName || 'General Answer'}</h2>
+          <span class="card-date">${new Date(q.answerDate || q.submissionDate).toLocaleDateString()}</span>
         </div>
         <div class="card-body">
-          <!-- New: Display "Asked by" username before question -->
-          <div class="asked-by">Asked by: <strong>${q.userName || "Anonymous"}</strong></div>
+          <div class="asked-by">
+            <i class="fas fa-user-circle"></i>
+            Asked by: <strong>${q.userName || "Anonymous"}</strong>
+          </div>
           <p class="question">${q.questionText}</p>
-          <div class="answer-content" style="margin: 1rem 0;">
+          <div class="answer-content">
             <p>${q.answerText}</p>
             ${q.answerAudio ? `<audio src="${q.answerAudio}" controls></audio>` : ''}
           </div>
-          <div class="action-bar" style="display:flex; justify-content: space-around; margin-bottom: 1rem;">
-            <button class="action-btn like-btn" data-id="${q.id}" onclick="(async function(){
-              if(await requireLogin('like')) {
-                if(hasLiked('${q.id}')) { alert('You have already liked this post.'); return; }
-                showGlobalSpinnerOnReaction();
-                await db.collection('questionsanswered').doc('${q.id}').update({ likes: firebase.firestore.FieldValue.increment(1) });
-                setLiked('${q.id}');
-                hideGlobalSpinnerOnReaction();
-              }
-            })()">
-              <i class="fas fa-thumbs-up"></i> <span>${q.likes}</span>
+          <div class="action-bar">
+            <button class="action-btn like-btn ${isLiked}" data-id="${q.id}">
+              <i class="fas fa-thumbs-up"></i>
+              <span>${q.likes}</span>
             </button>
-            <button class="action-btn dislike-btn" data-id="${q.id}" onclick="(async function(){
-              if(await requireLogin('dislike')) {
-                if(hasDisliked('${q.id}')) { alert('You have already disliked this post.'); return; }
-                showGlobalSpinnerOnReaction();
-                await db.collection('questionsanswered').doc('${q.id}').update({ dislikes: firebase.firestore.FieldValue.increment(1) });
-                setDisliked('${q.id}');
-                hideGlobalSpinnerOnReaction();
-              }
-            })()">
-              <i class="fas fa-thumbs-down"></i> <span>${q.dislikes}</span>
+            <button class="action-btn dislike-btn ${isDisliked}" data-id="${q.id}">
+              <i class="fas fa-thumbs-down"></i>
+              <span>${q.dislikes}</span>
             </button>
-            <button class="action-btn comment-btn" onclick="this.closest('.celestial-card').querySelector('.comment-section').classList.toggle('expanded')">
-              <i class="fas fa-comment"></i> <span>${q.comments.length}</span>
+            <button class="action-btn comment-btn">
+              <i class="fas fa-comment"></i>
+              <span>${q.comments.length}</span>
             </button>
-            <button class="action-btn share-btn" data-id="${q.id}" onclick="(function(){
-              const shareURL = window.location.href.split('?')[0] + '?post=${q.id}';
-              if(navigator.share){
-                navigator.share({ title: 'Divine Answers', text: 'Check out this answer!', url: shareURL })
-                  .catch(err => console.error('Share failed:', err));
-              } else {
-                navigator.clipboard.writeText(shareURL)
-                  .then(() => alert('Link copied to clipboard!'))
-                  .catch(err => console.error('Clipboard error:', err));
-              }
-            })()">
-              <i class="fas fa-share-alt"></i> <span>Share</span>
+            <button class="action-btn share-btn" data-id="${q.id}">
+              <i class="fas fa-share-alt"></i>
+              <span>Share</span>
             </button>
           </div>
           <div class="comment-section">
             <div class="comments">
               ${commentsHTML}
             </div>
-            <div class="comment-input" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <div class="comment-input">
               <input type="text" placeholder="Add a comment...">
-              <button class="sacred-button send-comment-btn" data-id="${q.id}" onclick="(async function(){
-                const btn = this;
-                const input = btn.parentElement.querySelector('input');
-                let text = input.value.trim();
-                if(!text) return;
-                if(!(await requireLogin('comment'))) return;
-                showGlobalSpinnerOnReaction();
-                if(replyTarget) {
-                  text = 'Replied to ' + replyTarget + ': ' + text;
-                }
-                const user = firebase.auth().currentUser;
-                const userName = user.displayName || user.email;
-                await db.collection('questionsanswered').doc('${q.id}').update({
-                  comments: firebase.firestore.FieldValue.arrayUnion({ user: userName, text: text, likes: 0 })
-                });
-                input.value = '';
-                replyTarget = null;
-                input.placeholder = 'Add a comment...';
-                hideGlobalSpinnerOnReaction();
-              }).call(this)">
+              <button class="send-comment-btn" data-id="${q.id}">
                 <i class="fas fa-paper-plane"></i>
               </button>
             </div>
@@ -740,63 +1098,82 @@
       `;
     }
     
-    // Build comment HTML as string
+    // Build comment HTML
     function createCommentHTML(comm, docId, index) {
       return `
-      <div class="comment">
-        <strong>${comm.user}:</strong> ${comm.text}
-        <div class="comment-actions" style="display:flex; gap:0.5rem; margin-top:0.25rem;">
-          <button class="action-btn" onclick="updateCommentLike('${docId}', ${index}, this)">
-            <i class="fas fa-thumbs-up"></i> <span>${comm.likes || 0}</span>
+      <div class="comment animate__animated animate__fadeIn">
+        <div class="comment-user">${comm.user}</div>
+        <div class="comment-text">${comm.text}</div>
+        <div class="comment-actions">
+          <button class="comment-action" onclick="updateCommentLike('${docId}', ${index}, this)">
+            <i class="fas fa-thumbs-up"></i> Like <span>${comm.likes || 0}</span>
           </button>
-          <button class="action-btn" onclick="setReplyTarget('${comm.user}', this)">
-            Reply
-          </button>
-          <button class="action-btn" onclick="alert('Share comment functionality (dummy)')">
-            <i class="fas fa-share"></i>
+          <button class="comment-action" onclick="setReplyTarget('${comm.user}', this)">
+            <i class="fas fa-reply"></i> Reply
           </button>
         </div>
       </div>
       `;
     }
     
-    // Global function for updating comment like
+    // Update a comment's like count
     function updateCommentLike(docId, index, btn) {
-      showGlobalSpinnerOnReaction();
-      updateCommentLikeFB(docId, index, function(newLikes) {
-        btn.querySelector("span").textContent = newLikes;
-        hideGlobalSpinnerOnReaction();
+      showGlobalSpinner();
+      db.collection("questionsanswered").doc(docId).get().then(docSnap => {
+        if (docSnap.exists) {
+          let comments = docSnap.data().comments || [];
+          if (comments[index]) {
+            comments[index].likes = (comments[index].likes || 0) + 1;
+            return db.collection("questionsanswered").doc(docId).update({ comments: comments })
+              .then(() => {
+                const span = btn.querySelector("span");
+                if (span) span.textContent = comments[index].likes;
+                hideGlobalSpinner();
+              });
+          }
+        }
+      }).catch(err => {
+        console.error("Error updating comment like:", err);
+        hideGlobalSpinner();
       });
     }
     
-    // Set reply target and update placeholder in card's comment input
+    // Set reply target
     function setReplyTarget(user, btn) {
       replyTarget = user;
-      const parentCard = btn.closest('.celestial-card');
+      const parentCard = btn.closest('.cosmic-card');
       const inputField = parentCard.querySelector('.comment-input input');
-      if(inputField) {
+      if (inputField) {
         inputField.placeholder = 'Reply to ' + user + '...';
+        inputField.focus();
       }
     }
     
-    // Event delegation for send comment buttons (also handled inline)
-    document.addEventListener("click", async (e) => {
-      if (e.target.closest(".send-comment-btn")) {
-        // Already handled inline in createCardHTML's onclick
-      }
+    // Initialize the app
+    window.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      
+      // Add event delegation for share buttons
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.share-btn')) {
+          const btn = e.target.closest('.share-btn');
+          const docId = btn.getAttribute('data-id');
+          const shareURL = window.location.href.split('?')[0] + '?post=' + docId;
+          
+          if (navigator.share) {
+            navigator.share({ 
+              title: 'Divine Answers', 
+              text: 'Check out this answer!', 
+              url: shareURL 
+            }).catch(err => console.error('Share failed:', err));
+          } else {
+            navigator.clipboard.writeText(shareURL)
+              .then(() => alert('Link copied to clipboard!'))
+              .catch(err => console.error('Clipboard error:', err));
+          }
+        }
+      });
     });
-    
-    // Increase view count (one view per device per post)
-    function updateViewCount(doc) {
-      if(!localStorage.getItem("viewed_" + doc.id)) {
-        db.collection("questionsanswered").doc(doc.id).update({ views: (doc.views || 0) + 1 })
-          .then(() => {
-            doc.views = (doc.views || 0) + 1;
-            localStorage.setItem("viewed_" + doc.id, "true");
-          })
-          .catch(err => console.error("Error updating view count:", err));
-      }
-    }
   </script>
 </body>
 </html>
