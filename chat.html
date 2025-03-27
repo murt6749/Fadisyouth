@@ -14,594 +14,415 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset and base styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html,
-    body {
-      width: 100%;
-      height: 100%;
+    /* Base Reset and Fonts */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
       font-family: 'Poppins', sans-serif;
-      background: #f8f9fa;
-      color: #2d3748;
+      background: #f8f9fa; color: #2d3748;
     }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Main container fills full height */
+    body { display: flex; flex-direction: column; }
+    
+    /* Chat Container */
     .chat-container {
-      display: flex;
-      flex: 1;
+      display: flex; flex: 1;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-      border-radius: 10px;
-      margin: 10px;
-      background: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      border-radius: 10px; margin: 10px; background: #fff;
     }
-
-    /* Hamburger menu */
+    
+    /* Hamburger / Format Button Styles */
     .hamburger {
       position: absolute;
       top: 15px;
-      left: 15px;
+      right: 15px;
       font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 10;
+      cursor: pointer; z-index: 10;
       color: #4a5568;
-      background: rgba(255, 255, 255, 0.9);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+      background: transparent;
+      width: 40px; height: 40px;
+      border: none; outline: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s ease;
     }
-    .hamburger:hover {
-      background: #fff;
-      transform: scale(1.05);
-    }
-
-    /* Sidebar (hidden by default) */
+    .hamburger.active { transform: rotate(90deg); }
+    
+    /* Sidebar on the right */
     .sidebar {
       position: fixed;
       top: 0;
-      left: -300px;
+      right: -300px;
       width: 300px;
       height: 100%;
       background: #fff;
-      border-right: 1px solid #e2e8f0;
-      transition: left 0.3s ease;
+      border-left: 1px solid #e2e8f0;
+      transition: right 0.3s ease;
       z-index: 9;
       display: flex;
       flex-direction: column;
     }
     .sidebar.active {
-      left: 0;
+      right: 0;
     }
     .sidebar-header {
-      background: #2c5282;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background: #2c5282; color: #fff;
+      padding: 20px; text-align: center;
+      font-size: 1.2rem; font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .search-container {
-      padding: 15px;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 15px; border-bottom: 1px solid #e2e8f0;
     }
     .search-input {
-      width: 100%;
-      padding: 10px 15px;
-      border: 1px solid #e2e8f0;
-      border-radius: 25px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: all 0.3s ease;
+      width: 100%; padding: 10px 15px;
+      border: 1px solid #e2e8f0; border-radius: 25px;
+      font-size: 0.9rem; outline: none;
+      transition: border-color 0.3s ease;
     }
     .search-input:focus {
       border-color: #4299e1;
-      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+      box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
     }
     .contact-list {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
     }
     .contact-item {
-      padding: 12px 15px;
-      border-bottom: 1px solid #f0f4f8;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: all 0.2s ease;
+      padding: 12px 15px; border-bottom: 1px solid #f0f4f8;
+      cursor: pointer; display: flex; align-items: center;
+      transition: background 0.2s ease;
     }
-    .contact-item:hover {
-      background: #f8fafc;
-    }
-    .contact-item.active {
-      background: #ebf8ff;
-    }
+    .contact-item:hover { background: #f8fafc; }
+    .contact-item.active { background: #ebf8ff; }
     .contact-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2b6cb0;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      margin-right: 12px;
-      position: relative;
-      flex-shrink: 0;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #2b6cb0; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; margin-right: 12px;
+      position: relative; flex-shrink: 0;
     }
-    /* Active status indicator */
     .status-dot {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #48bb78;
-      border: 2px solid #fff;
+      position: absolute; bottom: 0; right: 0;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #48bb78; border: 2px solid #fff;
     }
-    .inactive-dot {
-      background: #a0aec0;
-    }
-    .contact-name {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #2d3748;
-    }
+    .inactive-dot { background: #a0aec0; }
+    .contact-name { font-size: 0.95rem; font-weight: 500; color: #2d3748; }
     .contact-last-message {
-      font-size: 0.8rem;
-      color: #718096;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.8rem; color: #718096; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-
+    
     /* Chat Window */
     .chat-window {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #f0f4f8;
-      margin-left: 0;
-      position: relative;
-    }
-    .chat-header {
-      background: #fff;
-      padding: 15px 20px;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-    .chat-header-info {
-      flex: 1;
-      text-align: center;
-    }
-    .chat-header-actions {
-      display: flex;
-      gap: 15px;
-    }
-    .chat-header-action {
-      color: #4a5568;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .chat-header-action:hover {
-      color: #2b6cb0;
-      transform: scale(1.1);
-    }
-    .message-list {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      overflow-x: hidden;
+      flex: 1; display: flex; flex-direction: column;
+      background: #f0f4f8; margin-left: 0; position: relative;
       background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNDIsMjQ0LDI0NSwwLjAzKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
     }
+    .chat-header {
+      background: #fff; padding: 15px 20px;
+      border-bottom: 1px solid #e2e8f0; font-size: 1.1rem; font-weight: 600;
+      flex-shrink: 0; display: flex; align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .chat-header-info { flex: 1; text-align: center; }
+    .chat-header-actions { display: flex; gap: 15px; }
+    .chat-header-action {
+      color: #4a5568; cursor: pointer; transition: transform 0.2s ease;
+    }
+    .chat-header-action:hover { color: #2b6cb0; transform: scale(1.1); }
+    .message-list {
+      flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden;
+    }
     .message-date-divider {
-      text-align: center;
-      margin: 15px 0;
-      position: relative;
+      text-align: center; margin: 15px 0; position: relative;
     }
     .message-date-divider span {
-      background: #e2e8f0;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      color: #4a5568;
-      font-weight: 500;
-      position: relative;
-      z-index: 1;
+      background: #e2e8f0; padding: 5px 12px; border-radius: 20px;
+      font-size: 0.75rem; color: #4a5568; font-weight: 500; position: relative; z-index: 1;
     }
     .message-date-divider:before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #e2e8f0;
-      z-index: 0;
+      content: ""; position: absolute; top: 50%; left: 0; right: 0;
+      height: 1px; background: #e2e8f0; z-index: 0;
     }
     .message {
-      margin-bottom: 15px;
-      max-width: 75%;
-      padding: 12px 15px;
-      border-radius: 12px;
-      position: relative;
-      clear: both;
-      word-wrap: break-word;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s ease;
+      margin-bottom: 15px; max-width: 75%; padding: 12px 15px;
+      border-radius: 12px; position: relative; clear: both;
+      word-wrap: break-word; background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s ease;
     }
-    .message:hover {
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
+    .message:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
     .message.sent {
-      background: #ebf8ff;
-      margin-left: auto;
-      border-bottom-right-radius: 4px;
+      background: #ebf8ff; margin-left: auto; border-bottom-right-radius: 4px;
     }
     .message.received {
-      background: #fff;
-      margin-right: auto;
-      border-bottom-left-radius: 4px;
+      background: #fff; margin-right: auto; border-bottom-left-radius: 4px;
     }
     .message .sender-name {
-      font-size: 0.8rem;
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #2b6cb0;
+    }
+    .message .message-text { 
+      font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+    .message .message-text a {
+      color: #3182ce;
+      text-decoration: underline;
+    }
+    .message .message-text b, .message .message-text strong {
       font-weight: 600;
-      margin-bottom: 5px;
-      color: #2b6cb0;
     }
-    .message .message-text {
-      font-size: 0.95rem;
-      line-height: 1.4;
-      white-space: pre-wrap;
+    .message .message-text i, .message .message-text em {
+      font-style: italic;
     }
-    /* Show image in message if imageUrl is present */
+    .message .message-text u {
+      text-decoration: underline;
+    }
     .message .message-image {
-      max-width: 250px;
-      max-height: 250px;
-      display: block;
-      margin-top: 8px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      max-width: 250px; max-height: 250px; display: block; margin-top: 8px;
+      border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;
+      transition: transform 0.2s ease;
     }
-    .message .message-image:hover {
-      transform: scale(1.02);
-    }
-    /* Tick status for sent messages */
+    .message .message-image:hover { transform: scale(1.02); }
     .message .tick-status {
-      position: absolute;
-      bottom: 6px;
-      right: 8px;
-      font-size: 0.7rem;
-      color: #718096;
+      position: absolute; bottom: 6px; right: 8px;
+      font-size: 0.7rem; color: #718096;
     }
-    .message .tick-status.seen {
-      color: #4299e1;
-    }
-    /* Small reply button */
+    .message .tick-status.seen { color: #4299e1; }
     .reply-btn {
-      position: absolute;
-      bottom: 6px;
-      left: 8px;
-      font-size: 0.7rem;
-      color: #4a5568;
-      cursor: pointer;
-      opacity: 0;
-      transition: all 0.2s ease;
+      position: absolute; bottom: 6px; left: 8px; font-size: 0.7rem;
+      color: #4a5568; cursor: pointer; opacity: 0; transition: opacity 0.2s ease;
     }
-    .message:hover .reply-btn {
-      opacity: 1;
-    }
-    /* Edit button for the sender */
+    .message:hover .reply-btn { opacity: 1; }
     .edit-btn {
-      position: absolute;
-      bottom: 6px;
-      right: 28px;
-      font-size: 0.7rem;
-      color: #4a5568;
-      cursor: pointer;
-      opacity: 0;
-      transition: all 0.2s ease;
+      position: absolute; bottom: 6px; right: 28px; font-size: 0.7rem;
+      color: #4a5568; cursor: pointer; opacity: 0; transition: opacity 0.2s ease;
     }
-    .message:hover .edit-btn {
-      opacity: 1;
-    }
-    /* Reaction Panel */
+    .message:hover .edit-btn { opacity: 1; }
     .reaction-panel {
-      position: absolute;
-      bottom: 45px;
-      right: 10px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
-      padding: 5px 10px;
-      display: none;
-      z-index: 5;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: absolute; bottom: 45px; right: 10px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;
+      padding: 5px 10px; display: none; z-index: 5;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .reaction-panel span {
-      cursor: pointer;
-      font-size: 1.2rem;
-      margin: 0 5px;
-      transition: all 0.2s ease;
+      cursor: pointer; font-size: 1.2rem; margin: 0 5px;
+      transition: transform 0.2s ease;
     }
-    .reaction-panel span:hover {
-      transform: scale(1.2);
-    }
+    .reaction-panel span:hover { transform: scale(1.2); }
     .message-reaction {
-      position: absolute;
-      bottom: -8px;
-      right: 10px;
-      background: #fff;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-size: 0.7rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      position: absolute; bottom: -8px; right: 10px;
+      background: #fff; padding: 2px 6px; border-radius: 10px;
+      font-size: 0.7rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-
-    /* Chat Input pinned at the bottom */
+    
+    /* Chat Input Area */
     .chat-input-container {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      background: #fff;
-      border-top: 1px solid #e2e8f0;
-      flex-shrink: 0;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+      display: flex; align-items: center;
+      padding: 15px; background: #fff;
+      border-top: 1px solid #e2e8f0; flex-shrink: 0;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
     }
     .chat-input {
-      flex: 1;
-      padding: 12px 15px;
-      border: 1px solid #e2e8f0;
-      border-radius: 25px;
-      font-size: 0.95rem;
-      margin-right: 10px;
-      outline: none;
-      transition: all 0.3s ease;
+      flex: 1; padding: 12px 15px;
+      border: 1px solid #e2e8f0; border-radius: 25px;
+      font-size: 0.95rem; margin-right: 10px; outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .chat-input:focus {
       border-color: #4299e1;
-      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+      box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
     }
     .send-button {
-      background: #2b6cb0;
-      border: none;
-      color: #fff;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      margin-right: 10px;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background: #2b6cb0; border: none; color: #fff;
+      width: 45px; height: 45px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem; margin-right: 10px;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .send-button:hover {
-      background: #2c5282;
-      transform: scale(1.05);
+      background: #2c5282; transform: scale(1.05);
     }
     .send-button:disabled {
-      background: #a0aec0;
-      cursor: not-allowed;
-      transform: none;
+      background: #a0aec0; cursor: not-allowed; transform: none;
     }
     .upload-button {
-      background: #2b6cb0;
-      border: none;
-      color: #fff;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background: #2b6cb0; border: none; color: #fff;
+      width: 45px; height: 45px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .upload-button:hover {
-      background: #2c5282;
-      transform: scale(1.05);
+      background: #2c5282; transform: scale(1.05);
     }
-
-    /* Display reply info above input if replying */
+    
+    /* Reply Info above Input */
     .reply-info {
-      background: #fff;
-      border-left: 4px solid #2b6cb0;
-      padding: 10px 15px;
-      font-size: 0.85rem;
-      color: #4a5568;
-      margin: 0;
-      border-radius: 0;
-      flex-shrink: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      background: #fff; border-left: 4px solid #2b6cb0;
+      padding: 10px 15px; font-size: 0.85rem; color: #4a5568;
+      margin: 0; flex-shrink: 0; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     .reply-info span.reply-to-text {
-      font-weight: 600;
-      color: #2b6cb0;
-      cursor: pointer;
+      font-weight: 600; color: #2b6cb0; cursor: pointer;
     }
     .reply-cancel {
-      color: #e53e3e;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-left: 10px;
+      color: #e53e3e; cursor: pointer; font-size: 1rem; margin-left: 10px;
     }
-
-    /* Typing indicator */
+    
+    /* Typing Indicator */
     .typing-indicator {
-      padding: 5px 15px;
-      font-size: 0.8rem;
-      color: #4a5568;
-      font-style: italic;
-      display: flex;
-      align-items: center;
+      padding: 5px 15px; font-size: 0.8rem; color: #4a5568;
+      font-style: italic; display: flex; align-items: center;
     }
-    .typing-dots {
-      display: flex;
-      margin-left: 5px;
-    }
+    .typing-dots { display: flex; margin-left: 5px; }
     .typing-dot {
-      width: 6px;
-      height: 6px;
-      background: #4a5568;
-      border-radius: 50%;
-      margin: 0 2px;
+      width: 6px; height: 6px; background: #4a5568;
+      border-radius: 50%; margin: 0 2px;
       animation: typingAnimation 1.4s infinite ease-in-out;
     }
-    .typing-dot:nth-child(1) {
-      animation-delay: 0s;
-    }
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typingAnimation {
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-5px); }
     }
-
-    /* Message context menu */
+    
+    /* Context Menu */
     .context-menu {
-      position: fixed;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 100;
-      display: none;
+      position: fixed; background: #fff;
+      border: 1px solid #e2e8f0; border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100; display: none;
     }
     .context-menu-item {
-      padding: 10px 15px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: #2d3748;
-      transition: all 0.2s ease;
+      padding: 10px 15px; cursor: pointer;
+      font-size: 0.9rem; color: #2d3748;
+      transition: background 0.2s ease, color 0.2s ease;
     }
     .context-menu-item:hover {
-      background: #ebf8ff;
-      color: #2b6cb0;
+      background: #ebf8ff; color: #2b6cb0;
     }
     .context-menu-item i {
-      margin-right: 8px;
-      width: 18px;
-      text-align: center;
+      margin-right: 8px; width: 18px; text-align: center;
     }
-
-    /* Image preview modal */
+    
+    /* Image Preview Modal */
     .image-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; pointer-events: none;
       transition: opacity 0.3s ease;
     }
     .image-modal.active {
-      opacity: 1;
-      pointer-events: all;
+      opacity: 1; pointer-events: all;
     }
     .image-modal-content {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: 90%; max-height: 90%;
     }
     .image-modal-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      color: #fff;
-      font-size: 2rem;
-      cursor: pointer;
+      position: absolute; top: 20px; right: 20px;
+      color: #fff; font-size: 2rem; cursor: pointer;
     }
-
-    /* Additional responsive adjustments */
+    
+    /* Formatting Toolbar for Chat Input */
+    .format-toolbar {
+      position: absolute;
+      bottom: 65px;
+      right: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 15;
+    }
+    .format-toolbar button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      font-size: 1rem;
+      color: #4a5568;
+      transition: color 0.2s ease;
+    }
+    .format-toolbar button:hover {
+      color: #2b6cb0;
+    }
+    .format-btn-container {
+      position: relative;
+    }
+    /* Three-dot button for formatting */
+    .format-toggle {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #4a5568;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    
+    /* Login Prompt */
+    .login-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+    .login-prompt button {
+      background: #2b6cb0;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s ease;
+    }
+    .login-prompt button:hover {
+      background: #2c5282;
+    }
+    
+    /* Responsive adjustments */
     @media (max-width: 768px) {
       .chat-container {
-        flex-direction: column;
-        margin: 0;
-        border-radius: 0;
+        flex-direction: column; margin: 0; border-radius: 0;
       }
-      .sidebar {
-        width: 100%;
-        height: 40vh;
-        left: -100%;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-      .chat-window {
-        height: 60vh;
-      }
-      .message {
-        max-width: 85%;
-      }
+      .sidebar { width: 100%; height: 40vh; right: -100%; }
+      .sidebar.active { right: 0; }
+      .chat-window { height: 60vh; }
+      .message { max-width: 85%; }
     }
-
-    /* Loading spinner */
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-left: 8px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @media (max-width: 480px) {
+      .chat-header { padding: 10px; }
+      .chat-header-action { margin-left: 10px; }
+      .message-list { padding: 10px; }
+      .chat-input-container { padding: 8px 10px; }
+      .message .message-image { max-width: 180px; }
     }
   </style>
 </head>
 <body>
   <!-- Main container -->
   <div class="chat-container">
-    <!-- Hamburger Icon to open sidebar -->
-    <div class="hamburger" onclick="toggleSidebar()">
+    <!-- Hamburger / Format Toggle Button (now on right) -->
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
       <i class="fas fa-bars"></i>
-    </div>
+    </button>
 
-    <!-- Sidebar with contacts -->
+    <!-- Sidebar (right side) -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">Fadis Youth Chat</div>
       <div class="search-container">
@@ -613,28 +434,28 @@
           <div class="contact-avatar" style="background:#2b6cb0;">F</div>
           <div>
             <div class="contact-name">Fadis Youth Group</div>
-            <div class="contact-last-message">Welcome to our community</div>
+            <div class="contact-last-message" style="font-size:0.7rem;">Welcome to our community</div>
           </div>
         </div>
         <div class="contact-item" onclick="openGroup('QuranGroup','Quran Group')">
           <div class="contact-avatar" style="background:#2b6cb0;">Q</div>
           <div>
             <div class="contact-name">Quran Group</div>
-            <div class="contact-last-message">Discuss Quranic teachings</div>
+            <div class="contact-last-message" style="font-size:0.7rem;">Discuss Quranic teachings</div>
           </div>
         </div>
         <div class="contact-item" onclick="openGroup('HalalJokes','Halal Jokes')">
           <div class="contact-avatar" style="background:#2b6cb0;">H</div>
           <div>
             <div class="contact-name">Halal Jokes</div>
-            <div class="contact-last-message">Share clean humor</div>
+            <div class="contact-last-message" style="font-size:0.7rem;">Share clean humor</div>
           </div>
         </div>
         <div class="contact-item" onclick="openGroup('IslamicChat','Islamic Chat')">
           <div class="contact-avatar" style="background:#2b6cb0;">I</div>
           <div>
             <div class="contact-name">Islamic Chat</div>
-            <div class="contact-last-message">General Islamic discussions</div>
+            <div class="contact-last-message" style="font-size:0.7rem;">General Islamic discussions</div>
           </div>
         </div>
         <!-- Firestore users appended here -->
@@ -654,6 +475,11 @@
       <div id="replyInfo" class="reply-info" style="display:none;"></div>
       <div class="message-list" id="messageList">
         <!-- Messages will be loaded here -->
+        <div id="loginPrompt" class="login-prompt" style="display:none;">
+          <h3>Please log in to view and send messages</h3>
+          <p>Connect with the Fadis Youth community by signing in</p>
+          <button onclick="redirectToLogin()">Log In / Register</button>
+        </div>
       </div>
       <div class="typing-indicator" id="typingIndicator" style="display:none;">
         <span id="typingText">Typing</span>
@@ -664,12 +490,22 @@
         </div>
       </div>
       <div class="chat-input-container" id="chatInputContainer" style="display:none;">
-        <!-- Hidden file input for uploading images/files -->
+        <!-- Hidden file input -->
         <input type="file" id="fileInput" style="display:none;" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" onchange="uploadFile(this.files)" />
-        <!-- Upload button -->
         <button class="upload-button" onclick="document.getElementById('fileInput').click();">
           <i class="fas fa-paperclip"></i>
         </button>
+        <!-- Formatting Toggle Button -->
+        <div class="format-btn-container">
+          <button class="format-toggle" id="formatToggleBtn" onclick="toggleFormatToolbar(event)"><i class="fas fa-ellipsis-h"></i></button>
+          <div class="format-toolbar" id="formatToolbar">
+            <button onclick="applyFormat('bold')"><i class="fas fa-bold"></i></button>
+            <button onclick="applyFormat('italic')"><i class="fas fa-italic"></i></button>
+            <button onclick="applyFormat('underline')"><i class="fas fa-underline"></i></button>
+            <button onclick="applyFormat('spoiler')"><i class="fas fa-eye-slash"></i></button>
+            <button onclick="applyFormat('link')"><i class="fas fa-link"></i></button>
+          </div>
+        </div>
         <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeydown="checkForEnter(event)" oninput="handleTyping()" />
         <button class="send-button" id="sendButton" onclick="sendMessage()" disabled>
           <i class="fas fa-paper-plane"></i>
@@ -687,16 +523,14 @@
   </div>
 
   <!-- Image Preview Modal -->
-  <div class="image-modal" id="imageModal" onclick="closeImageModal()">
-    <span class="image-modal-close" onclick="closeImageModal(event)">&times;</span>
+  <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
+    <span class="image-modal-close">&times;</span>
     <img class="image-modal-content" id="modalImage">
   </div>
 
   <script>
-    // -----------------------------------------------------------------------
-    // Firebase Configuration & Initialization
-    // -----------------------------------------------------------------------
-    var firebaseConfig = {
+    // ---------------- Firebase Config & Init ----------------
+    const firebaseConfig = {
       apiKey: "AIzaSyAFgxSMtktsqJjcJOMnkTB8yZF6T492gpA",
       authDomain: "fadis-youth.firebaseapp.com",
       databaseURL: "https://fadis-youth-default-rtdb.firebaseio.com",
@@ -706,420 +540,755 @@
       appId: "1:1067077305340:web:3ca9c71202a8020c6ba879",
       measurementId: "G-Z02SPW9ZKW"
     };
+    
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // -----------------------------------------------------------------------
-    // Auth & Login Check with Timeout
-    // -----------------------------------------------------------------------
-    let isLoggedIn = false;
-    let authResolved = false;
+    // ---------------- Auth & Online Status ----------------
     let currentUser = null;
-
-    const authTimeout = setTimeout(() => {
-      if (!authResolved) {
-        if (confirm("We couldn't verify your login status. Do you want to log in?")) {
-          window.location.href = "login.html";
-        } else {
-          isLoggedIn = false;
-          authResolved = true;
-          loadContacts();
+    let authResolved = false;
+    let authTimeout = null;
+    
+    // Initialize auth state listener
+    function initializeAuth() {
+      authResolved = false;
+      
+      // Set timeout for auth resolution
+      authTimeout = setTimeout(() => {
+        if (!authResolved) {
+          showLoginPrompt("Authentication check timed out. Please log in.");
         }
-      }
-    }, 10000);
-
-    auth.onAuthStateChanged((user) => {
-      authResolved = true;
-      clearTimeout(authTimeout);
-      if (user) {
-        isLoggedIn = true;
-        currentUser = user;
-        loadContacts();
-        updateUserOnlineStatus(true);
-        window.addEventListener('beforeunload', () => {
-          updateUserOnlineStatus(false);
-        });
-      } else {
-        if (confirm("You are not logged in. Do you want to log in?")) {
-          window.location.href = "login.html";
+      }, 10000);
+      
+      // Auth state listener
+      auth.onAuthStateChanged((user) => {
+        clearTimeout(authTimeout);
+        authResolved = true;
+        
+        if (user) {
+          // User is signed in
+          currentUser = user;
+          updateUserOnlineStatus(true);
+          loadContacts();
+          hideLoginPrompt();
+          
+          // Set up beforeunload handler to mark user as offline
+          window.addEventListener('beforeunload', () => {
+            updateUserOnlineStatus(false);
+          });
         } else {
-          isLoggedIn = false;
+          // No user is signed in
           currentUser = null;
-          loadContacts();
+          showLoginPrompt("Please log in to access the chat");
+        }
+      }, (error) => {
+        console.error("Auth state error:", error);
+        showLoginPrompt("Authentication error. Please log in again.");
+      });
+    }
+    
+    function updateUserOnlineStatus(online) {
+      if (!currentUser) return;
+      
+      const statusUpdate = {
+        online: online,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      db.collection("users").doc(currentUser.uid).update(statusUpdate)
+        .catch(error => {
+          console.error("Error updating user status:", error);
+        });
+    }
+    
+    function showLoginPrompt(message) {
+      const loginPrompt = document.getElementById("loginPrompt");
+      if (loginPrompt) {
+        loginPrompt.style.display = "flex";
+        if (message) {
+          loginPrompt.querySelector("h3").textContent = message;
         }
       }
-    });
+      document.getElementById("chatInputContainer").style.display = "none";
+    }
+    
+    function hideLoginPrompt() {
+      const loginPrompt = document.getElementById("loginPrompt");
+      if (loginPrompt) {
+        loginPrompt.style.display = "none";
+      }
+    }
+    
+    function redirectToLogin() {
+      window.location.href = "login.html";
+    }
 
-    // -----------------------------------------------------------------------
-    // Global Variables
-    // -----------------------------------------------------------------------
+    // ---------------- Global Variables ----------------
     let currentChatId = null;
     let currentChatIsGroup = false;
     let messageUnsubscribe = null;
     let replyTarget = null;
     let typingTimeout = null;
-    let typingListener = null;
     let contextMenuMessageId = null;
-
     let pendingUploadUrl = null;
     let pendingUploadIsImage = false;
-    let isUploading = false;
 
-    // -----------------------------------------------------------------------
-    // User Online Status
-    // -----------------------------------------------------------------------
-    function updateUserOnlineStatus(online) {
-      if (!isLoggedIn || !currentUser) return;
-      db.collection("users").doc(currentUser.uid).update({
-        online: online,
-        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      // Note: Realtime Database presence can be added if needed.
-    }
-
-    // -----------------------------------------------------------------------
-    // Sidebar Toggle
-    // -----------------------------------------------------------------------
+    // ---------------- Sidebar & Search ----------------
     function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("active");
+      
+      // Animate hamburger icon
+      const btnIcon = document.querySelector("#hamburgerBtn i");
+      btnIcon.classList.toggle("fa-bars");
+      btnIcon.classList.toggle("fa-times");
     }
-
-    // -----------------------------------------------------------------------
-    // Search Contacts
-    // -----------------------------------------------------------------------
+    
     function searchContacts() {
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-      const contactItems = document.querySelectorAll(".contact-item");
-      contactItems.forEach(item => {
-        const contactName = item.querySelector(".contact-name").textContent.toLowerCase();
-        item.style.display = contactName.includes(searchTerm) ? "flex" : "none";
+      const term = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".contact-item").forEach(item => {
+        const name = item.querySelector(".contact-name").textContent.toLowerCase();
+        item.style.display = name.includes(term) ? "flex" : "none";
       });
     }
-
-    // -----------------------------------------------------------------------
-    // Load Contacts from Firestore
-    // -----------------------------------------------------------------------
+    
     function loadContacts() {
       const contactList = document.getElementById("contactList");
-      const builtInGroupCount = 4;
-      while (contactList.children.length > builtInGroupCount) {
+      const builtInCount = 4; // Number of built-in groups
+      
+      // Remove all dynamic contacts (keep built-in groups)
+      while (contactList.children.length > builtInCount) {
         contactList.removeChild(contactList.lastChild);
       }
-      if (!isLoggedIn) return;
+      
+      if (!currentUser) return;
+      
       db.collection("users")
         .orderBy("displayName")
         .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            if (doc.id === currentUser.uid) return;
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            if (doc.id === currentUser.uid) return; // Skip current user
+            
             const userData = doc.data();
             const displayName = userData.displayName || "Unknown";
-            const onlineClass = userData.online ? "status-dot" : "status-dot inactive-dot";
             const lastMessage = userData.lastMessage || "No messages yet";
-            const div = document.createElement("div");
-            div.className = "contact-item";
-            div.onclick = (event) => { openDirectChat(doc.id, displayName, event); };
-            div.innerHTML = `
+            const isOnline = userData.online || false;
+            
+            const contactItem = document.createElement("div");
+            contactItem.className = "contact-item";
+            contactItem.onclick = (e) => openDirectChat(doc.id, displayName, e);
+            
+            contactItem.innerHTML = `
               <div class="contact-avatar">
                 ${displayName.charAt(0).toUpperCase()}
-                <div class="${onlineClass}"></div>
+                <div class="status-dot ${isOnline ? '' : 'inactive-dot'}"></div>
               </div>
               <div>
                 <div class="contact-name">${displayName}</div>
                 <div class="contact-last-message">${lastMessage}</div>
               </div>
             `;
-            contactList.appendChild(div);
+            
+            contactList.appendChild(contactItem);
           });
+        })
+        .catch(error => {
+          console.error("Error loading contacts:", error);
         });
     }
 
-    // -----------------------------------------------------------------------
-    // Open Direct Chat
-    // -----------------------------------------------------------------------
+    // ---------------- Chat Management ----------------
     function openDirectChat(otherUserId, displayName, event) {
-      if (!isLoggedIn) {
-        alert("You must be logged in to start a direct chat.");
+      if (!currentUser) {
+        showLoginPrompt("Please log in to start chatting");
         return;
       }
-      // Highlight the selected contact
-      const contactItems = document.querySelectorAll(".contact-item");
-      contactItems.forEach(item => item.classList.remove("active"));
+      
+      // Highlight selected contact
+      document.querySelectorAll(".contact-item").forEach(item => {
+        item.classList.remove("active");
+      });
       event.currentTarget.classList.add("active");
-
-      const chatId = getChatId(otherUserId);
+      
+      // Generate chat ID (sorted user IDs joined with underscore)
+      const chatId = [currentUser.uid, otherUserId].sort().join("_");
       currentChatId = chatId;
       currentChatIsGroup = false;
-      document.getElementById("chatHeader").innerText = displayName;
+      
+      // Update UI
+      document.getElementById("chatHeader").textContent = displayName;
       document.getElementById("chatHeaderActions").style.display = "flex";
       document.getElementById("chatInputContainer").style.display = "flex";
       document.getElementById("messageList").innerHTML = "";
       document.getElementById("replyInfo").style.display = "none";
       replyTarget = null;
+      
+      // Close sidebar on mobile
       document.getElementById("sidebar").classList.remove("active");
-
+      
+      // Create or verify chat document
       const chatDoc = db.collection("chats").doc(chatId);
-      chatDoc.get().then((docSnapshot) => {
-        if (!docSnapshot.exists) {
+      
+      chatDoc.get().then(docSnap => {
+        if (!docSnap.exists) {
+          // Create new chat document
           chatDoc.set({
             participants: [currentUser.uid, otherUserId],
             isGroup: false,
             chatName: displayName,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
+        
+        // Subscribe to messages
+        subscribeToMessages(chatId);
+      }).catch(error => {
+        console.error("Error opening chat:", error);
       });
-      subscribeToMessages(chatId);
-      setupTypingListener(otherUserId);
     }
-
-    // Return unique ID for direct chat
-    function getChatId(otherUserId) {
-      return [currentUser.uid, otherUserId].sort().join("_");
-    }
-
-    // -----------------------------------------------------------------------
-    // Open Group Chat
-    // -----------------------------------------------------------------------
+    
     async function openGroup(groupId, groupName) {
-      const contactItems = document.querySelectorAll(".contact-item");
-      contactItems.forEach(item => item.classList.remove("active"));
+      // Highlight selected group
+      document.querySelectorAll(".contact-item").forEach(item => {
+        item.classList.remove("active");
+      });
       event.currentTarget.classList.add("active");
-
+      
+      // Close sidebar on mobile
       document.getElementById("sidebar").classList.remove("active");
+      
+      // Clear message list and reply info
       document.getElementById("messageList").innerHTML = "";
       document.getElementById("replyInfo").style.display = "none";
-      document.getElementById("typingIndicator").style.display = "none";
       replyTarget = null;
-
+      
       currentChatId = groupId;
       currentChatIsGroup = true;
-
-      if (!isLoggedIn) {
-        document.getElementById("chatHeader").innerText = groupName + " (Login required)";
+      
+      if (!currentUser) {
+        // Not logged in - show group info but no input
+        document.getElementById("chatHeader").textContent = `${groupName} (Login required)`;
         document.getElementById("chatHeaderActions").style.display = "none";
         document.getElementById("chatInputContainer").style.display = "none";
+        showLoginPrompt("Log in to participate in this group");
         subscribeToMessages(groupId);
         return;
       }
-
+      
       const groupDoc = db.collection("chats").doc(groupId);
-      let snap = await groupDoc.get();
-      if (!snap.exists) {
-        await groupDoc.set({
-          participants: [],
-          isGroup: true,
-          chatName: groupName,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-        snap = await groupDoc.get();
-      }
-      const data = snap.data() || {};
-      const participants = data.participants || [];
-      if (!participants.includes(currentUser.uid)) {
-        if (confirm(`Do you want to join ${groupName}?`)) {
-          await groupDoc.update({
-            participants: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+      
+      try {
+        let groupSnap = await groupDoc.get();
+        
+        if (!groupSnap.exists) {
+          // Create new group
+          await groupDoc.set({
+            participants: [],
+            isGroup: true,
+            chatName: groupName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
-          participants.push(currentUser.uid);
+          groupSnap = await groupDoc.get();
         }
+        
+        const groupData = groupSnap.data() || {};
+        const participants = groupData.participants || [];
+        
+        // Check if user is a member
+        if (!participants.includes(currentUser.uid)) {
+          const join = confirm(`Join ${groupName}?`);
+          if (join) {
+            await groupDoc.update({
+              participants: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+            });
+          }
+        }
+        
+        // Update UI with group info
+        document.getElementById("chatHeader").innerHTML = `
+          ${groupName}<br>
+          <small style="font-size:0.7rem;color:#718096;">${participants.length} members</small>
+        `;
+        
+        document.getElementById("chatHeaderActions").style.display = "flex";
+        document.getElementById("chatInputContainer").style.display = "flex";
+        
+        // Subscribe to messages
+        subscribeToMessages(groupId);
+        
+      } catch (error) {
+        console.error("Error opening group:", error);
+        alert("Could not open group. Please try again.");
       }
-      document.getElementById("chatHeader").innerText = `${groupName} (${participants.length} members)`;
-      document.getElementById("chatHeaderActions").style.display = "flex";
-      document.getElementById("chatInputContainer").style.display = "flex";
-      subscribeToMessages(groupId);
     }
-
-    // -----------------------------------------------------------------------
-    // Subscribe to Messages
-    // -----------------------------------------------------------------------
+    
     function subscribeToMessages(chatId) {
+      // Unsubscribe from previous listener if exists
       if (messageUnsubscribe) {
         messageUnsubscribe();
       }
-      if (typingListener) {
-        typingListener();
-        typingListener = null;
+      
+      // Clear any typing timeout
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        document.getElementById("typingIndicator").style.display = "none";
       }
+      
+      const messageList = document.getElementById("messageList");
+      messageList.innerHTML = "";
+      
+      // Subscribe to messages
       messageUnsubscribe = db.collection("chats")
         .doc(chatId)
         .collection("messages")
         .orderBy("timestamp")
-        .onSnapshot((snapshot) => {
-          const messageList = document.getElementById("messageList");
-          messageList.innerHTML = "";
-          snapshot.forEach((doc) => {
-            const message = doc.data();
-            const msgDiv = document.createElement("div");
-            const sentByMe = isLoggedIn && currentUser && message.senderId === currentUser.uid;
-            msgDiv.className = "message " + (sentByMe ? "sent" : "received");
-
-            let tickHtml = "";
-            if (sentByMe) {
-              tickHtml = `<div class="tick-status ${message.seen ? "seen" : ""}">${message.seen ? "✔✔" : "✔"}</div>`;
+        .onSnapshot({
+          includeMetadataChanges: true
+        }, (snapshot) => {
+          // Skip if this is metadata-only change
+          if (snapshot.metadata.hasPendingWrites) return;
+          
+          // Clear message list if this is the first load
+          if (!messageList.hasChildNodes()) {
+            messageList.innerHTML = "";
+          }
+          
+          snapshot.docChanges().forEach(change => {
+            if (change.type === "added") {
+              addMessageToUI(change.doc);
+            } else if (change.type === "modified") {
+              updateMessageInUI(change.doc);
+            } else if (change.type === "removed") {
+              removeMessageFromUI(change.doc.id);
             }
-
-            let replyHtml = "";
-            if (message.replyTo) {
-              replyHtml = `<div class="reply-info" onclick="scrollToMessage('${message.replyTo.msgId}')">
-                <span class="reply-to-text">${message.replyTo.senderName}:</span> ${message.replyTo.msgText}
-              </div>`;
-            }
-
-            let imageHtml = "";
-            if (message.imageUrl) {
-              imageHtml = `<img class="message-image" src="${message.imageUrl}" onclick="openImageModal('${message.imageUrl}')">`;
-            }
-
-            let fileHtml = "";
-            if (message.fileUrl && !message.imageUrl) {
-              fileHtml = `<a href="${message.fileUrl}" class="file-download" target="_blank">View File</a>`;
-            }
-
-            msgDiv.innerHTML = `
-              <div class="sender-name">${message.senderName || "Guest"}</div>
-              ${replyHtml}
-              <div class="message-text">${message.text || ""}</div>
-              ${imageHtml}
-              ${fileHtml}
-              ${tickHtml}
-            `;
-
-            msgDiv.addEventListener("contextmenu", function(e) {
-              e.preventDefault();
-              showContextMenu(e, doc.id, message);
-            });
-            messageList.appendChild(msgDiv);
           });
+          
+          // Scroll to bottom
           messageList.scrollTop = messageList.scrollHeight;
+        }, (error) => {
+          console.error("Error subscribing to messages:", error);
         });
     }
-
-    // -----------------------------------------------------------------------
-    // Typing Listener (Dummy Implementation)
-    // -----------------------------------------------------------------------
-    function setupTypingListener(otherUserId) {
-      // In a real app, you would listen to a "typing" field in the chat document.
-      // Here we simply clear any existing timeout.
-      if (typingTimeout) clearTimeout(typingTimeout);
-    }
-
-    // -----------------------------------------------------------------------
-    // Handle Enter Key and Toggle Send Button
-    // -----------------------------------------------------------------------
-    function checkForEnter(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
+    
+    function addMessageToUI(doc) {
+      const message = doc.data();
+      const messageList = document.getElementById("messageList");
+      
+      // Create message element
+      const msgDiv = document.createElement("div");
+      msgDiv.setAttribute("data-doc-id", doc.id);
+      
+      const isSentByMe = currentUser && (message.senderId === currentUser.uid);
+      msgDiv.className = `message ${isSentByMe ? "sent" : "received"}`;
+      
+      // Build message HTML
+      let replyHtml = "";
+      if (message.replyTo) {
+        replyHtml = `
+          <div class="reply-info" onclick="scrollToMessage('${message.replyTo.msgId}')">
+            <span class="reply-to-text">${message.replyTo.senderName}:</span> 
+            ${truncateText(message.replyTo.msgText, 50)}
+          </div>
+        `;
+      }
+      
+      let mediaHtml = "";
+      if (message.imageUrl) {
+        mediaHtml = `<img class="message-image" src="${message.imageUrl}" onclick="openImageModal('${message.imageUrl}')" />`;
+      } else if (message.fileUrl) {
+        mediaHtml = `<a href="${message.fileUrl}" class="file-download" target="_blank">View File</a>`;
+      }
+      
+      // Format message text with HTML tags
+      let formattedText = message.text || "";
+      formattedText = formatMessageText(formattedText);
+      
+      msgDiv.innerHTML = `
+        <div class="sender-name">${message.senderName || "Guest"}</div>
+        ${replyHtml}
+        <div class="message-text">${formattedText}</div>
+        ${mediaHtml}
+        ${isSentByMe ? `<div class="tick-status ${message.seen ? "seen" : ""}">${message.seen ? "✔✔" : "✔"}</div>` : ""}
+        ${!isSentByMe ? `<div class="reply-btn" onclick="replyToMessage('${doc.id}', '${message.senderName}', '${escapeHtml(message.text || "")}')"><i class="fas fa-reply"></i></div>` : ""}
+        ${isSentByMe ? `<div class="edit-btn" onclick="editMessage('${doc.id}', '${escapeHtml(message.text || "")}')"><i class="fas fa-edit"></i></div>` : ""}
+      `;
+      
+      // Add context menu for right-click
+      msgDiv.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        if (!document.getElementById("sendButton").disabled) {
-          sendMessage();
+        showContextMenu(e, doc.id, message);
+      });
+      
+      messageList.appendChild(msgDiv);
+    }
+    
+    function updateMessageInUI(doc) {
+      const message = doc.data();
+      const msgElement = document.querySelector(`[data-doc-id="${doc.id}"]`);
+      
+      if (msgElement) {
+        // Update seen status if this is our message
+        if (currentUser && message.senderId === currentUser.uid) {
+          const tickStatus = msgElement.querySelector(".tick-status");
+          if (tickStatus) {
+            tickStatus.className = `tick-status ${message.seen ? "seen" : ""}`;
+            tickStatus.innerHTML = message.seen ? "✔✔" : "✔";
+          }
+        }
+        
+        // Update message text if edited
+        if (message.text) {
+          const textElement = msgElement.querySelector(".message-text");
+          if (textElement) {
+            textElement.innerHTML = formatMessageText(message.text);
+          }
         }
       }
     }
-    function handleTyping() {
-      const input = document.getElementById("chatInput");
-      document.getElementById("sendButton").disabled = input.value.trim() === "";
-      // Show typing indicator (dummy)
-      document.getElementById("typingIndicator").style.display = "flex";
-      if (typingTimeout) clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        document.getElementById("typingIndicator").style.display = "none";
-      }, 1500);
+    
+    function removeMessageFromUI(messageId) {
+      const msgElement = document.querySelector(`[data-doc-id="${messageId}"]`);
+      if (msgElement) {
+        msgElement.remove();
+      }
+    }
+    
+    function formatMessageText(text) {
+      // Convert HTML tags to formatted text
+      let formatted = text
+        .replace(/<b>(.*?)<\/b>/g, '<strong>$1</strong>')
+        .replace(/<i>(.*?)<\/i>/g, '<em>$1</em>')
+        .replace(/<u>(.*?)<\/u>/g, '<u>$1</u>')
+        .replace(/<a href="(.*?)".*?>(.*?)<\/a>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+        .replace(/<span style='background-color:#000;color:#000;'>(.*?)<\/span>/g, 
+                 '<span class="spoiler" onclick="revealSpoiler(this)">$1</span>');
+      
+      // Convert newlines to <br>
+      formatted = formatted.replace(/\n/g, '<br>');
+      
+      return formatted;
+    }
+    
+    function revealSpoiler(element) {
+      element.style.backgroundColor = 'transparent';
+      element.style.color = 'inherit';
+    }
+    
+    function truncateText(text, maxLength) {
+      if (!text) return "";
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + "...";
+    }
+    
+    function escapeHtml(unsafe) {
+      if (!unsafe) return "";
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    // -----------------------------------------------------------------------
-    // Context Menu Functions
-    // -----------------------------------------------------------------------
-    function showContextMenu(e, msgId, message) {
-      const contextMenu = document.getElementById("contextMenu");
-      contextMenu.style.top = e.pageY + "px";
-      contextMenu.style.left = e.pageX + "px";
-      contextMenu.style.display = "block";
-      contextMenuMessageId = msgId;
-      // Store message data if needed for context actions
-      window.currentContextMessage = message;
+    // ---------------- Message Actions ----------------
+    function scrollToMessage(msgId) {
+      const msgEl = document.querySelector(`[data-doc-id="${msgId}"]`);
+      if (msgEl) {
+        msgEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        
+        // Highlight the message temporarily
+        msgEl.style.transition = "background 0.5s ease";
+        msgEl.style.backgroundColor = "#fff3cd";
+        
+        setTimeout(() => {
+          msgEl.style.backgroundColor = "";
+        }, 2000);
+      }
     }
-    window.addEventListener("click", function() {
-      document.getElementById("contextMenu").style.display = "none";
-    });
+    
+    function replyToMessage(msgId, senderName, messageText) {
+      replyTarget = {
+        msgId: msgId,
+        senderName: senderName,
+        msgText: messageText
+      };
+      
+      const replyInfo = document.getElementById("replyInfo");
+      replyInfo.innerHTML = `
+        <span class="reply-to-text" onclick="scrollToMessage('${msgId}')">
+          Replying to ${senderName}: ${truncateText(messageText, 50)}
+        </span>
+        <span class="reply-cancel" onclick="clearReply()">×</span>
+      `;
+      replyInfo.style.display = "flex";
+      
+      // Focus the input
+      document.getElementById("chatInput").focus();
+    }
+    
+    function editMessage(msgId, currentText) {
+      if (!currentUser) return;
+      
+      const newText = prompt("Edit your message:", currentText);
+      if (newText !== null && newText !== currentText) {
+        db.collection("chats").doc(currentChatId)
+          .collection("messages").doc(msgId)
+          .update({ 
+            text: newText,
+            edited: true 
+          })
+          .catch(error => {
+            console.error("Error editing message:", error);
+            alert("Could not edit message. Please try again.");
+          });
+      }
+    }
+    
+    function clearReply() {
+      replyTarget = null;
+      document.getElementById("replyInfo").style.display = "none";
+    }
+
+    // ---------------- Context Menu Functions ----------------
+    function showContextMenu(e, msgId, message) {
+      const menu = document.getElementById("contextMenu");
+      menu.style.top = `${e.pageY}px`;
+      menu.style.left = `${e.pageX}px`;
+      menu.style.display = "block";
+      
+      contextMenuMessageId = msgId;
+      window.currentContextMessage = message;
+      
+      // Hide menu when clicking elsewhere
+      const hideMenu = () => {
+        menu.style.display = "none";
+        document.removeEventListener("click", hideMenu);
+      };
+      
+      document.addEventListener("click", hideMenu);
+    }
+    
     function replyFromContextMenu() {
       if (window.currentContextMessage) {
-        replyTarget = {
-          msgId: contextMenuMessageId,
-          msgText: window.currentContextMessage.text,
-          senderName: window.currentContextMessage.senderName
-        };
-        document.getElementById("replyInfo").innerHTML = `
-          <span class="reply-to-text" onclick="scrollToMessage('${replyTarget.msgId}')">
-            Replying to ${replyTarget.senderName}: ${replyTarget.msgText}
-          </span>
-          <span class="reply-cancel" onclick="clearReply()">×</span>
-        `;
-        document.getElementById("replyInfo").style.display = "flex";
+        replyToMessage(
+          contextMenuMessageId,
+          window.currentContextMessage.senderName,
+          window.currentContextMessage.text || ""
+        );
       }
     }
+    
     function editFromContextMenu() {
-      if (window.currentContextMessage && window.currentContextMessage.senderId === currentUser.uid) {
-        const newText = prompt("Edit your message:", window.currentContextMessage.text);
-        if (newText !== null) {
-          db.collection("chats").doc(currentChatId).collection("messages").doc(contextMenuMessageId)
-            .update({ text: newText })
-            .catch(err => console.error("Error editing message:", err));
-        }
+      if (!currentUser) {
+        showLoginPrompt("Please log in to edit messages");
+        return;
+      }
+      
+      if (window.currentContextMessage && 
+          window.currentContextMessage.senderId === currentUser.uid) {
+        editMessage(
+          contextMenuMessageId,
+          window.currentContextMessage.text || ""
+        );
       } else {
         alert("You can only edit your own messages.");
       }
     }
+    
     function deleteFromContextMenu() {
-      if (confirm("Are you sure you want to delete this message?")) {
-        db.collection("chats").doc(currentChatId).collection("messages").doc(contextMenuMessageId)
-          .delete()
-          .catch(err => console.error("Error deleting message:", err));
-      }
-    }
-    function copyFromContextMenu() {
-      if (window.currentContextMessage) {
-        navigator.clipboard.writeText(window.currentContextMessage.text)
-          .then(() => alert("Message copied to clipboard."))
-          .catch(err => console.error("Error copying text:", err));
-      }
-    }
-
-    // -----------------------------------------------------------------------
-    // Open Image Modal
-    // -----------------------------------------------------------------------
-    function openImageModal(url) {
-      const modal = document.getElementById("imageModal");
-      document.getElementById("modalImage").src = url;
-      modal.classList.add("active");
-    }
-    function closeImageModal(e) {
-      if(e) e.stopPropagation();
-      document.getElementById("imageModal").classList.remove("active");
-    }
-
-    // -----------------------------------------------------------------------
-    // Send Message
-    // -----------------------------------------------------------------------
-    function sendMessage() {
-      if (!isLoggedIn) {
-        alert("You must be logged in to send messages.");
+      if (!currentUser) {
+        showLoginPrompt("Please log in to delete messages");
         return;
       }
+      
+      if (window.currentContextMessage && 
+          window.currentContextMessage.senderId === currentUser.uid) {
+        if (confirm("Delete this message?")) {
+          db.collection("chats").doc(currentChatId)
+            .collection("messages").doc(contextMenuMessageId)
+            .delete()
+            .catch(error => {
+              console.error("Error deleting message:", error);
+              alert("Could not delete message. Please try again.");
+            });
+        }
+      } else {
+        alert("You can only delete your own messages.");
+      }
+    }
+    
+    function copyFromContextMenu() {
+      if (window.currentContextMessage && window.currentContextMessage.text) {
+        navigator.clipboard.writeText(window.currentContextMessage.text)
+          .then(() => {
+            // Show brief notification that text was copied
+            const notification = document.createElement("div");
+            notification.textContent = "Copied to clipboard";
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.left = "50%";
+            notification.style.transform = "translateX(-50%)";
+            notification.style.backgroundColor = "#2b6cb0";
+            notification.style.color = "white";
+            notification.style.padding = "8px 16px";
+            notification.style.borderRadius = "4px";
+            notification.style.zIndex = "1000";
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+              document.body.removeChild(notification);
+            }, 2000);
+          })
+          .catch(err => {
+            console.error("Copy error:", err);
+            alert("Could not copy message. Please try again.");
+          });
+      }
+    }
+
+    // ---------------- Message Formatting ----------------
+    function toggleFormatToolbar(e) {
+      e.stopPropagation();
+      const toolbar = document.getElementById("formatToolbar");
+      toolbar.style.display = toolbar.style.display === "block" ? "none" : "block";
+      
+      // Close toolbar when clicking elsewhere
+      if (toolbar.style.display === "block") {
+        const closeToolbar = (event) => {
+          if (!toolbar.contains(event.target) && event.target !== document.getElementById("formatToggleBtn")) {
+            toolbar.style.display = "none";
+            document.removeEventListener("click", closeToolbar);
+          }
+        };
+        
+        document.addEventListener("click", closeToolbar);
+      }
+    }
+    
+    function applyFormat(formatType) {
+      const input = document.getElementById("chatInput");
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const selectedText = input.value.substring(start, end);
+      
+      let formattedText = selectedText;
+      
+      switch (formatType) {
+        case "bold":
+          formattedText = `<b>${selectedText}</b>`;
+          break;
+        case "italic":
+          formattedText = `<i>${selectedText}</i>`;
+          break;
+        case "underline":
+          formattedText = `<u>${selectedText}</u>`;
+          break;
+        case "spoiler":
+          formattedText = `<span style='background-color:#000;color:#000;'>${selectedText}</span>`;
+          break;
+        case "link":
+          const url = prompt("Enter URL:", "https://");
+          if (url) {
+            const displayText = selectedText || prompt("Enter display text:", "Link");
+            if (displayText) {
+              formattedText = `<a href="${url}">${displayText}</a>`;
+            }
+          } else {
+            return; // User cancelled
+          }
+          break;
+      }
+      
+      // Replace selection with formatted text
+      input.setRangeText(formattedText, start, end, "end");
+      
+      // Focus back on input and set cursor position
+      input.focus();
+      input.selectionStart = start + formattedText.length;
+      input.selectionEnd = start + formattedText.length;
+      
+      // Trigger input event to update send button state
+      const event = new Event("input", { bubbles: true });
+      input.dispatchEvent(event);
+      
+      // Hide toolbar
+      document.getElementById("formatToolbar").style.display = "none";
+    }
+
+    // ---------------- Message Sending ----------------
+    function checkForEnter(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        const sendButton = document.getElementById("sendButton");
+        if (!sendButton.disabled) {
+          sendMessage();
+        }
+      }
+    }
+    
+    function handleTyping() {
+      const input = document.getElementById("chatInput");
+      const sendButton = document.getElementById("sendButton");
+      
+      sendButton.disabled = input.value.trim() === "" && !pendingUploadUrl;
+      
+      // Show typing indicator (only in direct chats)
+      if (!currentChatIsGroup && currentChatId && currentUser) {
+        document.getElementById("typingIndicator").style.display = "flex";
+        
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+        }
+        
+        typingTimeout = setTimeout(() => {
+          document.getElementById("typingIndicator").style.display = "none";
+        }, 1500);
+      }
+    }
+    
+    async function sendMessage() {
+      if (!currentUser) {
+        showLoginPrompt("Please log in to send messages");
+        return;
+      }
+      
+      if (!currentChatId) {
+        alert("No chat selected");
+        return;
+      }
+      
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
-      if (text === "" && !pendingUploadUrl) return;
-      let message = {
+      
+      // Don't send empty messages unless there's a file
+      if (text === "" && !pendingUploadUrl) {
+        return;
+      }
+      
+      // Create message object
+      const message = {
         senderId: currentUser.uid,
         senderName: currentUser.displayName || "Anonymous",
         text: text,
         seen: false,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
+      
+      // Add reply info if exists
       if (replyTarget) {
-        message.replyTo = { ...replyTarget };
+        message.replyTo = {
+          msgId: replyTarget.msgId,
+          senderName: replyTarget.senderName,
+          msgText: replyTarget.msgText
+        };
       }
+      
+      // Add media if exists
       if (pendingUploadUrl) {
         if (pendingUploadIsImage) {
           message.imageUrl = pendingUploadUrl;
@@ -1127,77 +1296,132 @@
           message.fileUrl = pendingUploadUrl;
         }
       }
-      db.collection("chats").doc(currentChatId).collection("messages").add(message)
-        .then(() => {
-          input.value = "";
-          clearReply();
-          pendingUploadUrl = null;
-          pendingUploadIsImage = false;
-          document.getElementById("sendButton").disabled = true;
-        })
-        .catch(err => console.error("Error sending message:", err));
+      
+      try {
+        // Add message to Firestore
+        await db.collection("chats")
+          .doc(currentChatId)
+          .collection("messages")
+          .add(message);
+        
+        // Clear input and reset state
+        input.value = "";
+        clearReply();
+        pendingUploadUrl = null;
+        pendingUploadIsImage = false;
+        document.getElementById("sendButton").disabled = true;
+        
+        // Update last message in chat document
+        await db.collection("chats")
+          .doc(currentChatId)
+          .update({
+            lastMessage: text || (pendingUploadIsImage ? "Image" : "File"),
+            lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        
+        // Update last message in user's document if direct chat
+        if (!currentChatIsGroup) {
+          const otherUserId = currentChatId.replace(currentUser.uid, "").replace("_", "");
+          await db.collection("users")
+            .doc(otherUserId)
+            .update({
+              lastMessage: text || (pendingUploadIsImage ? "Image" : "File")
+            });
+        }
+        
+      } catch (error) {
+        console.error("Error sending message:", error);
+        alert("Could not send message. Please try again.");
+      }
     }
 
-    // -----------------------------------------------------------------------
-    // File Upload Logic
-    // -----------------------------------------------------------------------
+    // ---------------- File Upload ----------------
     function uploadFile(files) {
-      if (!isLoggedIn) {
-        alert("You must be logged in to upload files.");
+      if (!currentUser) {
+        showLoginPrompt("Please log in to upload files");
         return;
       }
+      
       if (!files || files.length === 0) return;
       const file = files[0];
-      if (!file) return;
-      isUploading = true;
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size too large. Maximum 5MB allowed.");
+        return;
+      }
+      
+      // Show upload indicator
+      const uploadButton = document.querySelector(".upload-button i");
+      uploadButton.classList.remove("fa-paperclip");
+      uploadButton.classList.add("fa-spinner", "fa-spin");
+      
+      // Upload file to Firebase Storage
       const storageRef = storage.ref();
-      const fileRef = storageRef.child("chat_uploads/" + Date.now() + "_" + file.name);
+      const fileRef = storageRef.child(`chat_uploads/${currentUser.uid}/${Date.now()}_${file.name}`);
+      
       fileRef.put(file)
         .then(snapshot => snapshot.ref.getDownloadURL())
         .then(url => {
-          isUploading = false;
-          const isImage = file.type.startsWith("image/");
+          // Set pending upload
           pendingUploadUrl = url;
-          pendingUploadIsImage = isImage;
-          alert("File uploaded. Press Send to include it in your message.");
+          pendingUploadIsImage = file.type.startsWith("image/");
+          
+          // Update UI
+          uploadButton.classList.remove("fa-spinner", "fa-spin");
+          uploadButton.classList.add("fa-check");
+          
+          // Enable send button if there's content
+          const sendButton = document.getElementById("sendButton");
+          sendButton.disabled = document.getElementById("chatInput").value.trim() === "" && !pendingUploadUrl;
+          
+          // Reset icon after delay
+          setTimeout(() => {
+            uploadButton.classList.remove("fa-check");
+            uploadButton.classList.add("fa-paperclip");
+          }, 2000);
         })
-        .catch(err => {
-          isUploading = false;
-          console.error("Error uploading file:", err);
+        .catch(error => {
+          console.error("Upload error:", error);
+          uploadButton.classList.remove("fa-spinner", "fa-spin");
+          uploadButton.classList.add("fa-paperclip");
+          alert("File upload failed. Please try again.");
         });
     }
 
-    // -----------------------------------------------------------------------
-    // Edit / Delete Message via Button (if not using context menu)
-    // -----------------------------------------------------------------------
-    function openEditMenu(e, msgId, oldText) {
-      e.stopPropagation();
-      const action = prompt("Type 'edit' to edit or 'delete' to delete this message.\n(Current text: " + oldText + ")");
-      if (!action) return;
-      if (action.toLowerCase() === "edit") {
-        const newText = prompt("Enter new text", oldText);
-        if (newText !== null) {
-          db.collection("chats").doc(currentChatId).collection("messages").doc(msgId).update({ text: newText })
-            .catch(err => console.error("Error editing message:", err));
-        }
-      } else if (action.toLowerCase() === "delete") {
-        if (confirm("Are you sure you want to delete this message?")) {
-          db.collection("chats").doc(currentChatId).collection("messages").doc(msgId).delete()
-            .catch(err => console.error("Error deleting message:", err));
-        }
-      }
+    // ---------------- Image Preview Modal ----------------
+    function openImageModal(url) {
+      const modal = document.getElementById("imageModal");
+      const img = document.getElementById("modalImage");
+      
+      img.onload = () => {
+        modal.classList.add("active");
+      };
+      
+      img.src = url;
+    }
+    
+    function closeImageModal(e) {
+      if (e) e.stopPropagation();
+      document.getElementById("imageModal").classList.remove("active");
     }
 
-    // -----------------------------------------------------------------------
-    // Clear Reply
-    // -----------------------------------------------------------------------
-    function clearReply() {
-      replyTarget = null;
-      document.getElementById("replyInfo").style.display = "none";
-    }
-    function scrollToMessage(msgId) {
-      alert("Scroll to message " + msgId + " (implementation pending).");
-    }
+    // ---------------- Initialize App ----------------
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeAuth();
+      
+      // Close format toolbar when clicking elsewhere
+      document.addEventListener("click", (e) => {
+        const toolbar = document.getElementById("formatToolbar");
+        const toggleBtn = document.getElementById("formatToggleBtn");
+        
+        if (toolbar.style.display === "block" && 
+            !toolbar.contains(e.target) && 
+            e.target !== toggleBtn) {
+          toolbar.style.display = "none";
+        }
+      });
+    });
   </script>
 </body>
 </html>
