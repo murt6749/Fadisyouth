@@ -248,17 +248,6 @@
     .send-button:disabled {
       background: #a0aec0; cursor: not-allowed; transform: none;
     }
-    .upload-button {
-      background: #2b6cb0; border: none; color: #fff;
-      width: 45px; height: 45px; border-radius: 50%;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; font-size: 1.2rem;
-      transition: transform 0.2s ease, background 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .upload-button:hover {
-      background: #2c5282; transform: scale(1.05);
-    }
     
     /* Reply Info above Input */
     .reply-info {
@@ -294,7 +283,7 @@
       30% { transform: translateY(-5px); }
     }
     
-    /* Context Menu */
+    /* Context Menu - Now on left side */
     .context-menu {
       position: fixed; background: #fff;
       border: 1px solid #e2e8f0; border-radius: 8px;
@@ -491,30 +480,28 @@
       </div>
       <div class="chat-input-container" id="chatInputContainer" style="display:none;">
         <!-- Hidden file input -->
-        <input type="file" id="fileInput" style="display:none;" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" onchange="uploadFile(this.files)" />
-        <button class="upload-button" onclick="document.getElementById('fileInput').click();">
-          <i class="fas fa-paperclip"></i>
-        </button>
+        <input type="file" id="fileInput" style="display:none;" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" />
         <!-- Formatting Toggle Button -->
         <div class="format-btn-container">
-          <button class="format-toggle" id="formatToggleBtn" onclick="toggleFormatToolbar(event)"><i class="fas fa-ellipsis-h"></i></button>
+          <button class="format-toggle" id="formatToggleBtn"><i class="fas fa-ellipsis-h"></i></button>
           <div class="format-toolbar" id="formatToolbar">
             <button onclick="applyFormat('bold')"><i class="fas fa-bold"></i></button>
             <button onclick="applyFormat('italic')"><i class="fas fa-italic"></i></button>
             <button onclick="applyFormat('underline')"><i class="fas fa-underline"></i></button>
             <button onclick="applyFormat('spoiler')"><i class="fas fa-eye-slash"></i></button>
             <button onclick="applyFormat('link')"><i class="fas fa-link"></i></button>
+            <button onclick="document.getElementById('fileInput').click()"><i class="fas fa-paperclip"></i></button>
           </div>
         </div>
-        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeydown="checkForEnter(event)" oninput="handleTyping()" />
-        <button class="send-button" id="sendButton" onclick="sendMessage()" disabled>
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." />
+        <button class="send-button" id="sendButton" disabled>
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Context Menu -->
+  <!-- Context Menu (now on left side) -->
   <div class="context-menu" id="contextMenu">
     <div class="context-menu-item" onclick="replyFromContextMenu()"><i class="fas fa-reply"></i> Reply</div>
     <div class="context-menu-item" onclick="editFromContextMenu()"><i class="fas fa-edit"></i> Edit</div>
@@ -635,6 +622,52 @@
     let contextMenuMessageId = null;
     let pendingUploadUrl = null;
     let pendingUploadIsImage = false;
+    let pendingMessages = {}; // Track pending messages for optimistic UI
+
+    // ---------------- DOM Event Listeners ----------------
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeAuth();
+      
+      // Initialize UI event listeners
+      document.getElementById('hamburgerBtn').addEventListener('click', toggleSidebar);
+      document.getElementById('searchInput').addEventListener('input', searchContacts);
+      
+      // Chat input events
+      const chatInput = document.getElementById('chatInput');
+      const sendButton = document.getElementById('sendButton');
+      
+      chatInput.addEventListener('input', handleTyping);
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (!sendButton.disabled) sendMessage();
+        }
+      });
+      sendButton.addEventListener('click', sendMessage);
+      
+      // Format toolbar toggle
+      const formatToggle = document.getElementById('formatToggleBtn');
+      formatToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFormatToolbar(e);
+      });
+      
+      // File input handler
+      document.getElementById('fileInput').addEventListener('change', (e) => {
+        uploadFile(e.target.files);
+        e.target.value = ''; // Reset input to allow same file to be selected again
+      });
+      
+      // Close format toolbar when clicking elsewhere
+      document.addEventListener('click', (e) => {
+        const toolbar = document.getElementById('formatToolbar');
+        if (toolbar.style.display === 'block' && 
+            !toolbar.contains(e.target) && 
+            e.target !== formatToggle) {
+          toolbar.style.display = 'none';
+        }
+      });
+    });
 
     // ---------------- Sidebar & Search ----------------
     function toggleSidebar() {
@@ -852,14 +885,16 @@
           // Skip if this is metadata-only change
           if (snapshot.metadata.hasPendingWrites) return;
           
-          // Clear message list if this is the first load
-          if (!messageList.hasChildNodes()) {
-            messageList.innerHTML = "";
-          }
-          
           snapshot.docChanges().forEach(change => {
             if (change.type === "added") {
-              addMessageToUI(change.doc);
+              // Check if this is a pending message we've already shown
+              if (pendingMessages[change.doc.id]) {
+                // Update the pending message with the actual Firestore data
+                updatePendingMessage(change.doc);
+                delete pendingMessages[change.doc.id];
+              } else {
+                addMessageToUI(change.doc);
+              }
             } else if (change.type === "modified") {
               updateMessageInUI(change.doc);
             } else if (change.type === "removed") {
@@ -924,6 +959,26 @@
       });
       
       messageList.appendChild(msgDiv);
+    }
+    
+    function updatePendingMessage(doc) {
+      const message = doc.data();
+      const msgElement = document.querySelector(`[data-temp-id="${doc.id}"]`);
+      
+      if (msgElement) {
+        // Update the temporary ID to the real Firestore ID
+        msgElement.setAttribute("data-doc-id", doc.id);
+        msgElement.removeAttribute("data-temp-id");
+        
+        // Update seen status if this is our message
+        if (currentUser && message.senderId === currentUser.uid) {
+          const tickStatus = msgElement.querySelector(".tick-status");
+          if (tickStatus) {
+            tickStatus.className = `tick-status ${message.seen ? "seen" : ""}`;
+            tickStatus.innerHTML = message.seen ? "✔✔" : "✔";
+          }
+        }
+      }
     }
     
     function updateMessageInUI(doc) {
@@ -1053,7 +1108,7 @@
       document.getElementById("replyInfo").style.display = "none";
     }
 
-    // ---------------- Context Menu Functions ----------------
+    // ---------------- Context Menu Functions (now on left side) ----------------
     function showContextMenu(e, msgId, message) {
       const menu = document.getElementById("contextMenu");
       menu.style.top = `${e.pageY}px`;
@@ -1220,17 +1275,7 @@
       document.getElementById("formatToolbar").style.display = "none";
     }
 
-    // ---------------- Message Sending ----------------
-    function checkForEnter(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        const sendButton = document.getElementById("sendButton");
-        if (!sendButton.disabled) {
-          sendMessage();
-        }
-      }
-    }
-    
+    // ---------------- Message Sending (Optimistic UI) ----------------
     function handleTyping() {
       const input = document.getElementById("chatInput");
       const sendButton = document.getElementById("sendButton");
@@ -1270,6 +1315,9 @@
         return;
       }
       
+      // Create temporary message ID for optimistic UI
+      const tempMessageId = `temp-${Date.now()}`;
+      
       // Create message object
       const message = {
         senderId: currentUser.uid,
@@ -1297,12 +1345,18 @@
         }
       }
       
+      // Optimistic UI - show message immediately
+      showOptimisticMessage(tempMessageId, message);
+      
       try {
         // Add message to Firestore
-        await db.collection("chats")
+        const docRef = await db.collection("chats")
           .doc(currentChatId)
           .collection("messages")
           .add(message);
+        
+        // Track this pending message
+        pendingMessages[docRef.id] = tempMessageId;
         
         // Clear input and reset state
         input.value = "";
@@ -1331,11 +1385,58 @@
         
       } catch (error) {
         console.error("Error sending message:", error);
+        
+        // Remove the optimistic message if sending failed
+        removeMessageFromUI(tempMessageId);
+        
         alert("Could not send message. Please try again.");
       }
     }
+    
+    function showOptimisticMessage(tempId, message) {
+      const messageList = document.getElementById("messageList");
+      
+      // Create message element
+      const msgDiv = document.createElement("div");
+      msgDiv.setAttribute("data-temp-id", tempId);
+      msgDiv.className = "message sent";
+      
+      // Build message HTML
+      let replyHtml = "";
+      if (message.replyTo) {
+        replyHtml = `
+          <div class="reply-info" onclick="scrollToMessage('${message.replyTo.msgId}')">
+            <span class="reply-to-text">${message.replyTo.senderName}:</span> 
+            ${truncateText(message.replyTo.msgText, 50)}
+          </div>
+        `;
+      }
+      
+      let mediaHtml = "";
+      if (message.imageUrl) {
+        mediaHtml = `<img class="message-image" src="${message.imageUrl}" onclick="openImageModal('${message.imageUrl}')" />`;
+      } else if (message.fileUrl) {
+        mediaHtml = `<a href="${message.fileUrl}" class="file-download" target="_blank">View File</a>`;
+      }
+      
+      // Format message text with HTML tags
+      let formattedText = message.text || "";
+      formattedText = formatMessageText(formattedText);
+      
+      msgDiv.innerHTML = `
+        <div class="sender-name">${message.senderName || "Anonymous"}</div>
+        ${replyHtml}
+        <div class="message-text">${formattedText}</div>
+        ${mediaHtml}
+        <div class="tick-status"><i class="fas fa-circle-notch fa-spin"></i></div>
+        <div class="edit-btn" onclick="editMessage('${tempId}', '${escapeHtml(message.text || "")}')"><i class="fas fa-edit"></i></div>
+      `;
+      
+      messageList.appendChild(msgDiv);
+      messageList.scrollTop = messageList.scrollHeight;
+    }
 
-    // ---------------- File Upload ----------------
+    // ---------------- File Upload (now in format toolbar) ----------------
     function uploadFile(files) {
       if (!currentUser) {
         showLoginPrompt("Please log in to upload files");
@@ -1351,10 +1452,11 @@
         return;
       }
       
-      // Show upload indicator
-      const uploadButton = document.querySelector(".upload-button i");
-      uploadButton.classList.remove("fa-paperclip");
-      uploadButton.classList.add("fa-spinner", "fa-spin");
+      // Show upload indicator in the format toolbar
+      const formatToolbar = document.getElementById("formatToolbar");
+      const fileUploadBtn = formatToolbar.querySelector("button:last-child i");
+      fileUploadBtn.classList.remove("fa-paperclip");
+      fileUploadBtn.classList.add("fa-spinner", "fa-spin");
       
       // Upload file to Firebase Storage
       const storageRef = storage.ref();
@@ -1368,23 +1470,33 @@
           pendingUploadIsImage = file.type.startsWith("image/");
           
           // Update UI
-          uploadButton.classList.remove("fa-spinner", "fa-spin");
-          uploadButton.classList.add("fa-check");
+          fileUploadBtn.classList.remove("fa-spinner", "fa-spin");
+          fileUploadBtn.classList.add("fa-check");
           
           // Enable send button if there's content
           const sendButton = document.getElementById("sendButton");
           sendButton.disabled = document.getElementById("chatInput").value.trim() === "" && !pendingUploadUrl;
           
+          // Show preview for images
+          if (pendingUploadIsImage) {
+            const input = document.getElementById("chatInput");
+            if (input.value.trim() === "") {
+              input.value = "[Image attached]";
+              input.dispatchEvent(new Event("input"));
+            }
+          }
+          
           // Reset icon after delay
           setTimeout(() => {
-            uploadButton.classList.remove("fa-check");
-            uploadButton.classList.add("fa-paperclip");
+            fileUploadBtn.classList.remove("fa-check");
+            fileUploadBtn.classList.add("fa-paperclip");
+            formatToolbar.style.display = "none";
           }, 2000);
         })
         .catch(error => {
           console.error("Upload error:", error);
-          uploadButton.classList.remove("fa-spinner", "fa-spin");
-          uploadButton.classList.add("fa-paperclip");
+          fileUploadBtn.classList.remove("fa-spinner", "fa-spin");
+          fileUploadBtn.classList.add("fa-paperclip");
           alert("File upload failed. Please try again.");
         });
     }
@@ -1405,23 +1517,6 @@
       if (e) e.stopPropagation();
       document.getElementById("imageModal").classList.remove("active");
     }
-
-    // ---------------- Initialize App ----------------
-    document.addEventListener("DOMContentLoaded", () => {
-      initializeAuth();
-      
-      // Close format toolbar when clicking elsewhere
-      document.addEventListener("click", (e) => {
-        const toolbar = document.getElementById("formatToolbar");
-        const toggleBtn = document.getElementById("formatToggleBtn");
-        
-        if (toolbar.style.display === "block" && 
-            !toolbar.contains(e.target) && 
-            e.target !== toggleBtn) {
-          toolbar.style.display = "none";
-        }
-      });
-    });
   </script>
 </body>
 </html>
