@@ -32,7 +32,7 @@
       border-radius: 10px; margin: 10px; background: #fff;
     }
     
-    /* Hamburger Menu */
+    /* Hamburger / Format Button Styles */
     .hamburger {
       position: absolute;
       top: 15px;
@@ -126,6 +126,11 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     .chat-header-info { flex: 1; text-align: center; }
+    .chat-header-actions { display: flex; gap: 15px; }
+    .chat-header-action {
+      color: #4a5568; cursor: pointer; transition: transform 0.2s ease;
+    }
+    .chat-header-action:hover { color: #2b6cb0; transform: scale(1.1); }
     .message-list {
       flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden;
     }
@@ -195,46 +200,21 @@
       color: #4a5568; cursor: pointer; opacity: 0; transition: opacity 0.2s ease;
     }
     .message:hover .edit-btn { opacity: 1; }
-    
-    /* Reaction styles */
-    .reaction-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 8px;
-    }
-    .reaction {
-      background: #ebf8ff;
-      border: 1px solid #bee3f8;
-      border-radius: 12px;
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
     .reaction-panel {
-      position: absolute;
-      bottom: 45px;
-      right: 10px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
-      padding: 5px 10px;
-      display: none;
-      z-index: 5;
+      position: absolute; bottom: 45px; right: 10px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;
+      padding: 5px 10px; display: none; z-index: 5;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      width: 240px;
-      flex-wrap: wrap;
-      gap: 5px;
     }
     .reaction-panel span {
-      cursor: pointer;
-      font-size: 1.2rem;
+      cursor: pointer; font-size: 1.2rem; margin: 0 5px;
       transition: transform 0.2s ease;
     }
-    .reaction-panel span:hover {
-      transform: scale(1.2);
+    .reaction-panel span:hover { transform: scale(1.2); }
+    .message-reaction {
+      position: absolute; bottom: -8px; right: 10px;
+      background: #fff; padding: 2px 6px; border-radius: 10px;
+      font-size: 0.7rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     /* Chat Input Area */
@@ -268,44 +248,16 @@
     .send-button:disabled {
       background: #a0aec0; cursor: not-allowed; transform: none;
     }
-    
-    /* Formatting Toolbar for Chat Input */
-    .format-toolbar {
-      position: absolute;
-      bottom: 65px;
-      right: 15px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+    .upload-button {
+      background: #2b6cb0; border: none; color: #fff;
+      width: 45px; height: 45px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem;
+      transition: transform 0.2s ease, background 0.2s ease;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: none;
-      z-index: 15;
-      padding: 5px;
     }
-    .format-toolbar button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      font-size: 1rem;
-      color: #4a5568;
-      transition: color 0.2s ease;
-    }
-    .format-toolbar button:hover {
-      color: #2b6cb0;
-    }
-    .format-btn-container {
-      position: relative;
-      display: flex;
-      gap: 5px;
-    }
-    .format-toggle {
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      color: #4a5568;
-      cursor: pointer;
-      margin-right: 10px;
+    .upload-button:hover {
+      background: #2c5282; transform: scale(1.05);
     }
     
     /* Reply Info above Input */
@@ -381,6 +333,43 @@
       color: #fff; font-size: 2rem; cursor: pointer;
     }
     
+    /* Formatting Toolbar for Chat Input */
+    .format-toolbar {
+      position: absolute;
+      bottom: 65px;
+      right: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 15;
+    }
+    .format-toolbar button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      font-size: 1rem;
+      color: #4a5568;
+      transition: color 0.2s ease;
+    }
+    .format-toolbar button:hover {
+      color: #2b6cb0;
+    }
+    .format-btn-container {
+      position: relative;
+    }
+    /* Three-dot button for formatting */
+    .format-toggle {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #4a5568;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    
     /* Login Prompt */
     .login-prompt {
       display: flex;
@@ -415,26 +404,20 @@
       .sidebar.active { right: 0; }
       .chat-window { height: 60vh; }
       .message { max-width: 85%; }
-      .reaction-panel {
-        width: 200px;
-        bottom: 55px;
-      }
     }
     @media (max-width: 480px) {
       .chat-header { padding: 10px; }
+      .chat-header-action { margin-left: 10px; }
       .message-list { padding: 10px; }
       .chat-input-container { padding: 8px 10px; }
       .message .message-image { max-width: 180px; }
-      .format-toolbar {
-        bottom: 55px;
-      }
     }
   </style>
 </head>
 <body>
   <!-- Main container -->
   <div class="chat-container">
-    <!-- Hamburger Menu Button -->
+    <!-- Hamburger / Format Toggle Button (now on right) -->
     <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
       <i class="fas fa-bars"></i>
     </button>
@@ -483,6 +466,11 @@
     <div class="chat-window" id="chatWindow">
       <div class="chat-header">
         <div class="chat-header-info" id="chatHeader">Select a Chat</div>
+        <div class="chat-header-actions" id="chatHeaderActions" style="display:none;">
+          <i class="fas fa-phone-alt chat-header-action" title="Voice Call"></i>
+          <i class="fas fa-video chat-header-action" title="Video Call"></i>
+          <i class="fas fa-info-circle chat-header-action" title="Chat Info"></i>
+        </div>
       </div>
       <div id="replyInfo" class="reply-info" style="display:none;"></div>
       <div class="message-list" id="messageList">
@@ -504,34 +492,20 @@
       <div class="chat-input-container" id="chatInputContainer" style="display:none;">
         <!-- Hidden file input -->
         <input type="file" id="fileInput" style="display:none;" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" onchange="uploadFile(this.files)" />
-        
-        <!-- Formatting Toggle Button with Upload -->
+        <button class="upload-button" onclick="document.getElementById('fileInput').click();">
+          <i class="fas fa-paperclip"></i>
+        </button>
+        <!-- Formatting Toggle Button -->
         <div class="format-btn-container">
-          <button class="format-toggle" id="formatToggleBtn" onclick="toggleFormatToolbar(event)">
-            <i class="fas fa-ellipsis-h"></i>
-          </button>
+          <button class="format-toggle" id="formatToggleBtn" onclick="toggleFormatToolbar(event)"><i class="fas fa-ellipsis-h"></i></button>
           <div class="format-toolbar" id="formatToolbar">
-            <button onclick="document.getElementById('fileInput').click();" title="Upload File">
-              <i class="fas fa-paperclip"></i>
-            </button>
-            <button onclick="applyFormat('bold')" title="Bold">
-              <i class="fas fa-bold"></i>
-            </button>
-            <button onclick="applyFormat('italic')" title="Italic">
-              <i class="fas fa-italic"></i>
-            </button>
-            <button onclick="applyFormat('underline')" title="Underline">
-              <i class="fas fa-underline"></i>
-            </button>
-            <button onclick="applyFormat('spoiler')" title="Spoiler">
-              <i class="fas fa-eye-slash"></i>
-            </button>
-            <button onclick="applyFormat('link')" title="Link">
-              <i class="fas fa-link"></i>
-            </button>
+            <button onclick="applyFormat('bold')"><i class="fas fa-bold"></i></button>
+            <button onclick="applyFormat('italic')"><i class="fas fa-italic"></i></button>
+            <button onclick="applyFormat('underline')"><i class="fas fa-underline"></i></button>
+            <button onclick="applyFormat('spoiler')"><i class="fas fa-eye-slash"></i></button>
+            <button onclick="applyFormat('link')"><i class="fas fa-link"></i></button>
           </div>
         </div>
-        
         <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeydown="checkForEnter(event)" oninput="handleTyping()" />
         <button class="send-button" id="sendButton" onclick="sendMessage()" disabled>
           <i class="fas fa-paper-plane"></i>
@@ -661,7 +635,6 @@
     let contextMenuMessageId = null;
     let pendingUploadUrl = null;
     let pendingUploadIsImage = false;
-    let userReactions = {}; // Track user reactions to messages
 
     // ---------------- Sidebar & Search ----------------
     function toggleSidebar() {
@@ -748,6 +721,7 @@
       
       // Update UI
       document.getElementById("chatHeader").textContent = displayName;
+      document.getElementById("chatHeaderActions").style.display = "flex";
       document.getElementById("chatInputContainer").style.display = "flex";
       document.getElementById("messageList").innerHTML = "";
       document.getElementById("replyInfo").style.display = "none";
@@ -798,6 +772,7 @@
       if (!currentUser) {
         // Not logged in - show group info but no input
         document.getElementById("chatHeader").textContent = `${groupName} (Login required)`;
+        document.getElementById("chatHeaderActions").style.display = "none";
         document.getElementById("chatInputContainer").style.display = "none";
         showLoginPrompt("Log in to participate in this group");
         subscribeToMessages(groupId);
@@ -839,6 +814,7 @@
           <small style="font-size:0.7rem;color:#718096;">${participants.length} members</small>
         `;
         
+        document.getElementById("chatHeaderActions").style.display = "flex";
         document.getElementById("chatInputContainer").style.display = "flex";
         
         // Subscribe to messages
@@ -876,7 +852,11 @@
           // Skip if this is metadata-only change
           if (snapshot.metadata.hasPendingWrites) return;
           
-          // Process each change
+          // Clear message list if this is the first load
+          if (!messageList.hasChildNodes()) {
+            messageList.innerHTML = "";
+          }
+          
           snapshot.docChanges().forEach(change => {
             if (change.type === "added") {
               addMessageToUI(change.doc);
@@ -927,50 +907,15 @@
       let formattedText = message.text || "";
       formattedText = formatMessageText(formattedText);
       
-      // Build reactions HTML
-      let reactionsHtml = "";
-      if (message.reactions && Object.keys(message.reactions).length > 0) {
-        reactionsHtml = `<div class="reaction-container">`;
-        
-        // Count reactions by emoji
-        const reactionCounts = {};
-        Object.values(message.reactions).forEach(reaction => {
-          reactionCounts[reaction.emoji] = (reactionCounts[reaction.emoji] || 0) + 1;
-        });
-        
-        // Display each reaction with count
-        Object.entries(reactionCounts).forEach(([emoji, count]) => {
-          reactionsHtml += `
-            <div class="reaction" onclick="handleReaction('${doc.id}', '${emoji}')">
-              ${emoji} ${count}
-            </div>
-          `;
-        });
-        
-        reactionsHtml += `</div>`;
-      }
-      
       msgDiv.innerHTML = `
         <div class="sender-name">${message.senderName || "Guest"}</div>
         ${replyHtml}
         <div class="message-text">${formattedText}</div>
         ${mediaHtml}
-        ${reactionsHtml}
         ${isSentByMe ? `<div class="tick-status ${message.seen ? "seen" : ""}">${message.seen ? "✔✔" : "✔"}</div>` : ""}
         ${!isSentByMe ? `<div class="reply-btn" onclick="replyToMessage('${doc.id}', '${message.senderName}', '${escapeHtml(message.text || "")}')"><i class="fas fa-reply"></i></div>` : ""}
         ${isSentByMe ? `<div class="edit-btn" onclick="editMessage('${doc.id}', '${escapeHtml(message.text || "")}')"><i class="fas fa-edit"></i></div>` : ""}
       `;
-      
-      // Add click handler for reactions
-      msgDiv.addEventListener("click", (e) => {
-        // Only show reaction panel if clicking on message content (not on buttons or links)
-        if (e.target.tagName !== 'A' && e.target.tagName !== 'I' && 
-            !e.target.classList.contains('reply-btn') && 
-            !e.target.classList.contains('edit-btn') &&
-            !e.target.classList.contains('reaction')) {
-          showReactionPanel(e, doc.id);
-        }
-      });
       
       // Add context menu for right-click
       msgDiv.addEventListener("contextmenu", (e) => {
@@ -1001,38 +946,6 @@
           if (textElement) {
             textElement.innerHTML = formatMessageText(message.text);
           }
-        }
-        
-        // Update reactions
-        if (message.reactions) {
-          let reactionsHtml = `<div class="reaction-container">`;
-          
-          // Count reactions by emoji
-          const reactionCounts = {};
-          Object.values(message.reactions).forEach(reaction => {
-            reactionCounts[reaction.emoji] = (reactionCounts[reaction.emoji] || 0) + 1;
-          });
-          
-          // Display each reaction with count
-          Object.entries(reactionCounts).forEach(([emoji, count]) => {
-            reactionsHtml += `
-              <div class="reaction" onclick="handleReaction('${doc.id}', '${emoji}')">
-                ${emoji} ${count}
-              </div>
-            `;
-          });
-          
-          reactionsHtml += `</div>`;
-          
-          // Find or create reaction container
-          let reactionContainer = msgElement.querySelector(".reaction-container");
-          if (!reactionContainer) {
-            reactionContainer = document.createElement("div");
-            reactionContainer.className = "reaction-container";
-            msgElement.appendChild(reactionContainer);
-          }
-          
-          reactionContainer.innerHTML = reactionsHtml;
         }
       }
     }
@@ -1140,87 +1053,8 @@
       document.getElementById("replyInfo").style.display = "none";
     }
 
-    // ---------------- Reactions ----------------
-    function showReactionPanel(e, messageId) {
-      if (!currentUser) return;
-      
-      const panel = document.getElementById("reactionPanel");
-      if (panel) {
-        panel.remove();
-      }
-      
-      // Create reaction panel
-      const reactionPanel = document.createElement("div");
-      reactionPanel.id = "reactionPanel";
-      reactionPanel.className = "reaction-panel";
-      reactionPanel.style.display = "flex";
-      reactionPanel.style.left = `${e.pageX - 100}px`;
-      reactionPanel.style.top = `${e.pageY - 60}px`;
-      
-      // Add emoji reactions
-      const emojis = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "🎉"];
-      emojis.forEach(emoji => {
-        const emojiSpan = document.createElement("span");
-        emojiSpan.textContent = emoji;
-        emojiSpan.onclick = () => {
-          handleReaction(messageId, emoji);
-          reactionPanel.style.display = "none";
-        };
-        reactionPanel.appendChild(emojiSpan);
-      });
-      
-      document.body.appendChild(reactionPanel);
-      
-      // Close panel when clicking elsewhere
-      const closePanel = (event) => {
-        if (!reactionPanel.contains(event.target)) {
-          reactionPanel.style.display = "none";
-          document.removeEventListener("click", closePanel);
-        }
-      };
-      
-      document.addEventListener("click", closePanel);
-    }
-    
-    async function handleReaction(messageId, emoji) {
-      if (!currentUser || !currentChatId) return;
-      
-      const messageRef = db.collection("chats")
-        .doc(currentChatId)
-        .collection("messages")
-        .doc(messageId);
-      
-      try {
-        const messageDoc = await messageRef.get();
-        const messageData = messageDoc.data();
-        const reactions = messageData.reactions || {};
-        const reactionKey = `${currentUser.uid}_${emoji}`;
-        
-        // Check if user already reacted with this emoji
-        if (reactions[reactionKey]) {
-          // Remove reaction
-          await messageRef.update({
-            [`reactions.${reactionKey}`]: firebase.firestore.FieldValue.delete()
-          });
-        } else {
-          // Add reaction
-          await messageRef.update({
-            [`reactions.${reactionKey}`]: {
-              emoji: emoji,
-              userId: currentUser.uid,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }
-          });
-        }
-      } catch (error) {
-        console.error("Error handling reaction:", error);
-      }
-    }
-
     // ---------------- Context Menu Functions ----------------
     function showContextMenu(e, msgId, message) {
-      if (!currentUser) return;
-      
       const menu = document.getElementById("contextMenu");
       menu.style.top = `${e.pageY}px`;
       menu.style.left = `${e.pageX}px`;
@@ -1228,18 +1062,6 @@
       
       contextMenuMessageId = msgId;
       window.currentContextMessage = message;
-      
-      // Hide edit/delete options if not the sender
-      const editItem = menu.querySelector(".context-menu-item:nth-child(2)");
-      const deleteItem = menu.querySelector(".context-menu-item:nth-child(3)");
-      
-      if (message.senderId !== currentUser.uid) {
-        editItem.style.display = "none";
-        deleteItem.style.display = "none";
-      } else {
-        editItem.style.display = "block";
-        deleteItem.style.display = "block";
-      }
       
       // Hide menu when clicking elsewhere
       const hideMenu = () => {
@@ -1338,7 +1160,7 @@
       // Close toolbar when clicking elsewhere
       if (toolbar.style.display === "block") {
         const closeToolbar = (event) => {
-          if (!toolbar.contains(event.target) {
+          if (!toolbar.contains(event.target) && event.target !== document.getElementById("formatToggleBtn")) {
             toolbar.style.display = "none";
             document.removeEventListener("click", closeToolbar);
           }
@@ -1530,8 +1352,8 @@
       }
       
       // Show upload indicator
-      const uploadButton = document.querySelector(".format-toggle i");
-      uploadButton.classList.remove("fa-ellipsis-h");
+      const uploadButton = document.querySelector(".upload-button i");
+      uploadButton.classList.remove("fa-paperclip");
       uploadButton.classList.add("fa-spinner", "fa-spin");
       
       // Upload file to Firebase Storage
@@ -1556,13 +1378,13 @@
           // Reset icon after delay
           setTimeout(() => {
             uploadButton.classList.remove("fa-check");
-            uploadButton.classList.add("fa-ellipsis-h");
+            uploadButton.classList.add("fa-paperclip");
           }, 2000);
         })
         .catch(error => {
           console.error("Upload error:", error);
           uploadButton.classList.remove("fa-spinner", "fa-spin");
-          uploadButton.classList.add("fa-ellipsis-h");
+          uploadButton.classList.add("fa-paperclip");
           alert("File upload failed. Please try again.");
         });
     }
